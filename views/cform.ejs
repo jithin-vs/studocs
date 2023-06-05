@@ -33,7 +33,7 @@
     </nav>
 
   <div class="form" >
-    <form id="thisform" action="/cform" enctype ="multipart/form-data" method="POST">
+    <form id="thisform" action='/cform/<%= name%>' enctype ="multipart/form-data" method="POST">
       <div class="alert text-center" id="message" style="transition: opacity 1s;">
         <!-- Error message will be displayed here -->
       </div>
