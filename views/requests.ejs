@@ -46,13 +46,13 @@
               </tr>
             </thead>
           <tbody>
-          <% applications.forEach(function(application) { %>
+            <% for (let i = 0; i < forms.length; i++) { %>
               <tr>
-                <td data-toggle="m" data-target="#myMo"><%= application.form_id %></td>
-                <td data-toggle="m" data-target="#myM"><%= application.name %></td>
-                <td data-toggle="m" data-target="#my"><%= application.attachment %></td>
+                <td><%= forms[i].formid %></td>
+                <td><%= forms[i].name %></td>
+                <td><%= forms[i].date %></td>
               </tr>
-          <% }); %>
+            <% } %>
           </tbody>
           </table>
         </div>
@@ -64,6 +64,7 @@
         </div>
         <div class="col-sm-6 panel">
           <!-- Existing code for the panel -->
+
         </div>
         <div class="arrow-right">
           <i class="fa fa-arrow-circle-right fa-3x" ></i>

@@ -11,7 +11,7 @@ const mysqlStore = require('express-mysql-session')(session);
 const encoder =bodyParser.urlencoded({extended:true});
 require('dotenv').config();
 
-// Create an instance of the Express app
+// Create an instance of the Express app  
 const app = express();
 app.set('view engine','ejs');  
  

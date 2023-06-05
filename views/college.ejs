@@ -5,21 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>STUDOCS</title>
-  <link href="assets/img/logo.png" rel="icon">
+  <link href="/assets/img/logo.png" rel="icon">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
   <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
 
-   <link href="./css/c11.css" rel="stylesheet">
+   <link href="/css/c11.css" rel="stylesheet">
 
 </head>
 <body>
   <header>
     <nav class="navbar navbar-expand-sm navbar-dark">
       <a class="navbar-brand logo" href="#">
-        <img src="./assets/img/logo.png" alt="Studocs">
+        <img src="/assets/img/logo.png" alt="Studocs">
         STUDOCS
       </a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
@@ -55,17 +55,17 @@
   </header>
     
     <div class="container">
-      <img class="responsive-img" src="./assets/img/image-1.png" alt="Responsive Photo">
+      <img class="responsive-img" src="/assets/img/image-1.png" alt="Responsive Photo">
         <div class="row dp">
           <div class="col-lg-12 address">
             <br>
              <b> 
-              COLLEGE NAME&emsp;:<%= Name  %><br>
-              COLLEGE ID&emsp;&emsp;&emsp;:<%= Id %><br>
-              EMAIL&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;:<%= Email  %><br>
-              WEBSITE&emsp;&emsp;&nbsp;&emsp;&emsp;&nbsp;:<%= Website%><br>
-              ADDRESS&emsp;&emsp;&emsp;&nbsp;&emsp;:<%= Address %><br>
-              PHONE NO&emsp;&nbsp;&nbsp;&emsp;&nbsp;&emsp;:<%= Mobile %> <br>
+              COLLEGE NAME&emsp;:<%= collegeData.Name  %><br>
+              COLLEGE ID&emsp;&emsp;&emsp;:<%= collegeData.Id %><br>
+              EMAIL&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;:<%= collegeData.Email  %><br>
+              WEBSITE&emsp;&emsp;&nbsp;&emsp;&emsp;&nbsp;:<%= collegeData.Website%><br>
+              ADDRESS&emsp;&emsp;&emsp;&nbsp;&emsp;:<%= collegeData.Addr %><br>
+              PHONE NO&emsp;&nbsp;&nbsp;&emsp;&nbsp;&emsp;:<%= collegeData.Mobile %> <br>
             </b>
             <div class="edit ">
               Edit
@@ -93,7 +93,7 @@
         <tbody>
         <% applications.forEach(function(application) { %>
             <tr>
-              <td data-toggle="mod" data-target="#myMod"><%= application.form_id %></td>
+              <td data-toggle="mod" data-target="#myMod"><%= application.formid %></td>
               <td data-toggle="moda" data-target="#myModa"><%= application.name %></td>
               <td data-toggle="moda" data-target="#myModa"><%= applicant.name %></td>
               <td data-toggle="mo" data-target="#myMo"><%= application.date %></td>
@@ -116,10 +116,10 @@
     <div Class="service">
     
       <br>
-      <input type="button" class="button1 col-sm-3" value="PENDING REQUESTS">&nbsp;&nbsp;
-      <input type="button" class="button1 col-sm-3" onclick="window.location.href='verified_request.html'" value="VERIFIED REQUESTS">&nbsp;&nbsp;
-      <input type="button" class="button1 col-sm-3"  onclick="window.location.href='/principaladd?id=<%= Id %>'" value="PRINCIPAL">&nbsp;&nbsp;
-      <input type="button" class="button1 col-sm-3"  value="Forms">&nbsp;&nbsp;
+      <input type="button" class="button1 col-sm-3"  onclick="window.location.href='/pending-requests'" value="PENDING REQUESTS">&nbsp;&nbsp;
+      <input type="button" class="button1 col-sm-3"  onclick="window.location.href='/verified_request'" value="VERIFIED REQUESTS">&nbsp;&nbsp;
+      <input type="button" class="button1 col-sm-3"  onclick="window.location.href='/principaladd?id=<%= collegeData.Id %>'" value="PRINCIPAL">&nbsp;&nbsp;
+      <input type="button" class="button1 col-sm-3"  onclick="window.location.href='/addtemplate'" value="Forms">&nbsp;&nbsp;
     
     </div>
     </div>
