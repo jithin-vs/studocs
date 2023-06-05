@@ -5,7 +5,7 @@ const path=require('path');
 
 var routes =function(app,isAuth,encoder){     
 
-   
+///sdjaskjdhasjd
    
    
     app.get('/', (req, res) => {
@@ -459,7 +459,7 @@ var routes =function(app,isAuth,encoder){
          
      });
   
-     app.post('/tutoradd',encoder,(req,res)=>{
+  app.post('/tutoradd',encoder,(req,res)=>{
          var hodid=req.params.id;
           var {name,id,batch,email}=req.body;
           let Collegeid='1';
