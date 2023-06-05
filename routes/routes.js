@@ -58,16 +58,17 @@ var routes =function(app,isAuth,encoder){
     /*------register forms-------*/   
 
       //colllge form
-      app.post('/cform',(req, res) => {
+      app.post('/cform/:name',encoder,(req, res) => {
         console.log(req.body);
+        var name=req.params.name;
         var {collegename,collegeid,university,address,mobile,email,website,logo,image,username,password}=req.body;
         var { logo,image } = req.files;
-        console.log(image);
-        const photoName = `${username}_photo${path.extname(image.name)}`;
-        const logoName = `${username}_logo${path.extname(logo.name)}`;
-   
-        let photoPath = path.join('./public/uploads/college', username, photoName);
-        let logoPath = path.join('./public/uploads/college', username, logoName);
+        console.log(name);
+        const photoName = `${name}_photo${path.extname(image.name)}`;
+        const logoName = `${name}_logo${path.extname(logo.name)}`;
+        console.log(photoName)
+        let photoPath = path.join('./public/uploads/college', name, photoName);
+        let logoPath = path.join('./public/uploads/college',  name, logoName);
           
           if(!logo) {
               return res.status(400). send('please upload college logo. .');
@@ -76,7 +77,7 @@ var routes =function(app,isAuth,encoder){
             return res.status(400). send('please upload college image. .');
           }
           console.log(logo);
-          photo.mv(photoPath,function(err){
+          image.mv(photoPath,function(err){
             if(err) throw err;
             else { 
               console.log('upload successful');
@@ -91,15 +92,15 @@ var routes =function(app,isAuth,encoder){
             logoPath = logoPath.replace('public', '');
            }   
         })
-          db.connection.query("update ?? set username=?,password=?,collegename=?,university=?,address=?,phno=?,email=?,collegelogo=?,collegeimage=?,website=? where collegeid=?"
-      ,[req.query.user,username,password,collegename,university,address,mobile,email,logoPath,photoPath,website,collegeid],
+          db.connection.query("update college set password=?,collegename=?,university=?,address=?,phno=?,email=?,collegelogo=?,collegeimage=?,website=? where username=?"
+      ,[,password,collegename,university,address,mobile,email,logoPath,photoPath,website,name],
       (err,results,fields)=>{  
             if(err){
                res.send("server error");
                throw err;
             } 
             else{ 
-              res.render('/innerpage');
+              res.redirect('/inner-page');
             } 
     
        });  
@@ -412,35 +413,69 @@ var routes =function(app,isAuth,encoder){
     //Office
 
      app.get('/college/:name',isAuth,(req, res) => {
-      console.log(req.params.name);
       if(req.session.user){
-        try{
-          db.connection.query("select * from principal where username=?",
-          [req.params.name],(err,results,fields)=>{
-           if(err) {
-             throw err;
-             
-           }
-           else{
-              console.log(results);
-              var Name=results[0].collegename;
-              var Id=results[0].collegeid;  
-              var Email=results[0].email;
-              var Website=results[0].webiste;
-              var Address=results[0].address;
-              var Mobile=results[0].phno;  
-              var Photo=results[0].collegeimage;
-              res.render('Principal',{Name,Id,Mobile,Website,Address,Email,Photo})
-           }
-         }); 
-        }catch(err)
-        {
+        try {
+          const query1 = new Promise((resolve, reject) => {
+            db.connection.query("select * from requests", (err, results, fields) => {
+              if (err) {
+                reject(err);
+              } else {
+                resolve(results);
+              }
+            }); 
+          });
+        
+          const query2 = new Promise((resolve, reject) => {
+            var username=req.params.name;
+            console.log(username);
+            db.connection.query("select collegename,collegeid,phno,address,email,collegeimage,website from college where username=?",[username],(err,results,fields)=>{
+            if(err) {
+                        reject(err);      
+              }
+              else{ 
+                console.log(results);
+                const { name, id, phno, address, email, photo,website } = results[0];
+                var data = { Name: name, Id: id, Phno: phno, Addr: address, Email: email, Photo: photo, Website:website};
+                
+                  // Check and handle the undefined values
+                  const name1 = data.Name || 'N/A';
+                  const id1 = data.Id || 'N/A';
+                  const phno1 = data.Phno || 'N/A';
+                  const addr1 = data.Addr || 'N/A';
+                  const email1 = data.Email || 'N/A';
+                  const photo1 = data.Photo || 'N/A';
+                  const website1 = data.Website || 'N/A';
+
+                  // Now you can use these variables in your code
+                  console.log(name1);
+                  console.log(id1);
+                  console.log(phno1);
+                  console.log(addr1);
+                  console.log(email1);
+                  console.log(photo1);
+                  console.log(website1);
+                   data = { Name: name1, Id: id1, Phno: phno1, Addr: addr1, Email: email1, Photo: photo1, Website:website1};
+
+                resolve(data);
+                
+              }
+            }); 
+
+          });
+          Promise.all([query1, query2])
+          .then(([requests, collegeData]) => {
+            //console.log(tutorData.Photo);
+            console.log(collegeData);
+            res.render('college', { applications:requests,collegeData });
+          })
+          .catch((err) => { 
             console.log(err);
             res.send('server error');
+          });
+        }catch(err){
+            console.log(err); 
         }
-    
-      }
-      else{
+      }else{
         res.send('unauthorized user');
       }
     
@@ -506,7 +541,7 @@ var routes =function(app,isAuth,encoder){
      });
      
     
-     //add new HOD
+     //add new HOD  
   
  app.get('/hodadd',(req,res)=>{
             
@@ -523,7 +558,7 @@ var routes =function(app,isAuth,encoder){
          
      });
      
-      app.post('/hodadd',encoder,(req,res)=>{
+  app.post('/hodadd',encoder,(req,res)=>{
     
         var {name,id,dept,email}=req.body;
         let Collegeid='1';    
@@ -801,7 +836,6 @@ var routes =function(app,isAuth,encoder){
                                   try{
                                           if(results[0].phno===null){
                                               res.redirect(`/cform/${username}`);
-                                              console.log('hello');
                                           }
                                           else{
                                                 res.redirect(`/college/${username}`);
@@ -838,7 +872,7 @@ var routes =function(app,isAuth,encoder){
           }
         }); 
        })
-  
+    
      //logout
       app.get('/logout',(req,res)=>{
         req.session.destroy(function(err){  
