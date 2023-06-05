@@ -9,7 +9,7 @@ var routes =function(app,isAuth,encoder){
    
    
     app.get('/', (req, res) => {
-        res.render('index');
+        res.render('index');    
         
       });
       app.get('/home', (req, res) => {
