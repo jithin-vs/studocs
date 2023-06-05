@@ -22,7 +22,7 @@ var sessionstore =new mysqlStore({
   createDatabaseTable: true,
   schema:{
      tableName:'Sessions',
-     columnNames:{
+     columnNames:{ 
         session_id:'session id',
         expires:'expires',
         data:'data'

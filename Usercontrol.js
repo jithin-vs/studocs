@@ -22,7 +22,7 @@ const encoder =bodyParser.urlencoded({extended:false});
 
   app.get('/', (req, res) => { 
     
-    res.redirect('/addtemplate'); 
+    res.redirect(`/status?name=5`); 
     
   });
     // ADDING TEMPLATE 
@@ -32,12 +32,50 @@ const encoder =bodyParser.urlencoded({extended:false});
       res.render('addtemplate',{applications:results});
     });
 
-       // ADDING FORM 
-       app.get('/addnewform',(req,res)=>{         
-         
-        var results=[];
-        res.render('addnewform',{applications:results});
+    // ADDING FORM 
+    app.get('/addnewform',(req,res)=>{         
+      
+    var results=[];
+    res.render('addnewform',{applications:results});
       });
+
+    //SAVING TEMPLATE
+    app.post('/save-template',(req,res)=>{   
+     var name=req.query.name; 
+     //console.log(name);
+     var collegeid='98765432';
+     var divContent = req.body.content; 
+    //  console.log(divContent);
+      db.connection.query("insert into forms(name,collegeid,formdata)values(?,?,?)",
+        [name,collegeid,divContent],(err,results,fields)=>{
+         if(err) {
+           throw err; 
+         } 
+         else{
+
+          res.redirect(`/status?name=${name}`);
+         }
+        });
+  
+    });
+   app.get('/status',(req,res)=>{
+      try{
+        db.connection.query("select formdata from forms where formid=?",
+      [req.query.name],(err,results,fields)=>{
+      if(err) {
+        throw err; 
+      } 
+      else{
+        const formdata = results.length ? results[0].formdata : null;
+        const applications = []; // Empty array, can be populated later if needed
+        res.render('status', { formdata, applications });
+      }
+      });
+      }catch(err){
+        console.log(err);
+      }
+
+   })
   app.get('/Principal',(req, res) => {
     console.log(req.params.name);
       /*try{
@@ -177,7 +215,7 @@ const encoder =bodyParser.urlencoded({extended:false});
     
       });  
     /* -------- other control routes */   
-    app.post('/deleteuser/:id',encoder,(req,res)=>{ 
+    app.post('/deleteuser/:id',encoder,(req,res)=>{   
       console.log(req.params.id);     
       db.connection.query("delete from ?? where id=?",[req.params.user,req.params.id],(err,results,fields)=>{
         if(err) {

@@ -120,7 +120,7 @@ h6 {
 #header {
   transition: all 0.5s;
   z-index: 997;
-  padding: 15px;
+  padding: 15px 0;
   
 }
 
@@ -148,7 +148,7 @@ h6 {
   color: #fff;
 }
 
-#header .logo img{
+#header .logo img {
   max-height: 40px;
 }
 
@@ -161,9 +161,8 @@ h6 {
 */
 .navbar {
   padding: 0;
-  margin-left: 100px;
-  position: relative;
-  
+  position: absolute;
+  right: 50px;
 }
 
 
@@ -320,7 +319,7 @@ h6 {
 }
 
 .navbar-mobile {
- 
+  position: fixed;
   overflow: hidden;
   top: 0;
   right: 0;

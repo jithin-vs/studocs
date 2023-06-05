@@ -67,7 +67,9 @@
   overflow-y:auto;
   height: 500px;
   border: 2px solid ;
-  overflow-x: auto;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
   width: auto;
  }
  .panel2{
