@@ -300,11 +300,13 @@ var routes =function(app,isAuth,encoder){
           });
         
           const query2 = new Promise((resolve, reject) => {
-            db.connection.query("select name,id,phno,department,address,email,photo from tutor where username=?",[req.params.name],(err,results,fields)=>{
+            var username=req.params.name;
+            console.log(username);
+            db.connection.query("select name,id,phno,department,address,email,photo from hod where username=?",[username],(err,results,fields)=>{
             if(err) {
                         reject(err);      
               }
-              else{
+              else{ 
                 console.log(results);
                 const { name, id, phno, department, address, email, photo } = results[0];
                 const data = { Name: name, Id: id, Phno: phno, Dept: department, Addr: address, Email: email, Photo: photo };
@@ -317,7 +319,7 @@ var routes =function(app,isAuth,encoder){
           Promise.all([query1, query2])
           .then(([requests, tutorData]) => {
             console.log(tutorData.Photo);
-            res.render('Staffadvisor', { tutorData, applications: requests });
+            res.render('hod', { tutorData, applications: requests });
           })
           .catch((err) => {
             console.log(err);
@@ -752,7 +754,7 @@ var routes =function(app,isAuth,encoder){
                                               res.redirect(`/tform/${username}`);
                                           }
                                           else{
-                                                res.redirect(`/staffadvisor?username=${username}&user='tutor`);
+                                                res.redirect(`/staffadvisor/${username}`);
                                           }
                                       
                                     }catch{

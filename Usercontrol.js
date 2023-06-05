@@ -22,7 +22,7 @@ const encoder =bodyParser.urlencoded({extended:false});
 
   app.get('/', (req, res) => { 
     
-    res.redirect(`/status?name=5`); 
+    res.redirect(`/requests`); 
     
   });
     // ADDING TEMPLATE 
@@ -76,8 +76,26 @@ const encoder =bodyParser.urlencoded({extended:false});
       }
 
    })
+   app.get('/requests',(req,res)=>{
+    try{
+      db.connection.query("select name,formid,formdata from forms ",
+    [req.query.name],(err,results,fields)=>{ 
+    if(err) {
+      throw err; 
+    } 
+    else{
+      const formdata = results.length ? results[0].formdata : null;
+      const forms = results; // Empty array, can be populated later if needed
+      res.render('requests', { forms });
+    }
+    });
+    }catch(err){
+      console.log(err);
+    }
+
+ })
   app.get('/Principal',(req, res) => {
-    console.log(req.params.name);
+    console.log(req.params.name); 
       /*try{
         db.connection.query("select * from principal where username=?",
         [req.params.name],(err,results,fields)=>{

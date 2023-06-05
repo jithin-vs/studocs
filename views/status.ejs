@@ -8,8 +8,8 @@
   <link href="/assets/img/logo.png" rel="icon">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
   <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'>
-  <link rel="stylesheet" href="./css/status.css">
-  <link rel="stylesheet" href="./css/form.css">
+  <link rel="stylesheet" href="/css/status.css">
+  <link rel="stylesheet" href="/css/form.css">
 </head>
 
 <body>
@@ -50,7 +50,7 @@
             <tbody>
             <% applications.forEach(function(application) { %>
                 <tr>
-                  <td data-toggle="mod" data-target="#myMod"><%= application.form_id %></td>
+                  <td data-toggle="mod" data-target="#myMod"><%= application.formid %></td>
                   <td data-toggle="moda" data-target="#myModa"><%= application.name %></td>
                   <td data-toggle="mo" data-target="#myMo"><%= application.date %></td>
                 </tr>
