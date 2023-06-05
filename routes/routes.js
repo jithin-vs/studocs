@@ -50,16 +50,20 @@ var routes =function(app,isAuth,encoder){
       app.get('/cform/:name', (req, res) => {
         res.render('cform',{name:req.params.name});
       });
+      app.get('/pform/:name', (req, res) => {
+        res.render('pform',{name:req.params.name});
+      });
       
         
     /*------register forms-------*/   
 
       //colllge form
-      app.post('/cform',encoder,(req, res) => {
+      app.post('/cform',(req, res) => {
         console.log(req.body);
         var {collegename,collegeid,university,address,mobile,email,website,logo,image,username,password}=req.body;
-        var { photo,logo } = req.files;
-        const photoName = `${username}_photo${path.extname(photo.name)}`;
+        var { logo,image } = req.files;
+        console.log(image);
+        const photoName = `${username}_photo${path.extname(image.name)}`;
         const logoName = `${username}_logo${path.extname(logo.name)}`;
    
         let photoPath = path.join('./public/uploads/college', username, photoName);
@@ -725,7 +729,7 @@ var routes =function(app,isAuth,encoder){
                 req.session.isAuth=true;  
                 req.session.user =username;
                 console.log(req.session.id);
-                switch(user) {
+                switch(user) { 
           
                   case 'Student':   
                                       try{ 
@@ -752,7 +756,7 @@ var routes =function(app,isAuth,encoder){
                                               res.redirect(`/tform/${username}`);
                                           }
                                           else{
-                                                res.redirect(`/staffadvisor?username=${username}&user='tutor`);
+                                                res.redirect(`/staffadvisor/${username}`);
                                           }
                                       
                                     }catch{
