@@ -5,7 +5,7 @@ const path=require('path');
 
 var routes =function(app,isAuth,encoder){     
 
-   //aswassdssd
+   
    
    
     app.get('/', (req, res) => {
