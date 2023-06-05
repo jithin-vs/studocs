@@ -45,10 +45,10 @@ var routes =function(app,isAuth,encoder){
         res.render('tform',{user:req.query.user});  
       }); 
       app.get('/sform/:name',isAuth,(req, res) => {
-        res.render('sform');  
+        res.render('sform',{name:req.params.name});  
       }); 
       app.get('/cform/:name', (req, res) => {
-        res.render('cform');
+        res.render('cform',{name:req.params.name});
       });
       
         
@@ -56,9 +56,14 @@ var routes =function(app,isAuth,encoder){
 
       //colllge form
       app.post('/cform',encoder,(req, res) => {
-        var {collegename,collegeid,university,addresss,mobile,email,website,logo,image,username,password,repassword}=req.body;
-          let filePathlogo= "./public/uploads/college/"+Date.now()+logo.name;
-          let filePathimg=  "./public/uploads/college/"+Date.now()+image.name ;
+        console.log(req.body);
+        var {collegename,collegeid,university,address,mobile,email,website,logo,image,username,password}=req.body;
+        var { photo,logo } = req.files;
+        const photoName = `${username}_photo${path.extname(photo.name)}`;
+        const logoName = `${username}_logo${path.extname(logo.name)}`;
+   
+        let photoPath = path.join('./public/uploads/college', username, photoName);
+        let logoPath = path.join('./public/uploads/college', username, logoName);
           
           if(!logo) {
               return res.status(400). send('please upload college logo. .');
@@ -67,21 +72,30 @@ var routes =function(app,isAuth,encoder){
             return res.status(400). send('please upload college image. .');
           }
           console.log(logo);
-          logo.mv(filePathlogo,function(err){
-              if(err) throw err;
-          })
-          image.mv(filePathimg,function(err){
+          photo.mv(photoPath,function(err){
             if(err) throw err;
-          })
-          db.connection.query("INSERT INTO college VALUES (?,?,?,?,?,?,?,?,?,?,?) ",
-          [username,password,collegeid,collegename,university,addresss,mobile,email,filePathlogo,filePathimg,website],
-          (err,results,fields)=>{
+            else { 
+              console.log('upload successful');
+              photoPath = photoPath.replace('public', '');
+            }
+          })   
+        logo.mv(logoPath,function(err){
+           if(err)
+              throw err;
+           else { 
+            console.log('upload successful');
+            logoPath = logoPath.replace('public', '');
+           }   
+        })
+          db.connection.query("update ?? set username=?,password=?,collegename=?,university=?,address=?,phno=?,email=?,collegelogo=?,collegeimage=?,website=? where collegeid=?"
+      ,[req.query.user,username,password,collegename,university,address,mobile,email,logoPath,photoPath,website,collegeid],
+      (err,results,fields)=>{  
             if(err){
                res.send("server error");
                throw err;
             } 
             else{ 
-              res.render('/staffadvisor');
+              res.render('/innerpage');
             } 
     
        });  
@@ -694,6 +708,9 @@ var routes =function(app,isAuth,encoder){
             var username =req.body.username;
             var password =req.body.password;
             
+            if(user === 'Administrator'){
+                user='college';
+            }
             console.log(req.body);
  
 
@@ -774,14 +791,14 @@ var routes =function(app,isAuth,encoder){
                                       }
                       
                                             break;
-                  case  'Office':
+                  case  'college':
                                   try{
                                           if(results[0].phno===null){
                                               res.redirect(`/cform/${username}`);
                                               console.log('hello');
                                           }
                                           else{
-                                                res.redirect(`/staffadvisor/${username}`);
+                                                res.redirect(`/college/${username}`);
                                           }
                             
                                     }catch{

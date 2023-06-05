@@ -11,13 +11,13 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-  <link rel="stylesheet" href="./css/form.css">
+  <link rel="stylesheet" href="/css/form.css">
 
 </head>
 <body>
     <nav class="navbar navbar-expand-sm navbar-dark">
       <a class="navbar-brand logo" href="#">
-        <img src="./assets/img/logo.png" alt="Studocs">
+        <img src="/assets/img/logo.png" alt="Studocs">
         STUDOCS
       </a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
@@ -32,51 +32,53 @@
       </div>
     </nav>
 
-  <div class="form">
-    <form action="/cform" enctype ="multipart/form-data" method="POST">
+  <div class="form" >
+    <form id="thisform" action="/cform" enctype ="multipart/form-data" method="POST">
+      <div class="alert text-center" id="message" style="transition: opacity 1s;">
+        <!-- Error message will be displayed here -->
+      </div>
         <div class="form-row">
           <div class="form-group col-md-4">
             <label for="cname">College Name</label>
-            <input type="name" class="form-control" id="cname" placeholder="College Name" name="clgname">
+            <input type="name" class="form-control" id="cname" placeholder="College Name" name="collegename" required>
           </div>
           <div class="form-group col-md-4">
             <label for="id">Id</label>
-            <input type="id" class="form-control" id="id" placeholder="id" name="clgid">
+            <input type="id" class="form-control" id="id" placeholder="id" name="collegeid" required>
           </div>
           <div class="form-group col-md-4">
             <label for="university">University</label>
-            <input type="name" class="form-control" id="university" placeholder="university" name="university">
+            <input type="name" class="form-control" id="university" placeholder="university" name="university" required>
           </div>
         </div>
         <div class="form-group" style="padding-left: 0px;">
           <label for="inputAddress">Address</label>
-          <textarea type="textarea" rows="1" class="form-control" id="inputAddress" placeholder="1234 Main St" name="address">
-          </textarea>
+          <textarea type="textarea" rows="1" class="form-control" id="inputAddress" placeholder="1234 Main St" name="address"required></textarea>
         </div>
         <div class="form-row">
             <div class="form-group col-md-4">
               <label for="phno">Mobile Number</label>
-              <input type="name" class="form-control" id="phno" placeholder="Number" name="phno">
+              <input type="name" class="form-control" id="phno" placeholder="Number" name="mobile"required>
             </div>
             <div class="form-group col-md-4">
               <label for="email">Email</label>
-              <input type="email" class="form-control" id="email" placeholder="Email" name="email">
+              <input type="email" class="form-control" id="email" placeholder="Email" name="email"required>
             </div>
             <div class="form-group col-md-4">
               <label for="website">Website</label>
-              <input type="name" class="form-control" id="website" placeholder="Website" name="website">
+              <input type="name" class="form-control" id="website" placeholder="Website" name="website"required>
             </div>
             <div class="form-group col-md-4">
                 <label for="logo" class="form-label">College Logo</label>
-                <input class="form-control form-control-sm" id="logo" type="file" placeholder="Size 78 X 76" name="logo">
+                <input class="form-control form-control-sm" id="logo" type="file" placeholder="Size 78 X 76" name="logo"required>
           </div>
           <div class="form-group col-md-4">
             <label for="image1" class="form-label">College Image</label>
-            <input class="form-control form-control-sm" id="image" type="file" placeholder="Size 1360 X 245" name="image">
+            <input class="form-control form-control-sm" id="image" type="file" placeholder="Size 1360 X 245" name="image"required >
           </div>
           <div class="form-group col-md-4">
             <label for="username">Username</label>
-            <input type="username" class="form-control" id="username" placeholder="username" name="username">
+            <input type="username" class="form-control" id="username" value=<%= name%> name="username" disabled>
           </div>
           <div class="form-group col-md-6">
             <label for="password">Password</label>
@@ -84,7 +86,7 @@
           </div>
           <div class="form-group col-md-6">
             <label for="Re-password">Re-Enter Password</label>
-            <input type="password" class="form-control" id="re-password" placeholder="Password" name="re-password">
+            <input type="password" class="form-control" id="re-password" placeholder="Password" name="repassword">
           </div>
       </div>
       Do you want to save
@@ -123,5 +125,6 @@
 			</div>
 		</div>
 	</div>
+  <script src="/js/pass.js"></script>
 </body>
 </html>
