@@ -780,7 +780,62 @@ var routes =function(app,isAuth,encoder){
   }
 
 })
+     //SAVING TEMPLATE
+     app.post('/save-template',(req,res)=>{   
+      var name=req.query.name; 
+      //console.log(name);
+      var collegeid='98765432';
+      var divContent = req.body.content; 
+     //  console.log(divContent);
+       db.connection.query("insert into forms(name,collegeid,formdata)values(?,?,?)",
+         [name,collegeid,divContent],(err,results,fields)=>{
+          if(err) {
+            throw err; 
+          } 
+          else{
  
+           res.redirect(`/status?name=${name}`);
+          }
+         });
+   
+     });
+    app.get('/status/:name',(req,res)=>{
+       try{
+         db.connection.query("select formdata from forms where name=?",
+       [req.params.name],(err,results,fields)=>{
+       if(err) {
+         throw err; 
+       } 
+       else{
+         console.log(results);
+         const formdata =  results[0].formdata ;
+         const applications = []; // Empty array, can be populated later if needed
+         res.render('status', { formdata, applications });
+       }
+       });
+       }catch(err){
+         console.log(err);
+       }
+ 
+    })
+    app.get('/requests',(req,res)=>{
+     try{
+       db.connection.query("select name,formid,formdata from forms ",
+     [req.query.name],(err,results,fields)=>{ 
+     if(err) {
+       throw err; 
+     } 
+     else{
+       const formdata = results.length ? results[0].formdata : null;
+       const forms = results; // Empty array, can be populated later if needed
+       res.render('requests', { forms });
+     }
+     });
+     }catch(err){
+       console.log(err);
+     }
+ 
+  })
 
 
 /*----------- other control routes -------------*/
