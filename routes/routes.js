@@ -1,10 +1,11 @@
+const { Console } = require('console');
 const db =require('../controller/dbconnect');
 const mail =require("../controller/mailserv");
 const verify =require("../controller/verification");
 const path=require('path');
 
 var routes =function(app,isAuth,encoder){     
-
+  
 ///sdjaskjdhasjd
    
    
@@ -92,13 +93,13 @@ var routes =function(app,isAuth,encoder){
             logoPath = logoPath.replace('public', '');
            }   
         })
-          db.connection.query("update college set password=?,collegename=?,university=?,address=?,phno=?,email=?,address=?,collegelogo=?,collegeimage=?,website=? where username=?"
-      ,[password,collegename,university,address,mobile,email,address,logoPath,photoPath,website,name],
+          db.connection.query("update college set password=?,collegename=?,university=?,address=?,phno=?,email=?,collegelogo=?,collegeimage=?,website=? where username=?"
+      ,[password,collegename,university,address,mobile,email,logoPath,photoPath,website,name],
       (err,results,fields)=>{  
             if(err){
                res.send("server error");
                throw err;
-            } 
+            }  
             else{ 
               res.redirect('/inner-page');
             } 
@@ -197,46 +198,52 @@ var routes =function(app,isAuth,encoder){
 
   //principal form
 
- app.post('/pform/:name',encoder,(req, res) => {
- 
-    var name =req.body.name;
-    var id =req.body.id;
-    var photo =req.files.photo;
-    var address =req.body.address;
-    var signature =req.files.signature;
-    var mobile =req.body.phno;
-    var email =req.body.email;
-    var design =req.body.design;
-    var dept =req.body.dept;
-    var collegeid =req.body.collegeid;
-    var username =req.body.username;
-    var password =req.body.password;
-    var repassword =req.body.re-password;
-
-   console.log(photo,signature);
-   
-    let filePathphoto= "./public/uploads/principal/"+Date.now()+photo.name;
-    if(password!==repassword)
-        res.status(400).send('passwords do not match')
-    if(!photo) {
-        return res.status(400). send('please upload photo .');
+  app.post('/pform/:name',encoder,(req, res) => {
+  console.log(req.body);
+  var name=req.params.name;
+  var {name,id,photo,address,signature,phno,email,collegeid,username,password}=req.body;
+  var { photo,signature} = req.files;
+  console.log(name);
+  const photoName = `${name}_photo${path.extname(photo.name)}`;
+  const logoName = `${name}_logo${path.extname(signature.name)}`;
+  console.log(photoName)
+  let photoPath = path.join('./public/uploads/college', name, photoName);
+  let logoPath = path.join('./public/uploads/college',  name, logoName);
+    
+    if(!signature) {
+        return res.status(400). send('please upload photo. .');
     }
-    console.log(logo);
-    photo.mv(filePathphoto,function(err){
-        if(err) throw err;
-    })
-    db.connection.query("INSERT INTO student VALUES (?,?,?,?,?,?,?,?,?,?) ",
-    [name,id,collegeid,admno,address,mobile,email,filePathphoto,username,password],
-    (err,results,fields)=>{
+    if(!photo) {
+      return res.status(400). send('please upload signature. .');
+    }
+   photo.mv(photoPath,function(err){
+      if(err) throw err;
+      else { 
+        console.log('upload successful');
+        photoPath = photoPath.replace('public', '');
+      }
+    })   
+  signature.mv(logoPath,function(err){
+     if(err)
+        throw err;
+     else { 
+      console.log('upload successful');
+      logoPath = logoPath.replace('public', '');
+     }    
+  })
+    db.connection.query("update principal set name=?,id=?,collegeid=?,address=?,phno=?,email=?,password=?,photo=? where username=?"
+,[name,id,collegeid,address,phno,email,password,photoPath],
+(err,results,fields)=>{  
       if(err){
          res.send("server error");
          throw err;
-      } 
+      }  
       else{ 
-        res.render(`/Principal/${req.params.name}`);
-      }   
-      });  
-   });  
+        res.redirect('/inner-page');
+      } 
+
+ });  
+}); 
 
 
     /*------dashboards-------*/   
@@ -315,7 +322,7 @@ var routes =function(app,isAuth,encoder){
                 console.log(results);
                 const { name, id, phno, department, address, email, photo } = results[0];
                 const data = { Name: name, Id: id, Phno: phno, Dept: department, Addr: address, Email: email, Photo: photo };
-                resolve(data);
+                resolve(data); 
                 
               }
             }); 
@@ -428,20 +435,20 @@ var routes =function(app,isAuth,encoder){
           const query2 = new Promise((resolve, reject) => {
             var username=req.params.name;
             console.log(username);
-            db.connection.query("select collegename,collegeid,phno,address,email,collegeimage,website from college where username=?",[username],(err,results,fields)=>{
+            db.connection.query("select * from college where username=?",[username],(err,results,fields)=>{
             if(err) {
                         reject(err);      
               }
               else{ 
                 console.log(results);
-                const { name, id, phno, address, email, photo,website } = results[0];
-                var data = { Name: name, Id: id, Phno: phno, Addr: address, Email: email, Photo: photo, Website:website};
-                
+                const { collegename, collegeid, phno, address, email, collegeimage,website } = results[0];
+
+                var data = { Name: collegename, Id: collegeid, Phno: phno, Addr: address, Email: email, Photo: collegeimage, Website:website};
                   // Check and handle the undefined values
                   const name1 = data.Name || 'N/A';
                   const id1 = data.Id || 'N/A';
                   const phno1 = data.Phno || 'N/A';
-                  const addr1 = data.Addr || 'N/A';
+                  const addr1 = data.Addr || 'N/A';  
                   const email1 = data.Email || 'N/A';
                   const photo1 = data.Photo || 'N/A';
                   const website1 = data.Website || 'N/A';
@@ -707,11 +714,7 @@ var routes =function(app,isAuth,encoder){
       /*-----------REQUEST HANDLING ROUTES ------*/
 
    //STATUS ROUTE FOR STUDENTS 
-  app.get('/status',(req,res)=>{         
-         
-          var results=[];
-          res.render('status',{applications:results});
-      });
+ 
       
       
   // SENDING REQUEST ROUTE FOR STUDENTS 
@@ -729,10 +732,25 @@ var routes =function(app,isAuth,encoder){
    });
      
    // PENDING REQUEST ROUTE FOR ADMINS 
-   app.get('/pending-requests',(req,res)=>{         
+   app.get('/pending-requests/:name',(req,res)=>{         
          
-      var results=[];
-      res.render('pending-requests',{applications:results});
+    try{
+      db.connection.query("select formdata from forms where name=?",
+    [req.params.name],(err,results,fields)=>{
+    if(err) {
+      throw err; 
+    } 
+    else{
+      const divContent = results[0].formdata;
+      console.log(divContent);
+      const applications = []; // Empty array, can be populated later if needed
+      res.render('pending-requests',{ divContent, applications });
+    }
+    });
+    }catch(err){
+      console.log(err); 
+    }
+
     });
 
 
@@ -744,21 +762,22 @@ var routes =function(app,isAuth,encoder){
     var results=[];
     res.render('addtemplate',{applications:results});
   });
-  app.get('/status',(req,res)=>{
+  app.get('/status/:name',(req,res)=>{
     try{
-      db.connection.query("select formdata from forms where formid=?",
-    [req.query.name],(err,results,fields)=>{
+      db.connection.query("select formdata from forms where name=?",
+    [req.params.name],(err,results,fields)=>{
     if(err) {
       throw err; 
     } 
     else{
-      const formdata = results.length ? results[0].formdata : null;
+      const divContent = results[0].formdata;
+      console.log(divContent);
       const applications = []; // Empty array, can be populated later if needed
-      res.render('status', { formdata, applications });
+      res.render('status',{ divContent, applications });
     }
     });
     }catch(err){
-      console.log(err);
+      console.log(err); 
     }
 
  })
@@ -794,48 +813,6 @@ var routes =function(app,isAuth,encoder){
           } 
           else{
  
-           res.redirect(`/status?name=${name}`);
-          }
-         });
-   
-     });
-    app.get('/status/:name',(req,res)=>{
-       try{
-         db.connection.query("select formdata from forms where name=?",
-       [req.params.name],(err,results,fields)=>{
-       if(err) {
-         throw err; 
-       } 
-       else{
-         console.log(results);
-         const formdata =  results[0].formdata ;
-         const applications = []; // Empty array, can be populated later if needed
-         res.render('status', { formdata, applications });
-       }
-       });
-       }catch(err){
-         console.log(err);
-       }
- 
-    })
-    app.get('/requests',(req,res)=>{
-     try{
-       db.connection.query("select name,formid,formdata from forms ",
-     [req.query.name],(err,results,fields)=>{ 
-     if(err) {
-       throw err; 
-     } 
-     else{
-       const formdata = results.length ? results[0].formdata : null;
-       const forms = results; // Empty array, can be populated later if needed
-       res.render('requests', { forms });
-     }
-     });
-     }catch(err){
-       console.log(err);
-     }
- 
-  })
 
 
 /*----------- other control routes -------------*/
