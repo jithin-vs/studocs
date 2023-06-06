@@ -1,0 +1,5 @@
+git add  C:\Users\Lenovo\OneDrive\Desktop\studocs\views\status.ejs
+
+git commit -m "Update status.ejs"
+
+git push origin main
