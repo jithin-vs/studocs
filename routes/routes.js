@@ -232,11 +232,11 @@ var routes =function(app,isAuth,encoder){
      }    
   })
     db.connection.query("update principal set name=?,id=?,collegeid=?,address=?,phno=?,email=?,password=?,photo=? where username=?"
-,[name,id,collegeid,address,phno,email,password,photoPath],
-(err,results,fields)=>{  
+,[name,id,collegeid,address,phno,email,password,photoPath,username],
+(err,results,fields)=>{   
       if(err){
-         res.send("server error");
-         throw err;
+         res.send("server error"); 
+         throw err; 
       }  
       else{ 
         res.redirect('/inner-page');
@@ -364,7 +364,8 @@ var routes =function(app,isAuth,encoder){
               var Address=results[0].address
               var Email=results[0].email;
               var Photo=results[0].photo;
-              res.render('Principal',{Name,Id,Mobile,Address,Email,Photo})
+              var applications=[];
+              res.render('Principal',{Name,Id,Mobile,Address,Email,Photo,applications})
            }
          }); 
         }catch(err)
