@@ -4,7 +4,7 @@ const verify =require("../controller/verification");
 const path=require('path');
 
 var routes =function(app,isAuth,encoder){     
-
+  
 ///sdjaskjdhasjd
    
    
@@ -93,7 +93,7 @@ var routes =function(app,isAuth,encoder){
            }   
         })
           db.connection.query("update college set password=?,collegename=?,university=?,address=?,phno=?,email=?,collegelogo=?,collegeimage=?,website=? where username=?"
-      ,[,password,collegename,university,address,mobile,email,logoPath,photoPath,website,name],
+      ,[password,collegename,university,address,mobile,email,logoPath,photoPath,website,name],
       (err,results,fields)=>{  
             if(err){
                res.send("server error");
@@ -428,20 +428,20 @@ var routes =function(app,isAuth,encoder){
           const query2 = new Promise((resolve, reject) => {
             var username=req.params.name;
             console.log(username);
-            db.connection.query("select collegename,collegeid,phno,address,email,collegeimage,website from college where username=?",[username],(err,results,fields)=>{
+            db.connection.query("select * from college where username=?",[username],(err,results,fields)=>{
             if(err) {
                         reject(err);      
               }
               else{ 
                 console.log(results);
-                const { name, id, phno, address, email, photo,website } = results[0];
-                var data = { Name: name, Id: id, Phno: phno, Addr: address, Email: email, Photo: photo, Website:website};
-                
+                const { collegename, collegeid, phno, address, email, collegeimage,website } = results[0];
+
+                var data = { Name: collegename, Id: collegeid, Phno: phno, Addr: address, Email: email, Photo: collegeimage, Website:website};
                   // Check and handle the undefined values
                   const name1 = data.Name || 'N/A';
                   const id1 = data.Id || 'N/A';
                   const phno1 = data.Phno || 'N/A';
-                  const addr1 = data.Addr || 'N/A';
+                  const addr1 = data.Addr || 'N/A';  
                   const email1 = data.Email || 'N/A';
                   const photo1 = data.Photo || 'N/A';
                   const website1 = data.Website || 'N/A';
