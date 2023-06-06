@@ -92,8 +92,8 @@ var routes =function(app,isAuth,encoder){
             logoPath = logoPath.replace('public', '');
            }   
         })
-          db.connection.query("update college set password=?,collegename=?,university=?,address=?,phno=?,email=?,collegelogo=?,collegeimage=?,website=? where username=?"
-      ,[,password,collegename,university,address,mobile,email,logoPath,photoPath,website,name],
+          db.connection.query("update college set password=?,collegename=?,university=?,address=?,phno=?,email=?,address=?,collegelogo=?,collegeimage=?,website=? where username=?"
+      ,[password,collegename,university,address,mobile,email,address,logoPath,photoPath,website,name],
       (err,results,fields)=>{  
             if(err){
                res.send("server error");
@@ -571,12 +571,13 @@ var routes =function(app,isAuth,encoder){
                 if (err) {
                   reject(err);
                 } else {
+                  console.log(results);
                   resolve(results);
                 }
               });
             });
         
-            Collegeid = hodQueryResult[0].collegeid;
+            Collegeid = hodQueryResult[0];
             console.log(Collegeid); // Output the updated Collegeid value here
         
             const studentsQueryResult = await new Promise((resolve, reject) => {
@@ -611,38 +612,44 @@ var routes =function(app,isAuth,encoder){
                 }
                 else{
                    console.log(results);
-                    res.render('addnewstudent',{applications:results});
-                }
+                   var id=req.query.id;
+                   if(id === null)
+                            id='12345'
+                   console.log(id);
+                    res.render('addnewstudent',{applications:results,id});
+                } 
               }); 
               
           });
    
       app.post('/studentadd',encoder,(req,res)=>{
-        var tutorid=req.params.id;
+        var tutorid=req.query.id;
         var {name,id,email}=req.body;
+        var Collegeid;
         async function getData() {
           try {
-            let Collegeid;
             const hodQueryResult = await new Promise((resolve, reject) => {
               db.connection.query("SELECT collegeid FROM tutor WHERE id=?", [tutorid], (err, results, fields) => {
                 if (err) {
                   reject(err);
                 } else {
-                  resolve(results);
+                  console.log(results);
+                  resolve(results);  
                 }
               });
             });
         
             Collegeid = hodQueryResult[0].collegeid;
             console.log(Collegeid); // Output the updated Collegeid value here
-        
-            const studentsQueryResult = await new Promise((resolve, reject) => {
-              db.connection.query("insert into student (name,regno,collegeid,email) values(?,?,?,?)", [name,id,Collegeid,email], (err, results, fields) => {
+            var genPassword=verify.randomPassword;
+            mail.sendcredEmail(name,email,email,genPassword);
+            const studentsQueryResult = await new Promise((resolve, reject) => {  
+              db.connection.query("insert into student (name,regno,collegeid,email,username,password) values(?,?,?,?,?,?)", [name,id,Collegeid,email,email,genPassword], (err, results, fields) => {
                 if (err) {
                   reject(err);
                 } else {
                   resolve(results);
-                  res.redirect('/studentadd');
+                  res.redirect(`/studentadd?id=${tutorid}`);
                 };
               });
             });
@@ -737,7 +744,42 @@ var routes =function(app,isAuth,encoder){
     var results=[];
     res.render('addtemplate',{applications:results});
   });
+  app.get('/status',(req,res)=>{
+    try{
+      db.connection.query("select formdata from forms where formid=?",
+    [req.query.name],(err,results,fields)=>{
+    if(err) {
+      throw err; 
+    } 
+    else{
+      const formdata = results.length ? results[0].formdata : null;
+      const applications = []; // Empty array, can be populated later if needed
+      res.render('status', { formdata, applications });
+    }
+    });
+    }catch(err){
+      console.log(err);
+    }
 
+ })
+ app.get('/requests',(req,res)=>{
+  try{
+    db.connection.query("select name,formid,formdata from forms ",
+  [req.query.name],(err,results,fields)=>{ 
+  if(err) {
+    throw err; 
+  } 
+  else{
+    const formdata = results.length ? results[0].formdata : null;
+    const forms = results; // Empty array, can be populated later if needed
+    res.render('requests', { forms });
+  }
+  });
+  }catch(err){
+    console.log(err);
+  }
+
+})
  
 
 
@@ -859,9 +901,9 @@ var routes =function(app,isAuth,encoder){
           });
       
       //delete user
-      app.post('/deleteuser/:id',encoder,(req,res)=>{ 
+      app.post('/deleteuser',encoder,(req,res)=>{ 
         console.log(req.params.id);     
-        db.connection.query("delete from ?? where id=?",[req.params.user,req.params.id],(err,results,fields)=>{
+        db.connection.query("delete from ?? where id=?",[req.query.user,req.query.id],(err,results,fields)=>{
           if(err) {
             res.send('server error');
             throw err;

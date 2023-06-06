@@ -84,7 +84,7 @@
                                        <td><%= application.regno %></td>
                                        <td><%= application.email  %></td>
                                        <td>
-                                        <form id="deleteForm_<%= application.id %>" method="POST" action="/deleteuser?id=<%= application.id %>&user=student">
+                                        <form id="deleteForm_<%= application.id %>" method="POST" action="/deleteuser?id=<%= application.id %>&user=user">
                                             <input type="hidden" name="_method" value="DELETE">
                                             <a type="button" onclick="confirmDelete('<%= application.id %>')"><i class="fa fa-trash"></i></a>
                                           </form>
@@ -112,7 +112,7 @@
                         </div>
                     <div class="container">
                     <br>
-                    <form action="/studentadd" method="post">
+                    <form action="/studentadd?id=<%= id%>" method="post">
                         <div class="row">
                         <div class="col">
                             <input type="text" class="form-control" placeholder="Name" name="name">
