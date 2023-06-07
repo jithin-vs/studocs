@@ -998,6 +998,22 @@ var routes =function(app,isAuth,encoder){
           }
         })
       });
+
+      app.post('/search', (req, res) => {
+        const searchTerm = req.body.search;
+      
+        // Perform search query
+        const query = `SELECT * FROM student WHERE
+          name LIKE '%${searchTerm}%' OR
+          regno LIKE '%${searchTerm}%'`;
+      
+        db.connection.query(query, (err, results) => { 
+          if (err) throw err; 
+          var applications=[]
+          res.render('addnewstudent', { applications:results,id:req.query.id,searchTerm });
+        });
+      });
+      
     
       /* app.get('/verify',(req,res)=>{ 
           
