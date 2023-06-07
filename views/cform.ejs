@@ -45,7 +45,7 @@
           </div>
           <div class="form-group col-md-4">
             <label for="id">Id</label>
-            <input type="id" class="form-control" id="id" placeholder="id" name="collegeid" required>
+            <input type="id" class="form-control" id="id" value="<%= name%>" name="collegeid" disabled>
           </div>
           <div class="form-group col-md-4">
             <label for="university">University</label>
@@ -76,10 +76,6 @@
           <div class="form-group col-md-4">
             <label for="image1" class="form-label">College Image</label>
             <input class="form-control form-control-sm" id="image" type="file" placeholder="Size 1360 X 245" name="image"required >
-          </div>
-          <div class="form-group col-md-4">
-            <label for="username">Username</label>
-            <input type="username" class="form-control" id="username" value=<%= name%> name="username" disabled>
           </div>
           <div class="form-group col-md-6">
             <label for="password">Password</label>
