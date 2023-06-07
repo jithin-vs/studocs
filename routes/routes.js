@@ -48,13 +48,14 @@ var routes =function(app,isAuth,encoder){
       app.get('/sform/:name',isAuth,(req, res) => {
 
         var name=req.params.name;
-        db.connection.query("select collegeid from student where username=",
-        [username],(err,results,fields)=>{
+        db.connection.query("select collegeid from student where id=?",
+        [name],(err,results,fields)=>{
         if(err) {
           throw err;
           
         }
         else{
+
           var collegeid=results[0];
           console.log(collegeid);
           res.render('sform',{name,collegeid}); 
@@ -131,21 +132,15 @@ var routes =function(app,isAuth,encoder){
       const photoName = `${username}_photo${path.extname(photo.name)}`;
     
       let photoPath = path.join('./public/uploads/student', username, photoName);
-    
-      if (password !== repassword) {
-        return res.status(400).send('Passwords do not match');
-      }
-      if (!photo) {
-        return res.status(400).send('Please upload a photo.');
-      }
-    
+      
       photo.mv(photoPath)
         .then(() => {
           console.log('Upload successful');
 
-          photoPath = photoPath.replace('public', '');
+          photoPath = photoPath.replace('public','');  
+
           
-          db.connection.query("UPDATE student SET name=?, address=?, phno=?, email=?, yearofadmission=?, regno=?, admno=?, collegeid=?, photo=?, username=?, password=? WHERE regno=?",
+          db.connection.query("UPDATE student SET name=?, address=?, phno=?, email=?, yearofadmission=?, id=?, admno=?, collegeid=?, photo=?, username=?, password=? WHERE id=?",
             [name, address, phno, email, yearofadmn, regno, admno, collegeid, photoPath, username, password, regno],
             (err, results, fields) => {
               if (err) {
@@ -726,10 +721,6 @@ var routes =function(app,isAuth,encoder){
       });
    
       /*-----------REQUEST HANDLING ROUTES ------*/
-
-   //STATUS ROUTE FOR STUDENTS 
- 
-      
       
   // SENDING REQUEST ROUTE FOR STUDENTS    
   app.get('/requests',(req,res)=>{         
@@ -854,7 +845,7 @@ var routes =function(app,isAuth,encoder){
             console.log(req.body);
  
 
-            db.connection.query("select username,password,phno from ?? where username=? and password=?",[user,username,password],(err,results,fields)=>{
+            db.connection.query("select id,password,phno from ?? where id=? and password=?",[user,username,password],(err,results,fields)=>{
             if(err) {
               res.send('server error');
               throw err;
@@ -867,33 +858,18 @@ var routes =function(app,isAuth,encoder){
                 console.log(req.session.id);
                 switch(user) { 
           
-                  case 'Student':   
-                                      try{ 
+                  case 'Student':    
 
                                         if(results[0].phno===null){
-                                            db.connection.query("select collegeid from student where username=",
-                                            [username],(err,results,fields)=>{
-                                            if(err) {
-                                              throw err;
-                                              
-                                            }
-                                            else{
-                                              var collegeid=results[0];
-                                              res.redirect(`/sform/${username}/${collegeid}`);
+                                              res.redirect(`/sform/${username}`);
     
-                                            }
-                                          }); 
                                             
-                                        }
-                                        else{ 
+                                        }else{ 
  
                                               res.redirect(`/student/${username}`);
                                         }
                                     
-                                        }catch{
-                                          console.log(err);
-                                          res.send('server error');
-                                        }
+                                        
                               break;
 
                   case 'Tutor':
