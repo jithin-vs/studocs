@@ -31,8 +31,8 @@
       </ul>
     </div>
   </nav>
-  <div class="form">
-    <form action="/pform" enctype="multipart/form-data" method="post">
+  <div class="form" id="thisform">
+    <form action="/pform/<%= name %>" enctype="multipart/form-data" method="post">
         <div class="form-row">
           <div class="form-group col-md-4">
             <label for="cname">Name</label>
@@ -73,7 +73,7 @@
           </div>
           <div class="form-group col-md-6">
             <label for="username">Username</label>
-            <input type="username" class="form-control" id="username" placeholder="username" name="username">
+            <input type="username" class="form-control" id="username" value="<%= name %>" name="username">
           </div>
           <div class="form-group col-md-6">
             <label for="password">Password</label>
@@ -95,8 +95,8 @@
         <label class="form-check-label" for="inlineRadio2">No</label>
       </div>
       <br><center>
-        <button type="submit" class="btn btn-primary">Sign in</button>
-        <button type="clear" class="btn btn-primary">clear</button>
+        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="clear" class="btn btn-primary">Clear</button>
     </center>
       </form>
   </div>
