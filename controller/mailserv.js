@@ -54,6 +54,25 @@ const sendcredEmail=async(name,email,gen_username,gen_password)=>{
       })
 
 }
+
+const sendregisterEmail=async(name,email)=>{
+  const mailOptions = {
+    from: 'studocs.geci@gmail.com',
+    to: email,
+    subject: 'College Registeration',
+    html: '<p>Hi, '+name+' .Given below is your username and password .You can change your login details if needed</p>  <p>Username: '+gen_username+'</p> <p>Password: '+gen_password+'</p>'   
+  };
+  transporter.sendMail(mailOptions, function(error,info){
+    if(error){
+       console.log(error);
+    }
+    else{
+
+       console.log("Email has been sent:- ",info.response);
+    }
+  })
+
+}
  
 /*const verifyEmail =async (req,res) =>{
    
@@ -64,4 +83,4 @@ const sendcredEmail=async(name,email,gen_username,gen_password)=>{
   }
 } */
 
- module.exports = {sendverifyEmail,sendcredEmail};
+ module.exports = {sendverifyEmail,sendcredEmail,sendregisterEmail};
