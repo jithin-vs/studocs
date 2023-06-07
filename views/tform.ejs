@@ -35,7 +35,7 @@
   </nav>
 
   <div class="form">
-    <form id="thisform" action="/tform?user=<%= user%>" enctype="multipart/form-data" method="post">
+    <form id="thisform" action="/tform/<%= name %>" enctype="multipart/form-data" method="post">
       <div class="alert text-center" id="message" style="transition: opacity 1s;">
         <!-- Error message will be displayed here -->
       </div>
@@ -46,7 +46,7 @@
         </div>
         <div class="form-group col-md-4">
           <label for="pid">Id</label>
-          <input type="text" class="form-control" id="pid" placeholder="ID" required name="id">
+          <input type="text" class="form-control" id="pid" value="<%= name%>" required name="id">
         </div>
         <div class="form-group col-md-4">
           <label for="image1" class="form-label">Photo</label>
@@ -89,7 +89,7 @@
         </div>
         <div class="form-group col-md-4">
           <label for="collegeId" class="form-label">College ID</label>
-          <input class="form-control form-control-sm" id="collegeId" type="text" placeholder="College ID" name="collegeid">
+          <input class="form-control form-control-sm" id="collegeId" type="text" value="<%= collegeid%>" name="collegeid" disabled>
         </div>
         <div class="form-group col-md-6">
           <label for="password">Password</label>
