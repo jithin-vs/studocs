@@ -33,50 +33,52 @@
   </nav>
 
   <div class="form">
-    <form action="/sform?name=<%= name%>" enctype ="multipart/form-data" method="POST">
-        <div class="form-row">
+    <form id="thisform" action="/sform?name=<%= name%>" enctype ="multipart/form-data" method="POST">
+      <div class="alert text-center" id="message" style="transition: opacity 1s;">
+        <!-- Error message will be displayed here -->
+      </div>
+      <div class="form-row">
           <div class="form-group col-md-4">
             <label for="cname">Name</label>
-            <input type="name" class="form-control" id="cname" placeholder="Name" name="name">
+            <input type="name" class="form-control" id="cname" placeholder="Name" name="name" required>
           </div>
           <div class="form-group col-md-4">
             <label for="image1" class="form-label">Photo</label>
-            <input class="form-control form-control-sm" id="image1" type="file" placeholder="Size 1360 X 245" name="photo">
+            <input class="form-control form-control-sm" id="image1" type="file" placeholder="Size 1360 X 245" name="photo"required>
           </div>
         </div>
         <div class="form-group" style="padding-left: 0px;">
           <label for="inputAddress">Address</label>
-          <textarea type="textarea" rows="1" class="form-control" id="inputAddress" placeholder="1234 Main St" name="address">
-          </textarea>
+          <textarea type="textarea" rows="1" class="form-control" id="inputAddress" placeholder="1234 Main St" name="address" required></textarea>
         </div>
         <div class="form-row">
             <div class="form-group col-md-4">
               <label for="phno">Mobile Number</label>
-              <input type="name" class="form-control" id="phno" placeholder="Number" name="phno">
+              <input type="name" class="form-control" id="phno" placeholder="Number" name="phno"required>
             </div>
             <div class="form-group col-md-4">
               <label for="email">Email</label>
-              <input type="email" class="form-control" id="email" placeholder="Email" name="email">
+              <input type="email" class="form-control" id="email" placeholder="Email" name="email"required>
             </div>
             <div class="form-group col-md-4">
               <label for="year">Year of Admission</label>
-              <input type="date" class="form-control" id="year" name="yearofadmn">
+              <input type="date" class="form-control" id="year" name="yearofadmn" required>
             </div>
               <div class="form-group col-md-4">
                 <label for="reg" class="form-label">Register No</label>
-                <input class="form-control form-control-sm" id="reg" type="id" placeholder="Register No" name="regno">
+                <input class="form-control form-control-sm" id="reg" type="id" placeholder="Register No" name="regno" required>
               </div>
              <div class="form-group col-md-4">
                   <label for="reg" class="form-label">Admission Number</label>
-                  <input class="form-control form-control-sm" id="reg" type="text" placeholder="Register No" name="admno"> 
+                  <input class="form-control form-control-sm" id="reg" type="text" placeholder="Register No" name="admno"required> 
           </div>
           <div class="form-group col-md-4">
             <label for="id" class="form-label">College Id</label>
-            <input class="form-control form-control-sm" id="id" type="text" placeholder="college id" name="collegeid">
+            <input class="form-control form-control-sm" id="id" type="text" placeholder="college id" name="collegeid"required>
           </div>
           <div class="form-group col-md-4">
             <label for="username">Username</label>
-            <input type="username" class="form-control" id="username" value=<%= name%> name="username" disabled>
+            <input type="username" class="form-control" id="username" value="<%= name%>" name="username" disabled>
           </div>
           <div class="form-group col-md-6">
             <label for="password">Password</label>
@@ -123,8 +125,6 @@
 			</div>
 		</div>
 	</div>
-  
-  <!--javascript template-->
   <script src="/js/pass.js"></script>
 </body>
 </html>

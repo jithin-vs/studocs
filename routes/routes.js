@@ -555,7 +555,7 @@ var routes =function(app,isAuth,encoder){
      });
      
     
-     //add new HOD  
+     //add new HOD   
   
  app.get('/hodadd',(req,res)=>{
             
