@@ -762,6 +762,8 @@ var routes =function(app,isAuth,encoder){
     var results=[];
     res.render('addtemplate',{applications:results});
   });
+  
+  //STATUS OF FORMS
   app.get('/status/:name',(req,res)=>{
     try{
       db.connection.query("select formdata from forms where name=?",
