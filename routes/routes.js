@@ -55,6 +55,7 @@ var routes =function(app,isAuth,encoder){
           
         }
         else{
+
           var collegeid=results[0];
           console.log(collegeid);
           res.render('sform',{name,collegeid}); 
