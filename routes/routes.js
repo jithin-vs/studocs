@@ -848,6 +848,9 @@ var routes =function(app,isAuth,encoder){
             if(user === 'Administrator'){
                 user='college';
             }
+            if(user === 'Staff Advaiser'){
+              user='Tutor';
+          }
             console.log(req.body);
  
 
