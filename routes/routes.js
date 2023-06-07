@@ -799,20 +799,7 @@ var routes =function(app,isAuth,encoder){
   }
 
 })
-     //SAVING TEMPLATE
-     app.post('/save-template',(req,res)=>{   
-      var name=req.query.name; 
-      //console.log(name);
-      var collegeid='98765432';
-      var divContent = req.body.content; 
-     //  console.log(divContent);
-       db.connection.query("insert into forms(name,collegeid,formdata)values(?,?,?)",
-         [name,collegeid,divContent],(err,results,fields)=>{
-          if(err) {
-            throw err; 
-          } 
-          else{
- 
+    
 
 
 /*----------- other control routes -------------*/
