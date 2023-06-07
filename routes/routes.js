@@ -92,8 +92,8 @@ var routes =function(app,isAuth,encoder){
             logoPath = logoPath.replace('public', '');
            }   
         })
-          db.connection.query("update college set password=?,collegename=?,university=?,address=?,phno=?,email=?,collegelogo=?,collegeimage=?,website=? where username=?"
-      ,[,password,collegename,university,address,mobile,email,logoPath,photoPath,website,name],
+          db.connection.query("update college set password=?,collegename=?,collegeid=?,university=?,address=?,phno=?,email=?,collegelogo=?,collegeimage=?,website=? where username=?"
+      ,[,password,collegename,collegeid,university,address,mobile,email,logoPath,photoPath,website,name],
       (err,results,fields)=>{  
             if(err){
                res.send("server error");
@@ -494,16 +494,16 @@ var routes =function(app,isAuth,encoder){
              
            }
            else{
-              res.render('addnewtutor',{applications:results});
+              res.render('addnewtutor',{applications:results,id:req.query.id});
            }
          }); 
          
      });
   
-     app.post('/tutoradd',encoder,(req,res)=>{
-         var hodid=req.params.id;
-          var {name,id,batch,email}=req.body;
-          let Collegeid='1';
+     app.post('/tutoradd/',encoder,(req,res)=>{
+         var hodid=req.query.id;
+         console.log(hodid);
+          var {name,id,batch,email}=req.body;   
           async function getid() {
             try {
               let Collegeid = '12345';
@@ -512,13 +512,14 @@ var routes =function(app,isAuth,encoder){
                 db.connection.query("SELECT collegeid FROM hod WHERE id=?", [hodid], (err, results, fields) => {
                   if (err) {
                     reject(err);
-                  } else {
+                  } else { console.log(results);
+
                     resolve(results);
                   }
                 });
               });
           
-              Collegeid = hodQueryResult[0].collegeid;
+              //Collegeid = hodQueryResult[0].collegeid;
               console.log(Collegeid); // Output the updated Collegeid value here
           
               const studentsQueryResult = await new Promise((resolve, reject) => {
@@ -560,8 +561,7 @@ var routes =function(app,isAuth,encoder){
      
   app.post('/hodadd',encoder,(req,res)=>{
     
-        var {name,id,dept,email}=req.body;
-        let Collegeid='1';    
+        var {name,id,dept,email}=req.body;   
         async function getData() {
           try {
             let Collegeid = '12345';
