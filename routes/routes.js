@@ -137,7 +137,8 @@ var routes =function(app,isAuth,encoder){
         .then(() => {
           console.log('Upload successful');
 
-          photoPath = photoPath.replace('public','');
+          photoPath = photoPath.replace('public','');  
+
           
           db.connection.query("UPDATE student SET name=?, address=?, phno=?, email=?, yearofadmission=?, id=?, admno=?, collegeid=?, photo=?, username=?, password=? WHERE id=?",
             [name, address, phno, email, yearofadmn, regno, admno, collegeid, photoPath, username, password, regno],
