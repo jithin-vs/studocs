@@ -3,7 +3,6 @@ const db =require('../controller/dbconnect');
 const mail =require("../controller/mailserv");
 const verify =require("../controller/verification");
 const path=require('path');
-const { query } = require('express');
 
 var routes =function(app,isAuth,encoder){     
   
@@ -47,8 +46,21 @@ var routes =function(app,isAuth,encoder){
         res.render('tform',{user:req.query.user});  
       }); 
       app.get('/sform/:name',isAuth,(req, res) => {
-        res.render('sform',{name:req.params.name});  
-      }); 
+
+        var name=req.params.name;
+        db.connection.query("select collegeid from student where username=",
+        [username],(err,results,fields)=>{
+        if(err) {
+          throw err;
+          
+        }
+        else{
+          var collegeid=results[0];
+          console.log(collegeid);
+          res.render('sform',{name,collegeid}); 
+         }
+      });    
+    }); 
       app.get('/cform/:name', (req, res) => {
         res.render('cform',{name:req.params.name});
       });
@@ -60,8 +72,9 @@ var routes =function(app,isAuth,encoder){
     /*------register forms-------*/   
 
       //colllge form
-      app.post('/cform/:name',encoder,(req, res) => {
+      app.post('/cform/:name/:collegeid',encoder,(req, res) => {
         console.log(req.body);
+        console.log(req.params);
         var name=req.params.name;
         var {collegename,collegeid,university,address,mobile,email,website,logo,image,username,password}=req.body;
         var { logo,image } = req.files;
@@ -111,13 +124,20 @@ var routes =function(app,isAuth,encoder){
     //student form
     app.post('/sform', encoder, (req, res) => {
       console.log(req.body);
-      var { name, address, phno, email, yearofadmn, regno, admno, collegeid, username, password, repassword,photo } = req.body;
+      var { name, address, phno, email, yearofadmn, regno, admno, collegeid, username, password, repassword } = req.body;
       var { photo } = req.files;
-      console.log(photo);
-      console.log(req.query.name);
-      const photoName = `${req.query.name}_photo${path.extname(photo.name)}`;
+      console.log(yearofadmn);
+      console.log(collegeid);
+      const photoName = `${username}_photo${path.extname(photo.name)}`;
     
-      let photoPath = path.join('./public/uploads/student', req.query.name, photoName);
+      let photoPath = path.join('./public/uploads/student', username, photoName);
+    
+      if (password !== repassword) {
+        return res.status(400).send('Passwords do not match');
+      }
+      if (!photo) {
+        return res.status(400).send('Please upload a photo.');
+      }
     
       photo.mv(photoPath)
         .then(() => {
@@ -125,8 +145,8 @@ var routes =function(app,isAuth,encoder){
 
           photoPath = photoPath.replace('public', '');
           
-          db.connection.query("UPDATE student SET name=?, address=?, phno=?, email=?, yearofadmission=?, regno=?, admno=?, collegeid=?, photo=?, password=? WHERE username=?",
-            [name, address, phno, email, yearofadmn, regno, admno, collegeid, photoPath, password,req.query.name],
+          db.connection.query("UPDATE student SET name=?, address=?, phno=?, email=?, yearofadmission=?, regno=?, admno=?, collegeid=?, photo=?, username=?, password=? WHERE regno=?",
+            [name, address, phno, email, yearofadmn, regno, admno, collegeid, photoPath, username, password, regno],
             (err, results, fields) => {
               if (err) {
                 console.error(err);   
@@ -140,7 +160,7 @@ var routes =function(app,isAuth,encoder){
         .catch((err) => {
           console.error(err);
           return res.status(500).send('Server error');
-        });  
+        });
     });
     
    //teacher form
@@ -226,11 +246,11 @@ var routes =function(app,isAuth,encoder){
      }    
   })
     db.connection.query("update principal set name=?,id=?,collegeid=?,address=?,phno=?,email=?,password=?,photo=? where username=?"
-,[name,id,collegeid,address,phno,email,password,photoPath,username],
-(err,results,fields)=>{   
+,[name,id,collegeid,address,phno,email,password,photoPath],
+(err,results,fields)=>{  
       if(err){
-         res.send("server error"); 
-         throw err; 
+         res.send("server error");
+         throw err;
       }  
       else{ 
         res.redirect('/inner-page');
@@ -332,7 +352,7 @@ var routes =function(app,isAuth,encoder){
             res.send('server error');
           });
         }catch(err){
-            console.log(err);  
+            console.log(err);
         }
       }else{
         res.send('unauthorized user');
@@ -358,8 +378,7 @@ var routes =function(app,isAuth,encoder){
               var Address=results[0].address
               var Email=results[0].email;
               var Photo=results[0].photo;
-              var applications=[];
-              res.render('Principal',{Name,Id,Mobile,Address,Email,Photo,applications})
+              res.render('Principal',{Name,Id,Mobile,Address,Email,Photo})
            }
          }); 
         }catch(err)
@@ -712,7 +731,7 @@ var routes =function(app,isAuth,encoder){
  
       
       
-  // SENDING REQUEST ROUTE FOR STUDENTS 
+  // SENDING REQUEST ROUTE FOR STUDENTS    
   app.get('/requests',(req,res)=>{         
          
       var results=[];
@@ -751,52 +770,71 @@ var routes =function(app,isAuth,encoder){
 
 /*----------- FORM CONTROL AND MAANGEMENT -------------*/
 
-   // ADDING TEMPLATE 
-   app.get('/addtemplate',(req,res)=>{         
-         
-    var results=[];
-    res.render('addtemplate',{applications:results});
-  });
-  
-  //STATUS OF FORMS
-  app.get('/status/:name',(req,res)=>{
-    try{
-      db.connection.query("select formdata from forms where name=?",
-    [req.params.name],(err,results,fields)=>{
-    if(err) {
-      throw err; 
-    } 
-    else{
-      const divContent = results[0].formdata;
-      console.log(divContent);
-      const applications = []; // Empty array, can be populated later if needed
-      res.render('status',{ divContent, applications });
-    }
-    });
-    }catch(err){
-      console.log(err); 
-    }
+      // ADDING TEMPLATE 
+      app.get('/addtemplate',(req,res)=>{         
+            
+        var results=[];
+        res.render('addtemplate',{applications:results});
+      });
 
- })
- app.get('/requests',(req,res)=>{
-  try{
-    db.connection.query("select name,formid,formdata from forms ",
-  [req.query.name],(err,results,fields)=>{ 
-  if(err) {
-    throw err; 
-  } 
-  else{
-    const formdata = results.length ? results[0].formdata : null;
-    const forms = results; // Empty array, can be populated later if needed
-    res.render('requests', { forms });
-  }
-  });
-  }catch(err){
-    console.log(err);
-  }
+      //STATUS DISPLAY
+      app.get('/status/:name',(req,res)=>{
+        try{
+          db.connection.query("select formdata from forms where name=?",
+        [req.params.name],(err,results,fields)=>{
+        if(err) {
+          throw err; 
+        } 
+        else{
+          const divContent = results[0].formdata;
+          console.log(divContent);
+          const applications = []; // Empty array, can be populated later if needed
+          res.render('status',{ divContent, applications });
+        }
+        });
+        }catch(err){
+          console.log(err); 
+        }
 
-})
-    
+    })
+
+    //REQUEST DISPLAY
+    app.get('/requests',(req,res)=>{
+      try{
+        db.connection.query("select name,formid,formdata from forms ",
+      [req.query.name],(err,results,fields)=>{ 
+      if(err) {
+        throw err; 
+      } 
+      else{
+        const formdata = results.length ? results[0].formdata : null;
+        const forms = results; // Empty array, can be populated later if needed
+        res.render('requests', { forms });
+      }
+      });
+      }catch(err){
+        console.log(err);
+      }
+
+    })
+
+     //SAVING TEMPLATE
+     app.post('/save-template',(req,res)=>{   
+      var name=req.query.name; 
+      //console.log(name);
+      var collegeid='98765432';
+      var divContent = req.body.content; 
+     //  console.log(divContent);
+       db.connection.query("insert into forms(name,collegeid,formdata)values(?,?,?)",
+         [name,collegeid,divContent],(err,results,fields)=>{
+          if(err) {
+            throw err; 
+          } else{
+             res.redirect('/status');
+          }    
+       });
+       });
+          
 
 
 /*----------- other control routes -------------*/
@@ -830,8 +868,19 @@ var routes =function(app,isAuth,encoder){
                                       try{ 
 
                                         if(results[0].phno===null){
-                                            res.redirect(`/sform/${username}`);
+                                            db.connection.query("select collegeid from student where username=",
+                                            [username],(err,results,fields)=>{
+                                            if(err) {
+                                              throw err;
+                                              
+                                            }
+                                            else{
+                                              var collegeid=results[0];
+                                              res.redirect(`/sform/${username}/${collegeid}`);
     
+                                            }
+                                          }); 
+                                            
                                         }
                                         else{ 
  
@@ -915,7 +964,14 @@ var routes =function(app,isAuth,encoder){
             })
             
           });
-      
+
+        //REGISTER COLLEGE
+        app.post('/register-college',(req,res)=>{
+             
+           var{name,email}=req.body;
+           mail.sendregisterEmail(name,email);
+        })
+
       //delete user
       app.post('/deleteuser',encoder,(req,res)=>{ 
         console.log(req.params.id);     
