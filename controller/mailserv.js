@@ -6,6 +6,9 @@ let transporter=nodemailer.createTransport({
  port:587,
  secure:false,
  requireTLS:true,
+ tls: {
+  rejectUnauthorized: false
+ },
  auth:{
    user:'studocs.geci@gmail.com',
    pass:process.env.EMAIL_PASS

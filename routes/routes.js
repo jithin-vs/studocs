@@ -3,6 +3,7 @@ const db =require('../controller/dbconnect');
 const mail =require("../controller/mailserv");
 const verify =require("../controller/verification");
 const path=require('path');
+const { query } = require('express');
 
 var routes =function(app,isAuth,encoder){     
   
@@ -110,20 +111,13 @@ var routes =function(app,isAuth,encoder){
     //student form
     app.post('/sform', encoder, (req, res) => {
       console.log(req.body);
-      var { name, address, phno, email, yearofadmn, regno, admno, collegeid, username, password, repassword } = req.body;
+      var { name, address, phno, email, yearofadmn, regno, admno, collegeid, username, password, repassword,photo } = req.body;
       var { photo } = req.files;
-      console.log(yearofadmn);
-      console.log(collegeid);
-      const photoName = `${username}_photo${path.extname(photo.name)}`;
+      console.log(photo);
+      console.log(req.query.name);
+      const photoName = `${req.query.name}_photo${path.extname(photo.name)}`;
     
-      let photoPath = path.join('./public/uploads/student', username, photoName);
-    
-      if (password !== repassword) {
-        return res.status(400).send('Passwords do not match');
-      }
-      if (!photo) {
-        return res.status(400).send('Please upload a photo.');
-      }
+      let photoPath = path.join('./public/uploads/student', req.query.name, photoName);
     
       photo.mv(photoPath)
         .then(() => {
@@ -131,8 +125,8 @@ var routes =function(app,isAuth,encoder){
 
           photoPath = photoPath.replace('public', '');
           
-          db.connection.query("UPDATE student SET name=?, address=?, phno=?, email=?, yearofadmission=?, regno=?, admno=?, collegeid=?, photo=?, username=?, password=? WHERE regno=?",
-            [name, address, phno, email, yearofadmn, regno, admno, collegeid, photoPath, username, password, regno],
+          db.connection.query("UPDATE student SET name=?, address=?, phno=?, email=?, yearofadmission=?, regno=?, admno=?, collegeid=?, photo=?, password=? WHERE username=?",
+            [name, address, phno, email, yearofadmn, regno, admno, collegeid, photoPath, password,req.query.name],
             (err, results, fields) => {
               if (err) {
                 console.error(err);   
@@ -146,7 +140,7 @@ var routes =function(app,isAuth,encoder){
         .catch((err) => {
           console.error(err);
           return res.status(500).send('Server error');
-        });
+        });  
     });
     
    //teacher form
@@ -232,11 +226,11 @@ var routes =function(app,isAuth,encoder){
      }    
   })
     db.connection.query("update principal set name=?,id=?,collegeid=?,address=?,phno=?,email=?,password=?,photo=? where username=?"
-,[name,id,collegeid,address,phno,email,password,photoPath],
-(err,results,fields)=>{  
+,[name,id,collegeid,address,phno,email,password,photoPath,username],
+(err,results,fields)=>{   
       if(err){
-         res.send("server error");
-         throw err;
+         res.send("server error"); 
+         throw err; 
       }  
       else{ 
         res.redirect('/inner-page');
@@ -338,7 +332,7 @@ var routes =function(app,isAuth,encoder){
             res.send('server error');
           });
         }catch(err){
-            console.log(err);
+            console.log(err);  
         }
       }else{
         res.send('unauthorized user');
@@ -364,7 +358,8 @@ var routes =function(app,isAuth,encoder){
               var Address=results[0].address
               var Email=results[0].email;
               var Photo=results[0].photo;
-              res.render('Principal',{Name,Id,Mobile,Address,Email,Photo})
+              var applications=[];
+              res.render('Principal',{Name,Id,Mobile,Address,Email,Photo,applications})
            }
          }); 
         }catch(err)
