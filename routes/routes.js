@@ -41,10 +41,11 @@ var routes =function(app,isAuth,encoder){
       });
 
       //forms
-      app.get('/tform/:name',isAuth,(req, res) => {
-        var name=req.params.name;
-        db.connection.query("select collegeid from tutor where id=?",
-        [name],(err,results,fields)=>{
+      app.get('/tform',isAuth,(req, res) => {
+        var name=req.query.id;
+        var user=req.query.user;
+        db.connection.query("select collegeid from ?? where id=?",
+        [user,name],(err,results,fields)=>{
         if(err) {
           throw err;
           
@@ -340,7 +341,7 @@ var routes =function(app,isAuth,encoder){
             db.connection.query("select * from requests", (err, results, fields) => {
               if (err) {
                 reject(err);
-              } else {
+              } else { 
                 resolve(results);
               }
             }); 
@@ -349,7 +350,7 @@ var routes =function(app,isAuth,encoder){
           const query2 = new Promise((resolve, reject) => {
             var username=req.params.name;
             console.log(username);
-            db.connection.query("select name,id,phno,department,address,email,photo from hod where username=?",[username],(err,results,fields)=>{
+            db.connection.query("select name,id,phno,department,address,email,photo from hod where id=?",[username],(err,results,fields)=>{
             if(err) {
                         reject(err);      
               }
@@ -935,7 +936,7 @@ var routes =function(app,isAuth,encoder){
                                   try{   
 
                                           if(results[0].phno===null){
-                                              res.redirect(`/tform/${username}`);
+                                            res.redirect(`/tform?id=${username}&user=${user}`);
                                           }
                                           else{
                                                 res.redirect(`/staffadvisor/${username}`);
@@ -950,7 +951,7 @@ var routes =function(app,isAuth,encoder){
                   case 'Hod':
                               try{
                                       if(results[0].phno===null){
-                                          res.redirect(`/tform?username=${username}&user=${user}`);
+                                          res.redirect(`/tform?id=${username}&user=${user}`);
                                       }
                                       else{
                                             res.redirect(`/hod/${username}`);
