@@ -28,6 +28,8 @@ var routes =function(app,isAuth,encoder){
            res.render('inner-page',{message:'registeration complete!!'});
         else if(id ==='8989')
            res.render('inner-page',{message:'logged out successfully!!'});
+        else if(id ==='4000')
+           res.render('inner-page',{message:'server error!!'})
         else
             res.render('inner-page');
       });
@@ -36,12 +38,12 @@ var routes =function(app,isAuth,encoder){
         res.render('addnew');
       });
      
-      app.get('/Principal',isAuth,(req, res) => {
+    app.get('/Principal',isAuth,(req, res) => {
         res.render('Principal');  
-      });
+    });
 
       //forms
-      app.get('/tform',isAuth,(req, res) => {
+    app.get('/tform',isAuth,(req, res) => {
         var name=req.query.id;
         var user=req.query.user;
         db.connection.query("select collegeid from ?? where id=?",
@@ -57,8 +59,8 @@ var routes =function(app,isAuth,encoder){
           res.render('tform',{name,collegeid}); 
          }
         });
-      }); 
-      app.get('/sform/:name',isAuth,(req, res) => {
+    }); 
+    app.get('/sform/:name',isAuth,(req, res) => {
 
         var name=req.params.name;
         db.connection.query("select collegeid from student where id=?",
@@ -75,10 +77,10 @@ var routes =function(app,isAuth,encoder){
          }
       });    
     }); 
-      app.get('/cform/:name', (req, res) => {
+    app.get('/cform/:name', (req, res) => {
         res.render('cform',{name:req.params.name});
-      });
-      app.get('/pform/:name', (req, res) => {
+    });
+    app.get('/pform/:name', (req, res) => {
 
        var name=req.params.name;
         db.connection.query("select collegeid from principal where id=?",
@@ -94,13 +96,13 @@ var routes =function(app,isAuth,encoder){
           res.render('pform',{name,collegeid}); 
          }
       }); 
-      });
+    });
       
         
     /*------register forms-------*/   
 
       //colllge form
-      app.post('/cform/:name/:collegeid',encoder,(req, res) => {
+    app.post('/cform/:name/:collegeid',encoder,(req, res) => {
         console.log(req.body);
         console.log(req.params);
         var name=req.params.name;
@@ -184,8 +186,8 @@ var routes =function(app,isAuth,encoder){
         });
     });
     
-   //teacher form
- app.post('/tform',(req, res) => {
+   //teacher form  
+    app.post('/tform',(req, res) => {
     var {name,id,address,phno,email,design,dept,collegeid,username,password,repassword}=req.body;
      var{photo,signature}=req.files;
  
@@ -194,7 +196,7 @@ var routes =function(app,isAuth,encoder){
 
      let photoPath = path.join('./public/uploads/teacher', username, photoName);
      let signaturePath = path.join('./public/uploads/teacher', username, signatureName);
-
+    
       if(password!==repassword){
          return res.status(400).send('passwords do not match');
       }
@@ -229,11 +231,11 @@ var routes =function(app,isAuth,encoder){
           res.redirect(`/inner-page`);
         } 
     });  
- });  
+    });  
 
   //principal form
 
-  app.post('/pform/:name',encoder,(req, res) => {
+    app.post('/pform/:name',encoder,(req, res) => {
   console.log(req.body);
   var name=req.params.name;
   var {name,id,photo,address,signature,phno,email,collegeid,username,password}=req.body;
@@ -278,7 +280,7 @@ var routes =function(app,isAuth,encoder){
       } 
 
  });  
-}); 
+    }); 
 
 
     /*------dashboards-------*/   
@@ -299,15 +301,21 @@ var routes =function(app,isAuth,encoder){
           });
         
           const query2 = new Promise((resolve, reject) => {
-            db.connection.query("select name,id,phno,department,address,email,photo from tutor where username=?",[req.params.name],(err,results,fields)=>{
+            db.connection.query("select name,id,phno,department,address,email,photo from tutor where id=?",[req.params.name],(err,results,fields)=>{
             if(err) {
                         reject(err);      
               }
               else{
-                console.log(results);
-                const { name, id, phno, department, address, email, photo } = results[0];
-                const data = { Name: name, Id: id, Phno: phno, Dept: department, Addr: address, Email: email, Photo: photo };
-                resolve(data);
+                if(results.length>0){
+                  console.log(results);
+                  const { name, id, phno, department, address, email, photo } = results[0];
+                  const data = { Name: name, Id: id, Phno: phno, Dept: department, Addr: address, Email: email, Photo: photo };
+                  resolve(data);
+                }
+                else{
+                  console.log('no results were found.Check your db query');
+                  return res.redirect('/inner-page?id=4000');
+                }
                 
               }
             }); 
@@ -542,7 +550,7 @@ var routes =function(app,isAuth,encoder){
          
      });
   
-  app.post('/tutoradd',encoder,(req,res)=>{
+     app.post('/tutoradd',encoder,(req,res)=>{
          var hodid=req.params.id;
           var {name,id,batch,email}=req.body;
           let Collegeid='1';
@@ -585,7 +593,7 @@ var routes =function(app,isAuth,encoder){
     
      //add new HOD   
   
- app.get('/hodadd',(req,res)=>{
+     app.get('/hodadd',(req,res)=>{
             
       db.connection.query("select * from hod",
           [req.body.name],(err,results,fields)=>{
@@ -600,7 +608,7 @@ var routes =function(app,isAuth,encoder){
          
      });
      
-  app.post('/hodadd',encoder,(req,res)=>{
+     app.post('/hodadd',encoder,(req,res)=>{
     
         var {name,id,dept,email}=req.body;
         let Collegeid='1';    
@@ -664,7 +672,7 @@ var routes =function(app,isAuth,encoder){
               
           });
    
-      app.post('/studentadd',encoder,(req,res)=>{
+         app.post('/studentadd',encoder,(req,res)=>{
         var tutorid=req.query.id;
         var {name,id,email}=req.body;
         var Collegeid;
@@ -702,7 +710,7 @@ var routes =function(app,isAuth,encoder){
           }
         }
         getData()   
-    });
+         });
 
     //principal add
         app.get('/principaladd',(req,res)=>{
@@ -806,14 +814,13 @@ var routes =function(app,isAuth,encoder){
       //STATUS DISPLAY
       app.get('/status/:name',(req,res)=>{
         try{
-          db.connection.query("select formdata from forms where name=?",
+          db.connection.query("select formdata from forms",
         [req.params.name],(err,results,fields)=>{
         if(err) {
           throw err; 
         } 
         else{
           const divContent = results[0].formdata;
-          console.log(divContent);
           const applications = []; // Empty array, can be populated later if needed
           res.render('status',{ divContent, applications });
         }
@@ -874,127 +881,137 @@ var routes =function(app,isAuth,encoder){
             if(user === 'Administrator'){
                 user='college';
             }
-            if(user === 'Staff Advaiser'){
+            if(user === 'StaffAdvisor'){
               user='Tutor';
           }
             console.log(req.body);
             if(user === 'college')
-               {
-                db.connection.query("select collegeid,password,phno from college where collegeid=? and password=?",[username,password],(err,results,fields)=>{
-                  if(err) {
-                    res.send('server error');
-                    throw err;
-                    
-                  } 
-                if(results.length>0){
-                  req.session.isAuth=true;  
-                  req.session.user =username;
-                  console.log(req.session.id);
+               { 
+                try{
+                    db.connection.query("select collegeid,password,phno from college where collegeid=? and password=?",[username,password],(err,results,fields)=>{
+                      if(err) {
+                        res.send('server error');
+                        throw err;
+                        
+                      } 
+                      if(results.length>0){
+                          req.session.isAuth=true;  
+                          req.session.user =username;
+                          console.log(req.session.id);
 
-                      try{
-                        if(results[0].phno===null){
-                            res.redirect(`/cform/${username}`);
-                        }
-                        else{
-                              res.redirect(`/college/${username}`);
-                        } 
-          
-                        }catch{
-                          console.log(err);
-                          res.send('server error');
-                        }
-                }
-                else{  
-                  res.render('inner-page',{message:'incorrect username or password'}); 
-                } 
-                res.end(); 
-                });  
-            }
-               
-            else{
-
-            db.connection.query("select id,password,phno from ?? where id=? and password=?",[user,username,password],(err,results,fields)=>{
-            if(err) {
-              res.send('server error');
-              throw err;
-              
-            } 
-
-            if(results.length>0){ 
-                req.session.isAuth=true;  
-                req.session.user =username;
-                console.log(req.session.id);
-                switch(user) { 
-          
-                  case 'Student':    
-
-                                        if(results[0].phno===null){
-                                              res.redirect(`/sform/${username}`);
-    
-                                            
-                                        }else{ 
- 
-                                              res.redirect(`/student/${username}`);
-                                        }
-                                    
-                                        
-                              break;
-
-                  case 'Tutor':
-                                  try{   
-
-                                          if(results[0].phno===null){
-                                            res.redirect(`/tform?id=${username}&user=${user}`);
-                                          }
-                                          else{
-                                                res.redirect(`/staffadvisor/${username}`);
-                                          }
-                                      
-                                    }catch{
-                                      console.error(err);
-                                      res.send('server error');
-                                    }
-                    
-                        break;
-                  case 'Hod':
                               try{
-                                      if(results[0].phno===null){
-                                          res.redirect(`/tform?id=${username}&user=${user}`);
-                                      }
-                                      else{
-                                            res.redirect(`/hod/${username}`);
-                                      }
+                                if(results[0].phno===null){
+                                    res.redirect(`/cform/${username}`);
+                                }
+                                else{ 
+                                      res.redirect(`/college/${username}`);
+                                } 
                   
                                 }catch{
                                   console.log(err);
                                   res.send('server error');
                                 }
+                        }
+                        else{  
+                          res.render('inner-page',{message:'incorrect username or password'}); 
+                        } 
+                res.end(); 
+                });  
+               }catch(err){
+                  console.log(err);
+                  res.redirect(`/inner-page?id=4000`)
+               }
+            }
+               
+          else{
+                try{
+                  db.connection.query("select id,password,phno from ?? where id=? and password=?",[user,username,password],(err,results,fields)=>{
+                  if(err) {
+                    console.log(err);
+                    return res.redirect(`/inner-page?id=4000`);
+                    
+                  } 
 
-                        break;
-                  case  'Principal':
+                  if(results && results.length > 0){ 
+                      req.session.isAuth=true;  
+                      req.session.user =username;
+                      console.log(req.session.id);
+                      switch(user) { 
+                  
+                        case 'Student':    
+
+                                              if(results[0].phno===null){
+                                                    return res.redirect(`/sform/${username}`);
+          
+                                                  
+                                              }else{ 
+      
+                                                   return res.redirect(`/student/${username}`);
+                                              }
+                                          
+                                              
+                                    break;
+
+                        case 'Tutor':
+                                        try{   
+
+                                                if(results[0].phno===null){
+                                                    return  res.redirect(`/tform?id=${username}&user=${user}`);
+                                                }
+                                                else{
+                                                    return  res.redirect(`/staffadvisor/${username}`);
+                                                }
+                                            
+                                          }catch{
+                                            console.error(err);
+                                            res.send('server error');
+                                          }
+                          
+                              break;
+                        case 'Hod':
                                     try{
                                             if(results[0].phno===null){
-                                                res.redirect(`/pform/${username}`);
-                                             }
-                                            else{
-                                                  res.redirect(`/Principal/${username}`);
+                                                 return res.redirect(`/tform?id=${username}&user=${user}`);
                                             }
-                              
+                                            else{
+                                                 return res.redirect(`/hod/${username}`);
+                                            }
+                        
                                       }catch{
                                         console.log(err);
                                         res.send('server error');
                                       }
-                      
-                                            break;  
+
+                              break;
+                        case  'Principal':
+                                          try{
+                                                  if(results[0].phno===null){
+                                                      return res.redirect(`/pform/${username}`);
+                                                  }
+                                                  else{
+                                                      return res.redirect(`/Principal/${username}`);
+                                                  }
+                                    
+                                            }catch{
+                                              console.log(err);
+                                              res.send('server error');
+                                            }
+                            
+                                                  break;  
+                    }
+                    }
+                    else{  
+                      res.render('inner-page',{message:'incorrect username or password'}); 
+                    } 
+                    res.end();
+                    
+                  })
+                }catch(err){
+                 console.log();
+                  console.log(err);
+                  res.redirect(`/inner-page?id=4000`);
               }
-              }
-              else{  
-                res.render('inner-page',{message:'incorrect username or password'}); 
-              } 
-              res.end();
-              
-            })
-          }
+            }
           });
 
         //REGISTER COLLEGE
@@ -1002,7 +1019,7 @@ var routes =function(app,isAuth,encoder){
              
            var{name,email}=req.body;
            mail.sendregisterEmail(name,email);
-        })
+        })   
 
       //delete user
       app.post('/deleteuser',encoder,(req,res)=>{ 
