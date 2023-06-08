@@ -34,8 +34,8 @@ var routes =function(app,isAuth,encoder){
             res.render('inner-page');
       });
      
-      app.get('/addnew',isAuth,(req, res) => {
-        res.render('addnew');
+      app.get('/addnewform',isAuth,(req, res) => {
+        res.render('addnewform');
       });
      
     app.get('/Principal',isAuth,(req, res) => {
@@ -102,7 +102,7 @@ var routes =function(app,isAuth,encoder){
     /*------register forms-------*/   
 
       //colllge form
-    app.post('/cform/:name/:collegeid',encoder,(req, res) => {
+    app.post('/cform/:name',(req, res) => {
         console.log(req.body);
         console.log(req.params);
         var name=req.params.name;
@@ -137,7 +137,7 @@ var routes =function(app,isAuth,encoder){
             logoPath = logoPath.replace('public', '');
            }   
         })
-          db.connection.query("update college set password=?,collegename=?,university=?,address=?,phno=?,email=?,collegelogo=?,collegeimage=?,website=? where username=?"
+          db.connection.query("update college set password=?,collegename=?,university=?,address=?,phno=?,email=?,collegelogo=?,collegeimage=?,website=? where collegeid=?"
       ,[password,collegename,university,address,mobile,email,logoPath,photoPath,website,name],
       (err,results,fields)=>{  
             if(err){
@@ -207,7 +207,7 @@ var routes =function(app,isAuth,encoder){
         })   
       signature.mv(signaturePath,function(err){
          if(err)
-            throw err;
+            throw err; 
          else { 
           console.log('upload successful');
           signaturePath = signaturePath.replace('public', '');
@@ -218,8 +218,8 @@ var routes =function(app,isAuth,encoder){
       (err,results,fields)=>{  
         if(err){
            res.send("server error");  
-           throw err;  
-        } 
+           throw err;   
+        }  
         else{  
           console.log('query succesful');
           res.redirect(`/inner-page`);
@@ -274,6 +274,12 @@ var routes =function(app,isAuth,encoder){
 
     //staffadvisor
     app.get('/staffadvisor/:name',isAuth,(req, res) => {
+
+
+
+
+
+      
        
       if(req.session.user){
         try {
@@ -466,7 +472,7 @@ var routes =function(app,isAuth,encoder){
           const query2 = new Promise((resolve, reject) => {
             var username=req.params.name;
             console.log(username);
-            db.connection.query("select * from college where username=?",[username],(err,results,fields)=>{
+            db.connection.query("select * from college where collegeid=?",[username],(err,results,fields)=>{
             if(err) {
                         reject(err);      
               }
