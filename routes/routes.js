@@ -717,7 +717,7 @@ var routes =function(app,isAuth,encoder){
             }
           }
          getData(); 
-      });
+      });   
    
       /*-----------REQUEST HANDLING ROUTES ------*/
       
