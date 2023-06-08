@@ -56,7 +56,7 @@ var routes =function(app,isAuth,encoder){
         }
         else{
 
-          var collegeid=results[0];
+          var collegeid=results[0].collegeid;
           console.log(collegeid);
           res.render('sform',{name,collegeid}); 
          }
@@ -125,13 +125,12 @@ var routes =function(app,isAuth,encoder){
     //student form
     app.post('/sform', encoder, (req, res) => {
       console.log(req.body);
-      var { name, address, phno, email, yearofadmn, regno, admno, collegeid, username, password, repassword } = req.body;
+      var username=req.query.name;
+      var { name, address, phno, email, yearofadmn, regno, admno, password, repassword } = req.body;
       var { photo } = req.files;
-      console.log(yearofadmn);
-      console.log(collegeid);
       const photoName = `${username}_photo${path.extname(photo.name)}`;
     
-      let photoPath = path.join('./public/uploads/student', username, photoName);
+      let photoPath = path.join('./public/uploads/student',username, photoName);
       
       photo.mv(photoPath)
         .then(() => {
@@ -140,8 +139,8 @@ var routes =function(app,isAuth,encoder){
           photoPath = photoPath.replace('public','');  
 
           
-          db.connection.query("UPDATE student SET name=?, address=?, phno=?, email=?, yearofadmission=?, id=?, admno=?, collegeid=?, photo=?, username=?, password=? WHERE id=?",
-            [name, address, phno, email, yearofadmn, regno, admno, collegeid, photoPath, username, password, regno],
+          db.connection.query("UPDATE student SET name=?, address=?,phno=?, email=?, yearofadmission=?, admno=?, photo=?, password=? WHERE id=?",
+            [name, address,phno, email, yearofadmn, admno, photoPath, password,username],
             (err, results, fields) => {
               if (err) {
                 console.error(err);   
@@ -394,7 +393,7 @@ var routes =function(app,isAuth,encoder){
       console.log(req.params.name);
       if(req.session.user){
         try{
-          db.connection.query("select * from student where username=?",
+          db.connection.query("select * from student where id=?",
           [req.params.name],(err,results,fields)=>{
            if(err) {
              throw err;
@@ -404,7 +403,7 @@ var routes =function(app,isAuth,encoder){
               console.log(results);
               var name=results[0].name;
               var admno=results[0].admno;
-              var regno=results[0].regno; 
+              var regno=results[0].id; 
               var dept=results[0].department;
               var phno=results[0].phno;  
               var addr=results[0].address
@@ -724,9 +723,18 @@ var routes =function(app,isAuth,encoder){
       
   // SENDING REQUEST ROUTE FOR STUDENTS    
   app.get('/requests',(req,res)=>{         
-         
-      var results=[];
-      res.render('requests',{applications:results});
+    try{
+          db.connection.query("select * from forms ",(err,results,fields)=>{
+          if(err) {
+            throw err; 
+          } 
+          else{
+            res.render('requests',{forms:results});
+          }
+        });
+      }catch(err){
+        console.log(err); 
+      }
    });
          
    // SENDING REQUEST ROUTE FOR STUDENTS 
