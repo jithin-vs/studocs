@@ -10,7 +10,7 @@ var routes =function(app,isAuth,encoder){
    
    
     app.get('/', (req, res) => {
-        res.render('index');
+        res.render('index'); 
         
       });
       app.get('/home', (req, res) => {
@@ -213,8 +213,8 @@ var routes =function(app,isAuth,encoder){
           signaturePath = signaturePath.replace('public', '');
          }   
       }) 
-     db.connection.query("update ?? set name=?,photo=?,address=?,signature=?,phno=?,email=?,design=?,department=?,password=? where id=?"
-      ,[req.params.user,name,photoPath,address,signaturePath,phno,email,design,dept,password,username],
+     db.connection.query("update ?? set name=?,photo=?,address=?,signature=?,phno=?,email=?,department=?,password=? where id=?"
+      ,[req.params.user,name,photoPath,address,signaturePath,phno,email,dept,password,username],
       (err,results,fields)=>{  
         if(err){
            res.send("server error");  
