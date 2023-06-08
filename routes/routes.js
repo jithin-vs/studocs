@@ -56,7 +56,7 @@ var routes =function(app,isAuth,encoder){
 
           var collegeid=results[0].collegeid;
           console.log(collegeid);
-          res.render('tform',{name,collegeid}); 
+          res.render('tform',{name,collegeid,user}); 
          }
         });
     }); 
@@ -187,23 +187,17 @@ var routes =function(app,isAuth,encoder){
     });
     
    //teacher form  
-    app.post('/tform',(req, res) => {
-    var {name,id,address,phno,email,design,dept,collegeid,username,password,repassword}=req.body;
+    app.post('/tform/:id/:user',(req, res) => {
+     var {name,address,phno,email,design,dept,password,repassword}=req.body;
      var{photo,signature}=req.files;
- 
+     console.log(req.body);
+     var username=req.params.id;
      const photoName = `${username}_photo${path.extname(photo.name)}`;
      const signatureName = `${username}_signature${path.extname(signature.name)}`;
 
      let photoPath = path.join('./public/uploads/teacher', username, photoName);
      let signaturePath = path.join('./public/uploads/teacher', username, signatureName);
     
-      if(password!==repassword){
-         return res.status(400).send('passwords do not match');
-      }
-      if(!photo) {
-          return res.status(400). send('please upload photo .');
-      }
-   
       photo.mv(photoPath,function(err){
           if(err) throw err;
           else { 
@@ -219,8 +213,8 @@ var routes =function(app,isAuth,encoder){
           signaturePath = signaturePath.replace('public', '');
          }   
       }) 
-     db.connection.query("update ?? set name=?,id=?,photo=?,address=?,signature=?,phno=?,email=?,design=?,department=?,collegeid=?,username=?,password=? where id=?"
-      ,[req.query.user,name,id,photoPath,address,signaturePath,phno,email,design,dept,collegeid,username,password,id],
+     db.connection.query("update ?? set name=?,photo=?,address=?,signature=?,phno=?,email=?,design=?,department=?,password=? where id=?"
+      ,[req.params.user,name,photoPath,address,signaturePath,phno,email,design,dept,password,username],
       (err,results,fields)=>{  
         if(err){
            res.send("server error");  
@@ -235,48 +229,41 @@ var routes =function(app,isAuth,encoder){
 
   //principal form
 
-    app.post('/pform/:name',encoder,(req, res) => {
+ app.post('/pform/:name',encoder,(req, res) => {
   console.log(req.body);
-  var name=req.params.name;
-  var {name,id,photo,address,signature,phno,email,collegeid,username,password}=req.body;
+  var id=req.params.name;
+  var {name,photo,address,signature,phno,email,password}=req.body;
   var { photo,signature} = req.files;
-  console.log(name);
-  const photoName = `${name}_photo${path.extname(photo.name)}`;
-  const logoName = `${name}_logo${path.extname(signature.name)}`;
-  console.log(photoName)
-  let photoPath = path.join('./public/uploads/college', name, photoName);
-  let logoPath = path.join('./public/uploads/college',  name, logoName);
+  const photoName = `${id}_photo${path.extname(photo.name)}`;
+  const signatureName = `${id}_logo${path.extname(signature.name)}`;
+ 
+  let photoPath = path.join('./public/uploads/college', id, photoName);
+  let signaturePath = path.join('./public/uploads/college', id, signatureName);
     
-    if(!signature) {
-        return res.status(400). send('please upload photo. .');
-    }
-    if(!photo) {
-      return res.status(400). send('please upload signature. .');
-    }
-   photo.mv(photoPath,function(err){
+   photo.mv(photoPath,function(err){  
       if(err) throw err;
       else { 
         console.log('upload successful');
-        photoPath = photoPath.replace('public', '');
+        photoPath = photoPath.replace('public','');
       }
     })   
-  signature.mv(logoPath,function(err){
+  signature.mv(signaturePath,function(err){
      if(err)
         throw err;
      else { 
       console.log('upload successful');
-      logoPath = logoPath.replace('public', '');
+      signaturePath = signaturePath.replace('public','');
      }    
   })
-    db.connection.query("update principal set name=?,id=?,collegeid=?,address=?,phno=?,email=?,password=?,photo=? where username=?"
-,[name,id,collegeid,address,phno,email,password,photoPath],
+  db.connection.query("update principal set name=?,address=?,phno=?,email=?,password=?,photo=? where id=?"
+,[name,address,phno,email,password,photoPath,id],
 (err,results,fields)=>{  
       if(err){
          res.send("server error");
          throw err;
       }  
       else{ 
-        res.redirect('/inner-page');
+        res.redirect('/inner-page?id=1010');
       } 
 
  });  
@@ -393,7 +380,7 @@ var routes =function(app,isAuth,encoder){
       console.log(req.params.name);
       if(req.session.user){
         try{
-          db.connection.query("select * from principal where username=?",
+          db.connection.query("select * from principal where id=?",
           [req.params.name],(err,results,fields)=>{
            if(err) {
              throw err;
@@ -407,7 +394,8 @@ var routes =function(app,isAuth,encoder){
               var Address=results[0].address
               var Email=results[0].email;
               var Photo=results[0].photo;
-              res.render('Principal',{Name,Id,Mobile,Address,Email,Photo})
+              applications=[];
+              res.render('Principal',{Name,Id,Mobile,Address,Email,Photo,applications})
            }
          }); 
         }catch(err)
