@@ -378,7 +378,7 @@ var routes =function(app,isAuth,encoder){
     //Principal
     app.get('/Principal/:name',isAuth,(req, res) => {
       console.log(req.params.name);
-      if(req.session.user){
+      if(req.session.user){  
         try{
           db.connection.query("select * from principal where id=?",
           [req.params.name],(err,results,fields)=>{
