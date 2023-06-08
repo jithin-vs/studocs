@@ -44,18 +44,19 @@
           </div>
           <div class="form-group col-md-4">
             <label for="id">Id</label>
-            <input type="id" class="form-control" id="id" placeholder="id" name="collegeid" required>
+            <input type="id" class="form-control" id="id" value="<%= name%>" name="collegeid" disabled>
           </div>
           <div class="form-group col-md-4">
             <label for="university">University</label>
             <input type="name" class="form-control" id="university" placeholder="university" name="university" required>
           </div>
         </div>
-        <div class="form-group" style="padding-left: 0px;">
+        <div class="form-row">
+        <div class="form-group col-md-4" style="padding-left: 0px;">
           <label for="inputAddress">Address</label>
           <textarea type="textarea" rows="1" class="form-control" id="inputAddress" placeholder="1234 Main St" name="address"required></textarea>
         </div>
-        <div class="form-row">
+
             <div class="form-group col-md-4">
               <label for="phno">Mobile Number</label>
               <input type="name" class="form-control" id="phno" placeholder="Number" name="mobile"required>
@@ -75,10 +76,6 @@
           <div class="form-group col-md-4">
             <label for="image1" class="form-label">College Image</label>
             <input class="form-control form-control-sm" id="image" type="file" placeholder="Size 1360 X 245" name="image"required >
-          </div>
-          <div class="form-group col-md-4">
-            <label for="username">Username</label>
-            <input type="username" class="form-control" id="username" value=<%= name%> name="username" disabled>
           </div>
           <div class="form-group col-md-6">
             <label for="password">Password</label>

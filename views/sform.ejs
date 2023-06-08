@@ -38,7 +38,7 @@
         <!-- Error message will be displayed here -->
       </div>
       <div class="form-row">
-          <div class="form-group col-md-4">
+          <div class="form-group col-md-8">
             <label for="cname">Name</label>
             <input type="name" class="form-control" id="cname" placeholder="Name" name="name" required>
           </div>
@@ -66,7 +66,7 @@
             </div>
               <div class="form-group col-md-4">
                 <label for="reg" class="form-label">Register No</label>
-                <input class="form-control form-control-sm" id="reg" type="id" placeholder="<%= name%>" name="regno" disabled>
+                <input class="form-control form-control-sm" id="reg" type="id" value="<%= name%>" name="regno" disabled>
               </div>
              <div class="form-group col-md-4">
                   <label for="reg" class="form-label">Admission Number</label>
@@ -74,12 +74,10 @@
           </div>
           <div class="form-group col-md-4">
             <label for="id" class="form-label">College Id</label>
-            <input class="form-control form-control-sm" id="id" type="text" placeholder="<%= collegeid%>" name="collegeid"disabled>
+            <input class="form-control form-control-sm" id="id" type="text" value="<%= collegeid%>" name="id"disabled>
           </div>
-          <div class="form-group col-md-4">
-            <label for="username">Username</label>
-            <input type="username" class="form-control" id="username" value="<%= name%>" name="username" disabled>
-          </div>
+          </div> 
+          <div class="form-row">
           <div class="form-group col-md-6">
             <label for="password">Password</label>
             <input type="password" class="form-control" id="password" placeholder="Password" name="password" required>
@@ -88,17 +86,20 @@
             <label for="Re-password">Re-Enter Password</label>
             <input type="password" class="form-control" id="re-password" placeholder="Password" name="repassword">
           </div>
+        </div>
+        Do you want to save
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="inlineRadioOptions" id="yes" value="yes">
+          <label class="form-check-label" for="inlineRadio1">Yes</label>
+        </div>
+   
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="inlineRadioOptions" id="no" value="no">
+          <label class="form-check-label" for="inlineRadio2">No</label>
+        </div>
       </div>
-      Do you want to save
-      <div class="form-check form-check-inline">
-        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="yes" value="yes">
-        <label class="form-check-label" for="inlineRadio1">Yes</label>
-      </div>
- 
-      <div class="form-check form-check-inline">
-        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="no" value="no">
-        <label class="form-check-label" for="inlineRadio2">No</label>
-      </div>
+      
+
       <br><center>
         <button type="submit" class="btn btn-primary">Submit</button>
         <button type="clear" class="btn btn-primary">Clear</button>
