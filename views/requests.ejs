@@ -43,6 +43,7 @@
                 <th>ID</th>
                 <th>Name</th>
                 <th>Forms</th>
+                <th>Action</th>
               </tr>
             </thead>
           <tbody>
@@ -51,6 +52,9 @@
                 <td><%= forms[i].formid %></td>
                 <td><%= forms[i].name %></td>
                 <td><%= forms[i].date %></td>
+                <td>
+                  <button type="button" class="btn btn-success" data-toggle="dwd"  data-target="#dwd">view</button>
+                </td>
               </tr>
             <% } %>
           </tbody>
