@@ -9,7 +9,7 @@ var routes =function(app,isAuth,encoder){
   
 ///sdjaskjdhasjd
    
-   
+     
     app.get('/', (req, res) => {
         res.render('index'); 
         
@@ -473,11 +473,11 @@ var routes =function(app,isAuth,encoder){
           const query2 = new Promise((resolve, reject) => {
             var username=req.params.name;
             console.log(username);
-            db.connection.query("select * from college where username=?",[username],(err,results,fields)=>{
+            db.connection.query("select * from college where collegeid=?",[username],(err,results,fields)=>{
             if(err) {
                         reject(err);      
               }
-              else{ 
+              else{     
                 console.log(results);
                 const { collegename, collegeid, phno, address, email, collegeimage,website } = results[0];
 
@@ -492,7 +492,7 @@ var routes =function(app,isAuth,encoder){
                   const website1 = data.Website || 'N/A';
 
                   // Now you can use these variables in your code
-                  console.log(name1);
+                  console.log(name1); 
                   console.log(id1);
                   console.log(phno1);
                   console.log(addr1);
