@@ -482,13 +482,14 @@ var routes =function(app,isAuth,encoder){
                 const { collegename, collegeid, phno, address, email, collegeimage,website } = results[0];
 
                 var data = { Name: collegename, Id: collegeid, Phno: phno, Addr: address, Email: email, Photo: collegeimage, Website:website};
-                  // Check and handle the undefined values
+                const imagePath = path.relative('public', data.Photo);
+                // Check and handle the undefined values
                   const name1 = data.Name || 'N/A';
                   const id1 = data.Id || 'N/A';   
                   const phno1 = data.Phno || 'N/A';
                   const addr1 = data.Addr || 'N/A';  
                   const email1 = data.Email || 'N/A';
-                  const photo1 = data.Photo || 'N/A';
+                  const photo1 = imagePath|| 'N/A';
                   const website1 = data.Website || 'N/A';
 
                   // Now you can use these variables in your code
@@ -574,7 +575,7 @@ var routes =function(app,isAuth,encoder){
                     reject(err);
                   } else {
                     resolve(results);
-                    res.redirect(`/tutoradd?id=${hodid}`);
+                    res.redirect('/tutoradd');
                   };
                 });
               });
@@ -752,7 +753,7 @@ var routes =function(app,isAuth,encoder){
          getData(); 
       });   
    
-  /*-----------REQUEST HANDLING ROUTES ------*/
+      /*-----------REQUEST HANDLING ROUTES ------*/
       
   // SENDING REQUEST ROUTE FOR STUDENTS    
   app.get('/requests',(req,res)=>{         
