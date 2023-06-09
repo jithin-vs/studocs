@@ -473,7 +473,7 @@ var routes =function(app,isAuth,encoder){
           const query2 = new Promise((resolve, reject) => {
             var username=req.params.name;
             console.log(username);
-            db.connection.query("select * from college where username=?",[username],(err,results,fields)=>{
+            db.connection.query("select * from college where collegeid=?",[username],(err,results,fields)=>{
             if(err) {
                         reject(err);      
               }
