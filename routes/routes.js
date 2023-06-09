@@ -11,7 +11,7 @@ var routes =function(app,isAuth,encoder){
    
    
     app.get('/', (req, res) => {
-        res.render('index');
+        res.render('index'); 
         
       });
       app.get('/home', (req, res) => {
@@ -35,8 +35,8 @@ var routes =function(app,isAuth,encoder){
             res.render('inner-page');
       });
      
-      app.get('/addnew',isAuth,(req, res) => {
-        res.render('addnew');
+      app.get('/addnewform',isAuth,(req, res) => {
+        res.render('addnewform');
       });
      
     app.get('/Principal',isAuth,(req, res) => {
@@ -103,7 +103,7 @@ var routes =function(app,isAuth,encoder){
     /*------register forms-------*/   
 
       //colllge form
-    app.post('/cform/:name/:collegeid',encoder,(req, res) => {
+    app.post('/cform/:name',(req, res) => {
         console.log(req.body);
         console.log(req.params);
         var name=req.params.name;
@@ -208,19 +208,19 @@ var routes =function(app,isAuth,encoder){
         })   
       signature.mv(signaturePath,function(err){
          if(err)
-            throw err;
+            throw err; 
          else { 
           console.log('upload successful');
           signaturePath = signaturePath.replace('public', '');
          }   
       }) 
-     db.connection.query("update ?? set name=?,photo=?,address=?,signature=?,phno=?,email=?,design=?,department=?,password=? where id=?"
-      ,[req.params.user,name,photoPath,address,signaturePath,phno,email,design,dept,password,username],
+     db.connection.query("update ?? set name=?,photo=?,address=?,signature=?,phno=?,email=?,department=?,password=? where id=?"
+      ,[req.params.user,name,photoPath,address,signaturePath,phno,email,dept,password,username],
       (err,results,fields)=>{  
         if(err){
            res.send("server error");  
-           throw err;  
-        } 
+           throw err;   
+        }  
         else{  
           console.log('query succesful');
           res.redirect(`/inner-page`);
@@ -275,6 +275,12 @@ var routes =function(app,isAuth,encoder){
 
     //staffadvisor
     app.get('/staffadvisor/:name',isAuth,(req, res) => {
+
+
+
+
+
+      
        
       if(req.session.user){
         try {
@@ -467,7 +473,7 @@ var routes =function(app,isAuth,encoder){
           const query2 = new Promise((resolve, reject) => {
             var username=req.params.name;
             console.log(username);
-            db.connection.query("select * from college where collegeid=?",[username],(err,results,fields)=>{
+            db.connection.query("select * from college where username=?",[username],(err,results,fields)=>{
             if(err) {
                         reject(err);      
               }
@@ -551,7 +557,8 @@ var routes =function(app,isAuth,encoder){
                 db.connection.query("SELECT collegeid FROM hod WHERE id=?", [hodid], (err, results, fields) => {
                   if (err) {
                     reject(err);
-                  } else {
+                  } else { console.log(results);
+
                     resolve(results);
                   }   
                 });
@@ -600,8 +607,7 @@ var routes =function(app,isAuth,encoder){
      
      app.post('/hodadd',encoder,(req,res)=>{
     
-        var {name,id,dept,email}=req.body;
-        let Collegeid='1';    
+        var {name,id,dept,email}=req.body;   
         async function getData() {
           try {
             let Collegeid = '12345';
@@ -1047,6 +1053,54 @@ var routes =function(app,isAuth,encoder){
           }
         })
       });
+
+      // app.post('/search', (req, res) => {
+      //   const searchTerm = req.body.search;
+      
+      //   // Perform search query
+      //   const query = `SELECT * FROM student WHERE
+      //     name LIKE '%${searchTerm}%' OR
+      //     regno LIKE '%${searchTerm}%'`;
+      
+      //   db.connection.query(query, (err, results) => { 
+      //     if (err) throw err; 
+      //     var applications=[]
+      //     res.render('addnewstudent', { applications:results,id:req.query.id,searchTerm });
+      //   });
+      // });
+      // app.post('/search', (req, res) => {
+      //   const searchTerm = req.body.search;
+      
+      //   // Redirect to the home page without the search term query parameter
+      //   res.redirect(`/?search=${searchTerm}`);
+      // });
+
+      app.get('/', (req, res) => {
+        const searchTerm = req.query.search;
+        
+        // Check if a search term is present
+        if (searchTerm) {
+          // Perform search query
+          const query = `SELECT * FROM student WHERE
+            name LIKE '%${searchTerm}%' OR
+            regno LIKE '%${searchTerm}%'`;
+          
+          db.connection.query(query, (err, results) => {
+            if (err) throw err;
+            res.render('addnewstudent', { applications: results, id: req.query.id, searchTerm });
+          });
+        } else {
+          // No search term provided, fetch all students
+          const query = 'SELECT * FROM student';
+      
+          db.connection.query(query, (err, results) => {
+            if (err) throw err;
+            res.render('addnewstudent', { applications: results, id: req.query.id, searchTerm: '' });
+          });
+        }
+      }); 
+      
+      
     
       /* app.get('/verify',(req,res)=>{ 
           

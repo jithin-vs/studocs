@@ -58,7 +58,9 @@
                             </div>
                             <div class="col-sm-9 col-xs-12 text-right">
                                 <div class="btn_group">
-                                    <input type="text" class="form-control" placeholder="Search">
+                                    <form action="/search?id=<%= id%>" method="POST">
+                                        <input type="text" class="form-control" name="search" placeholder="Search name or id"  >
+                                      </form>
                                 </div>
                             </div>
                         </div>
