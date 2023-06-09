@@ -599,21 +599,21 @@ var routes =function(app,isAuth,encoder){
              
            }
            else{
-              res.render('addnewhod',{applications:results});
+              res.render('addnewhod',{applications:results,id:req.query.id});
            }
          }); 
          
      });
      
      app.post('/hodadd',encoder,(req,res)=>{
-    
+        
+        var principalid=req.query.id;
         var {name,id,dept,email}=req.body;   
         async function getData() {
           try {
-            let Collegeid = '12345';
-        
+            
             const hodQueryResult = await new Promise((resolve, reject) => {
-              db.connection.query("SELECT collegeid FROM principal WHERE id=?", [Collegeid], (err, results, fields) => {
+              db.connection.query("SELECT collegeid FROM principal WHERE id=?", [principalid], (err, results, fields) => {
                 if (err) {
                   reject(err);
                 } else {
@@ -627,12 +627,12 @@ var routes =function(app,isAuth,encoder){
             var genPassword=verify.randomPassword;
             mail.sendcredEmail(name,email,id,genPassword);
             const studentsQueryResult = await new Promise((resolve, reject) => {
-              db.connection.query("insert into hod (name,id,collegeid,email,department) values(?,?,?,?,?)", [name,id,Collegeid,email,dept], (err, results, fields) => {
+              db.connection.query("insert into hod (name,id,collegeid,email,department,password) values(?,?,?,?,?,?)", [name,id,Collegeid,email,dept,genPassword], (err, results, fields) => {
                 if (err) {
                   reject(err);
                 } else {
                   resolve(results);
-                  res.redirect('/hodadd');
+                  res.redirect(`/hodadd?id=${principalid}`);
                 };
               });
             });

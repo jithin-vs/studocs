@@ -83,7 +83,7 @@
                                        <td><%= number %></td>
                                        <td><%= application.name  %></td>
                                        <td><%= application.id %></td>
-                                       <td><%= application.batch  %></td>
+                                       <td><%= application.department %></td>
                                        <td><%= application.email  %></td>
                                        <td>
                                         <form id="deleteForm_<%= application.id %>" method="POST" action="/deleteuser?id=<%= application.id %>&user=hod">
@@ -114,7 +114,7 @@
                         </div>
                     <div class="container">
                     <br>
-                    <form action="/hodadd" method="post">
+                    <form action="/hodadd?id=<%= id%>" method="post">
                         <div class="row">
                         <div class="col">
                             <input type="text" class="form-control" placeholder="Name" name="name">
