@@ -553,7 +553,7 @@ var routes =function(app,isAuth,encoder){
                     reject(err);
                   } else {
                     resolve(results);
-                  }
+                  }   
                 });
               });
 
