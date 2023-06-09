@@ -3,6 +3,7 @@ const db =require('../controller/dbconnect');
 const mail =require("../controller/mailserv");
 const verify =require("../controller/verification");
 const path=require('path');
+const { query } = require('express');
 
 var routes =function(app,isAuth,encoder){     
   
@@ -263,7 +264,7 @@ var routes =function(app,isAuth,encoder){
          throw err;
       }  
       else{ 
-        res.redirect('/inner-page?id=1010');
+        res.redirect('/inner-page?id=1010');  
       } 
 
  });  
@@ -472,7 +473,7 @@ var routes =function(app,isAuth,encoder){
           const query2 = new Promise((resolve, reject) => {
             var username=req.params.name;
             console.log(username);
-            db.connection.query("select * from college where collegeid=?",[username],(err,results,fields)=>{
+            db.connection.query("select * from college where username=?",[username],(err,results,fields)=>{
             if(err) {
                         reject(err);      
               }
@@ -544,14 +545,14 @@ var routes =function(app,isAuth,encoder){
          
      });
   
-  app.post('/tutoradd',encoder,(req,res)=>{
-         var hodid=req.params.id;
+     app.post('/tutoradd',encoder,(req,res)=>{
+         var hodid=req.query.id;
           var {name,id,batch,email}=req.body;
-          let Collegeid='1';
+          var Collegeid;
+          console.log(hodid);
           async function getid() {
             try {
-              let Collegeid = '12345';
-          
+             
               const hodQueryResult = await new Promise((resolve, reject) => {
                 db.connection.query("SELECT collegeid FROM hod WHERE id=?", [hodid], (err, results, fields) => {
                   if (err) {
@@ -559,14 +560,15 @@ var routes =function(app,isAuth,encoder){
                   } else { console.log(results);
 
                     resolve(results);
-                  }
+                  }   
                 });
               });
-          
-              //Collegeid = hodQueryResult[0].collegeid;
+
+              Collegeid = hodQueryResult[0].collegeid;
               console.log(Collegeid); // Output the updated Collegeid value here
-          
               const studentsQueryResult = await new Promise((resolve, reject) => {
+                var genPassword=verify.randomPassword;
+                mail.sendcredEmail(name,email,id,genPassword);  
                 db.connection.query("insert into tutor (name,id,collegeid,email,batch) values(?,?,?,?,?)", [name,id,Collegeid,email,batch], (err, results, fields) => {
                   if (err) {
                     reject(err);
@@ -686,9 +688,9 @@ var routes =function(app,isAuth,encoder){
             Collegeid = hodQueryResult[0].collegeid;
             console.log(Collegeid); // Output the updated Collegeid value here
             var genPassword=verify.randomPassword;
-            mail.sendcredEmail(name,email,email,genPassword);
+            mail.sendcredEmail(name,email,id,genPassword);
             const studentsQueryResult = await new Promise((resolve, reject) => {  
-              db.connection.query("insert into student (name,regno,collegeid,email,username,password) values(?,?,?,?,?,?)", [name,id,Collegeid,email,email,genPassword], (err, results, fields) => {
+              db.connection.query("insert into student (name,id,collegeid,email,password) values(?,?,?,?,?)", [name,id,Collegeid,email,genPassword], (err, results, fields) => {
                 if (err) {
                   reject(err);
                 } else {
@@ -728,7 +730,9 @@ var routes =function(app,isAuth,encoder){
           
           async function getData() {  
             try {
-              let Collegeid='98765432';      
+              let Collegeid='98765432';    
+              var genPassword=verify.randomPassword;
+              mail.sendcredEmail(name,email,id,genPassword)  
               const studentsQueryResult = await new Promise((resolve, reject) => {
                 db.connection.query("insert into principal (name,id,collegeid,email) values(?,?,?,?)", [name,id,Collegeid,email], (err, results, fields) => {
                   if (err) {
@@ -1014,18 +1018,26 @@ var routes =function(app,isAuth,encoder){
            var{name,email}=req.body;
            mail.sendregisterEmail(name,email);
         })   
-
+  
       //delete user
       app.post('/deleteuser',encoder,(req,res)=>{ 
-        console.log(req.params.id);     
+
+        var user=req.query.user   
         db.connection.query("delete from ?? where id=?",[req.query.user,req.query.id],(err,results,fields)=>{
           if(err) {
             res.send('server error');
-            throw err;
+            throw err;  
                 
           }
           else{
-             res.redirect('/tutoradd');
+            if(user ==='student')
+               return res.redirect('/studentadd');
+            if(user ==='tutor')
+               return res.redirect('/tutoradd');
+            if(user ==='hod')
+               return res.redirect('/hodadd');
+            if(user ==='principal')
+               return res.redirect('/principaladd');
           }
         }); 
        })
