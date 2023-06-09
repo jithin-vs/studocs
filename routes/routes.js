@@ -605,7 +605,7 @@ var routes =function(app,isAuth,encoder){
          
      });
      
-     app.post('/hodadd',encoder,(req,res)=>{
+     app.post('/hodadd',encoder,(req,res)=>{ 
         
         var principalid=req.query.id;
         var {name,id,dept,email}=req.body;   
