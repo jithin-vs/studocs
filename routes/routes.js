@@ -574,7 +574,7 @@ var routes =function(app,isAuth,encoder){
                     reject(err);
                   } else {
                     resolve(results);
-                    res.redirect('/tutoradd');
+                    res.redirect(`/tutoradd?id=${hodid}`);
                   };
                 });
               });
@@ -752,7 +752,7 @@ var routes =function(app,isAuth,encoder){
          getData(); 
       });   
    
-      /*-----------REQUEST HANDLING ROUTES ------*/
+  /*-----------REQUEST HANDLING ROUTES ------*/
       
   // SENDING REQUEST ROUTE FOR STUDENTS    
   app.get('/requests',(req,res)=>{         
