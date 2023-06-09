@@ -85,7 +85,7 @@
                                        <td><%= application.batch  %></td>
                                        <td><%= application.email  %></td>
                                        <td>
-                                        <form id="deleteForm_<%= application.username %>" method="POST" action="/deleteuser/<%= application.username %>&user=principal">
+                                        <form id="deleteForm_<%= application.username %>" method="POST" action="/deleteuser?id=<%= application.id %>&user=principal">
                                             <input type="hidden" name="_method" value="DELETE">
                                             <a type="button" onclick="confirmDelete('<%= application.username %>')"><i class="fa fa-trash"></i></a>
                                           </form>
