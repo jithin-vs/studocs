@@ -484,7 +484,7 @@ var routes =function(app,isAuth,encoder){
                 var data = { Name: collegename, Id: collegeid, Phno: phno, Addr: address, Email: email, Photo: collegeimage, Website:website};
                   // Check and handle the undefined values
                   const name1 = data.Name || 'N/A';
-                  const id1 = data.Id || 'N/A';
+                  const id1 = data.Id || 'N/A';   
                   const phno1 = data.Phno || 'N/A';
                   const addr1 = data.Addr || 'N/A';  
                   const email1 = data.Email || 'N/A';
