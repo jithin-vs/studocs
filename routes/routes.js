@@ -6,7 +6,7 @@ const path=require('path');
 
 var routes =function(app,isAuth,encoder){     
   
-///sdjaskjdhasjd
+
    
    
     app.get('/', (req, res) => {
