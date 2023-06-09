@@ -9,10 +9,10 @@ var routes =function(app,isAuth,encoder){
 ///sdjaskjdhasjd
    
    
-    app.get('/', (req, res) => {
+  /*  app.get('/', (req, res) => {
         res.render('index');    
         
-      });
+      }); */
       app.get('/home', (req, res) => {
         res.render('index');
           
@@ -1022,20 +1022,52 @@ var routes =function(app,isAuth,encoder){
         })
       });
 
-      app.post('/search', (req, res) => {
-        const searchTerm = req.body.search;
+      // app.post('/search', (req, res) => {
+      //   const searchTerm = req.body.search;
       
-        // Perform search query
-        const query = `SELECT * FROM student WHERE
-          name LIKE '%${searchTerm}%' OR
-          regno LIKE '%${searchTerm}%'`;
+      //   // Perform search query
+      //   const query = `SELECT * FROM student WHERE
+      //     name LIKE '%${searchTerm}%' OR
+      //     regno LIKE '%${searchTerm}%'`;
       
-        db.connection.query(query, (err, results) => { 
-          if (err) throw err; 
-          var applications=[]
-          res.render('addnewstudent', { applications:results,id:req.query.id,searchTerm });
-        });
-      });
+      //   db.connection.query(query, (err, results) => { 
+      //     if (err) throw err; 
+      //     var applications=[]
+      //     res.render('addnewstudent', { applications:results,id:req.query.id,searchTerm });
+      //   });
+      // });
+      // app.post('/search', (req, res) => {
+      //   const searchTerm = req.body.search;
+      
+      //   // Redirect to the home page without the search term query parameter
+      //   res.redirect(`/?search=${searchTerm}`);
+      // });
+
+      app.get('/', (req, res) => {
+        const searchTerm = req.query.search;
+        
+        // Check if a search term is present
+        if (searchTerm) {
+          // Perform search query
+          const query = `SELECT * FROM student WHERE
+            name LIKE '%${searchTerm}%' OR
+            regno LIKE '%${searchTerm}%'`;
+          
+          db.connection.query(query, (err, results) => {
+            if (err) throw err;
+            res.render('addnewstudent', { applications: results, id: req.query.id, searchTerm });
+          });
+        } else {
+          // No search term provided, fetch all students
+          const query = 'SELECT * FROM student';
+      
+          db.connection.query(query, (err, results) => {
+            if (err) throw err;
+            res.render('addnewstudent', { applications: results, id: req.query.id, searchTerm: '' });
+          });
+        }
+      }); 
+      
       
     
       /* app.get('/verify',(req,res)=>{ 
