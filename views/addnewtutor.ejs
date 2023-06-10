@@ -33,7 +33,7 @@
 		<div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
 		  <ul class="navbar-nav">
 			<li class="nav-item">
-			  <a class="nav-link active" href="/hod">Home</a>
+			  <a class="nav-link active" href="/hod/<%= id%>">Home</a>
 			</li>
 			<li class="nav-item">
 			  <a class="nav-link active" href="/hod#banner">Services</a>
@@ -58,8 +58,12 @@
                             </div>
                             <div class="col-sm-9 col-xs-12 text-right">
                                 <div class="btn_group">
-                                    <input type="text" class="form-control" placeholder="Search">
+                                    <form action="/search1?id=<%= id %>" method="post">
+                                        <input type="text" class="form-control" placeholder="Search name or id">
+                                        <button class="btn btn-default" title="Reload"><i class="fa fa-refresh"></i></button>
+                                    </form>
                                 </div>
+                                
                             </div>
                         </div>
                     </div>
@@ -188,4 +192,5 @@
 		</div>
 	</div>
     <br><br>
+ 
 </body>

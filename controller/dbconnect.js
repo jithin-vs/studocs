@@ -1,6 +1,6 @@
 const mysql = require('mysql2');
 require('dotenv').config();
-
+ 
 // Set up a MySQL connection
 const connection = mysql.createConnection({
     host: 'localhost',
@@ -8,7 +8,7 @@ const connection = mysql.createConnection({
     password:process.env.MYSQL_PASS,
     database: 'studocs',
   });  
-
+  
   // Connect to the MySQL database
  connection.connect((error) => {
     if (error) {

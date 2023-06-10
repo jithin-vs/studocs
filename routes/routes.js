@@ -80,17 +80,21 @@ var routes =function(app,isAuth,encoder){
     app.get('/pform/:name', (req, res) => {
 
        var name=req.params.name;
-        db.connection.query("select collegeid from principal where id=?",
+        db.connection.query("select * from principal where id=?",
         [name],(err,results,fields)=>{
         if(err) {
           throw err;
-          
+           
         }
-        else{
+        else{ 
  
+          var n1=results[0].name;
           var collegeid=results[0].collegeid;
-          console.log(collegeid);
-          res.render('pform',{name,collegeid}); 
+          var address=results[0].address;
+          var phno=results[0].phno;
+          var email=results[0].email;
+          console.log(address);
+          res.render('pform',{n1,name,address,phno,email,collegeid}); 
          }
       }); 
     });
@@ -134,7 +138,7 @@ var routes =function(app,isAuth,encoder){
             logoPath = logoPath.replace('public', '');
            }   
         })
-          db.connection.query("update college set password=?,collegename=?,university=?,address=?,phno=?,email=?,collegelogo=?,collegeimage=?,website=? where username=?"
+          db.connection.query("update college set password=?,collegename=?,university=?,address=?,phno=?,email=?,collegelogo=?,collegeimage=?,website=? where collegeid=?" 
       ,[password,collegename,university,address,mobile,email,logoPath,photoPath,website,name],
       (err,results,fields)=>{  
             if(err){
@@ -271,14 +275,9 @@ var routes =function(app,isAuth,encoder){
 
     //staffadvisor
     app.get('/staffadvisor/:name',isAuth,(req, res) => {
-
-
-
-
-
-      
        
       if(req.session.user){
+        const username = req.params.name;
         try {
           const query1 = new Promise((resolve, reject) => {
             db.connection.query("select * from requests", (err, results, fields) => {
@@ -291,93 +290,93 @@ var routes =function(app,isAuth,encoder){
           });
         
           const query2 = new Promise((resolve, reject) => {
-            db.connection.query("select name,id,phno,department,address,email,photo from tutor where id=?",[req.params.name],(err,results,fields)=>{
-            if(err) {
-                        reject(err);      
-              }
-              else{
-                if(results.length>0){
-                  console.log(results);
-                  const { name, id, phno, department, address, email, photo } = results[0];
-                  const data = { Name: name, Id: id, Phno: phno, Dept: department, Addr: address, Email: email, Photo: photo };
-                  resolve(data);
-                }
-                else{
-                  console.log('no results were found.Check your db query');
-                  return res.redirect('/inner-page?id=4000');
-                }
-                
-              }
-            }); 
-
-          });
-          Promise.all([query1, query2])
-          .then(([requests, tutorData]) => {
-            console.log(tutorData.Photo);
-            res.render('Staffadvisor', { tutorData, applications: requests });
-          })
-          .catch((err) => {
-            console.log(err);
-            res.send('server error');
-          });
-        }catch(err){
-            console.log(err);
-        }
-      }else{
-        res.send('unauthorized user');
-      }
- 
-    });
-    
-    //hod
-    app.get('/hod/:name',isAuth,(req, res) => {
-       
-      if(req.session.user){
-        try {
-          const query1 = new Promise((resolve, reject) => {
-            db.connection.query("select * from requests", (err, results, fields) => {
+            db.connection.query("SELECT name, id, phno, department, address, email, photo FROM tutor WHERE id = ?", [username], (err, results, fields) => {
               if (err) {
                 reject(err);
-              } else { 
-                resolve(results);
+              } else {
+                if (results.length === 0) {
+                  reject(new Error('No data found for the specified username.'));
+                } else {
+                  resolve(results[0]);
+                }
               }
-            }); 
+            });
           });
-        
-          const query2 = new Promise((resolve, reject) => {
-            var username=req.params.name;
-            console.log(username);
-            db.connection.query("select name,id,phno,department,address,email,photo from hod where id=?",[username],(err,results,fields)=>{
-            if(err) {
-                        reject(err);      
-              }
-              else{ 
-                console.log(results);
-                const { name, id, phno, department, address, email, photo } = results[0];
-                const data = { Name: name, Id: id, Phno: phno, Dept: department, Addr: address, Email: email, Photo: photo };
-                resolve(data); 
-                
-              }
-            }); 
-
-          });
+    
           Promise.all([query1, query2])
-          .then(([requests, tutorData]) => {
-            console.log(tutorData.Photo);
-            res.render('hod', { tutorData, applications: requests });
-          })
-          .catch((err) => {
-            console.log(err);
-            res.send('server error');
-          });
-        }catch(err){
-            console.log(err);
+            .then(([requests, tutorData]) => {
+              const imagePath = tutorData.photo ? path.relative('public', tutorData.photo) : 'default/path/to/image.jpg';
+              const Photo = imagePath.replace(/\\/g, '/'); // Convert backslashes to forward slashes for URL compatibility
+    
+              const applications = [];
+              res.render('staffadvisor', { Photo, tutorData, applications });
+            })
+            .catch((err) => {
+              console.log(err);
+              res.send('Server error: ' + err.message);
+            });
+        } catch (err) {
+          console.log(err);
+          res.send('Server error: ' + err.message);
         }
-      }else{
-        res.send('unauthorized user');
+      } else {
+        res.send('Unauthorized user');
       }
- 
     });
+//hod
+
+app.get('/hod/:name', isAuth, (req, res) => {
+  if (req.session.user) {
+    try {
+      const username = req.params.name;
+      
+      const query1 = new Promise((resolve, reject) => {
+        db.connection.query("SELECT * FROM requests", (err, results, fields) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(results);
+          }
+        });
+      });
+
+      const query2 = new Promise((resolve, reject) => {
+        db.connection.query("SELECT name, id, phno, department, address, email, photo FROM hod WHERE id = ?", [username], (err, results, fields) => {
+          if (err) {
+            reject(err);
+          } else {
+            if (results.length === 0) {
+              reject(new Error('No data found for the specified username.'));
+            } else {
+              resolve(results[0]);
+            }
+          }
+        });
+      });
+
+      Promise.all([query1, query2])
+        .then(([requests, tutorData]) => {
+          const imagePath = tutorData.photo ? path.relative('public', tutorData.photo) : 'default/path/to/image.jpg';
+          const Photo = imagePath.replace(/\\/g, '/'); // Convert backslashes to forward slashes for URL compatibility
+
+          const applications = [];
+          res.render('hod', { Photo, tutorData, applications });
+        })
+        .catch((err) => {
+          console.log(err);
+          res.send('Server error: ' + err.message);
+        });
+    } catch (err) {
+      console.log(err);
+      res.send('Server error: ' + err.message);
+    }
+  } else {
+    res.send('Unauthorized user');
+  }
+});
+
+    //hod
+ 
     //Principal
     app.get('/Principal/:name',isAuth,(req, res) => {
       console.log(req.params.name);
@@ -388,15 +387,16 @@ var routes =function(app,isAuth,encoder){
            if(err) {
              throw err;
              
-           }
-           else{
+           } 
+           else{ 
               console.log(results);
-              var Name=results[0].name;
+              var Name=results[0].name; 
               var Id=results[0].id;
               var Mobile=results[0].phno;  
               var Address=results[0].address
               var Email=results[0].email;
-              var Photo=results[0].photo;
+              var imagePath=results[0].photo;
+              const Photo = path.relative('public',imagePath);
               applications=[];
               res.render('Principal',{Name,Id,Mobile,Address,Email,Photo,applications})
            }
@@ -465,7 +465,7 @@ var routes =function(app,isAuth,encoder){
               }
             }); 
           });
-        
+         
           const query2 = new Promise((resolve, reject) => {
             var username=req.params.name;
             console.log(username);
@@ -478,13 +478,14 @@ var routes =function(app,isAuth,encoder){
                 const { collegename, collegeid, phno, address, email, collegeimage,website } = results[0];
 
                 var data = { Name: collegename, Id: collegeid, Phno: phno, Addr: address, Email: email, Photo: collegeimage, Website:website};
-                  // Check and handle the undefined values
+                const imagePath = path.relative('public', data.Photo);
+                // Check and handle the undefined values
                   const name1 = data.Name || 'N/A';
                   const id1 = data.Id || 'N/A';   
                   const phno1 = data.Phno || 'N/A';
                   const addr1 = data.Addr || 'N/A';  
                   const email1 = data.Email || 'N/A';
-                  const photo1 = data.Photo || 'N/A';
+                  const photo1 = imagePath|| 'N/A';
                   const website1 = data.Website || 'N/A';
 
                   // Now you can use these variables in your code
@@ -528,16 +529,21 @@ var routes =function(app,isAuth,encoder){
      //tutor
       app.get('/tutoradd',(req,res)=>{     
           
-      db.connection.query("select * from Tutor",
-          [req.body.name],(err,results,fields)=>{
-           if(err) {
-             throw err;
-             
-           }
-           else{
-              res.render('addnewtutor',{applications:results,id:req.query.id});
-           }
-         }); 
+        db.connection.query("select * from tutor",
+        [req.body.name],(err,results,fields)=>{
+        if(err) {
+          throw err;
+          
+        }
+        else{
+           console.log(results);
+           var id=req.query.id;
+           if(id === null)
+                    id='12345'
+           console.log(id);
+            res.render('addnewtutor',{applications:results,id});
+        } 
+      });
          
      });
   
@@ -601,7 +607,7 @@ var routes =function(app,isAuth,encoder){
          
      });
      
-     app.post('/hodadd',encoder,(req,res)=>{
+     app.post('/hodadd',encoder,(req,res)=>{ 
         
         var principalid=req.query.id;
         var {name,id,dept,email}=req.body;   
@@ -678,7 +684,7 @@ var routes =function(app,isAuth,encoder){
                   console.log(results);
                   resolve(results);  
                 }
-              });
+              }); 
             });
         
             Collegeid = hodQueryResult[0].collegeid;
@@ -748,7 +754,7 @@ var routes =function(app,isAuth,encoder){
          getData(); 
       });   
    
-  /*-----------REQUEST HANDLING ROUTES ------*/
+      /*-----------REQUEST HANDLING ROUTES ------*/
       
   // SENDING REQUEST ROUTE FOR STUDENTS    
   app.get('/requests',(req,res)=>{         
@@ -1095,51 +1101,50 @@ var routes =function(app,isAuth,encoder){
         })
       });
 
-      // app.post('/search', (req, res) => {
-      //   const searchTerm = req.body.search;
+      app.post('/search', (req, res) => {
+        const searchTerm = req.body.search;
       
-      //   // Perform search query
-      //   const query = `SELECT * FROM student WHERE
-      //     name LIKE '%${searchTerm}%' OR
-      //     regno LIKE '%${searchTerm}%'`;
+        // Perform search query
+        const query = `SELECT * FROM student WHERE
+          name LIKE '%${searchTerm}%' OR
+          id LIKE '%${searchTerm}%'`;
       
-      //   db.connection.query(query, (err, results) => { 
-      //     if (err) throw err; 
-      //     var applications=[]
-      //     res.render('addnewstudent', { applications:results,id:req.query.id,searchTerm });
-      //   });
-      // });
-      // app.post('/search', (req, res) => {
-      //   const searchTerm = req.body.search;
-      
-      //   // Redirect to the home page without the search term query parameter
-      //   res.redirect(`/?search=${searchTerm}`);
-      // });
+        db.connection.query(query, (err, results) => { 
+          if (err) throw err; 
+          var applications=[]
+          res.render('addnewstudent', { applications:results,id:req.query.id,searchTerm });
+        });
+      });
+    
 
-      app.get('/', (req, res) => {
-        const searchTerm = req.query.search;
-        
-        // Check if a search term is present
-        if (searchTerm) {
-          // Perform search query
-          const query = `SELECT * FROM student WHERE
-            name LIKE '%${searchTerm}%' OR
-            regno LIKE '%${searchTerm}%'`;
-          
-          db.connection.query(query, (err, results) => {
-            if (err) throw err;
-            res.render('addnewstudent', { applications: results, id: req.query.id, searchTerm });
-          });
-        } else {
-          // No search term provided, fetch all students
-          const query = 'SELECT * FROM student';
+      app.post('/search1', (req, res) => {
+        const searchTerm = req.body.search;
       
-          db.connection.query(query, (err, results) => {
-            if (err) throw err;
-            res.render('addnewstudent', { applications: results, id: req.query.id, searchTerm: '' });
-          });
-        }
-      }); 
+        // Perform search query
+        const query = `SELECT * FROM tutor WHERE
+          name LIKE '%${searchTerm}%' OR
+          id LIKE '%${searchTerm}%'`;
+      
+        db.connection.query(query, (err, results) => { 
+          if (err) throw err; 
+          var applications=[]
+          res.render('addnewtutor', { applications:results,id:req.query.id,searchTerm });
+        });
+      });
+      
+//       app.post('/reload', (req, res) => {
+//   // Perform the query to retrieve all students
+//   const query = 'SELECT * FROM tutor';
+  
+//   db.connection.query(query, (err, results) => {
+//     if (err) throw err;
+//     var applications = results;
+//     res.render('addnewtutor', { applications, id: req.query.id });
+//   });
+// });
+      
+
+      
       
       
     

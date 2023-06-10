@@ -13,11 +13,18 @@ function displayText() {
   var paragraph2 = document.getElementById("text7").value.replace(/\n/g, "<br>");
   var ending = document.getElementById("text8").value.replace(/\n/g, "<br>");
   var letterPreview = document.getElementById("letter-preview");
-       letterPreview.innerHTML = "<strong>From,</strong><br> " + from + "<br><br>"+
-        date + "<br><br>" +"<strong>To,</strong><br> " + to + "<br><br>" +
-        "<strong>Sub:</strong>" + subject + "<br><br>" + salutation + ",<br><br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp " +
-         paragraph1 + "<br><br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp" + paragraph2 + "<br><br>"+ ending;
+
+  var content = "<strong>From,</strong><br> " + from + "<br><br>" +
+    date + "<br><br>" + "<strong>To,</strong><br> " + to + "<br><br>" +
+    "<strong>Sub:</strong>" + subject + "<br><br>" + salutation + ",<br><br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp " +
+    paragraph1 + "<br><br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp" + paragraph2 + "<br><br>" + ending;
+
+  var regex = /#\w+/g;
+  var highlightedContent = content.replace(regex, '<span style="color: red;">$&</span>');
+  letterPreview.innerHTML = highlightedContent;
 }
+
+
 
 function toggleTextArea(content, spanElement) 
 {
