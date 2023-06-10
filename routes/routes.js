@@ -142,7 +142,7 @@ var routes =function(app,isAuth,encoder){
             logoPath = logoPath.replace('public', '');
            }   
         })
-          db.connection.query("update college set password=?,collegename=?,university=?,address=?,phno=?,email=?,collegelogo=?,collegeimage=?,website=? where username=?"
+          db.connection.query("update college set password=?,collegename=?,university=?,address=?,phno=?,email=?,collegelogo=?,collegeimage=?,website=? where collegeid=?" 
       ,[password,collegename,university,address,mobile,email,logoPath,photoPath,website,name],
       (err,results,fields)=>{  
             if(err){
@@ -479,7 +479,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
               }
             }); 
           });
-        
+         
           const query2 = new Promise((resolve, reject) => {
             var username=req.params.name;
             console.log(username);
@@ -693,7 +693,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
                   console.log(results);
                   resolve(results);  
                 }
-              });
+              }); 
             });
         
             Collegeid = hodQueryResult[0].collegeid;
