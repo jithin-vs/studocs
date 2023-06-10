@@ -60,7 +60,7 @@ const isAuth = (req,res,next) =>{
     next();
   }
   else{
-     res.redirect('/inner-page');
+     res.redirect('/inner-page');     
   }
 }
 

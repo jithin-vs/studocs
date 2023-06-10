@@ -35,10 +35,6 @@ var routes =function(app,isAuth,encoder){
             res.render('inner-page');
       });
      
-      app.get('/addnewform',isAuth,(req, res) => {
-        res.render('addnewform');
-      });
-     
     app.get('/Principal',isAuth,(req, res) => {
         res.render('Principal');  
     });
@@ -64,7 +60,7 @@ var routes =function(app,isAuth,encoder){
     app.get('/sform/:name',isAuth,(req, res) => {
 
         var name=req.params.name;
-        db.connection.query("select collegeid from student where id=?",
+        db.connection.query("select * from student where id=?",
         [name],(err,results,fields)=>{
         if(err) {
           throw err;
@@ -72,9 +68,9 @@ var routes =function(app,isAuth,encoder){
         }
         else{
 
-          var collegeid=results[0].collegeid;
-          console.log(collegeid);
-          res.render('sform',{name,collegeid}); 
+          var result=results[0];
+          console.log(result);
+          res.render('sform',{name,result,address}); 
          }
       });    
     }); 
@@ -809,11 +805,43 @@ app.get('/hod/:name', isAuth, (req, res) => {
 
       // ADDING TEMPLATE 
       app.get('/addtemplate',(req,res)=>{         
-            
-        var results=[];
-        res.render('addtemplate',{applications:results});
+        try{
+          db.connection.query("select * from forms",
+        [req.params.name],(err,results,fields)=>{
+        if(err) {
+          throw err; 
+        } 
+        else{
+          const divContent = results[0].name;
+          const applications = results[0].name;// Empty array, can be populated later if needed
+          res.render('addtemplate',{applications:results});
+        }
+        });
+        }catch(err){
+          console.log(err); 
+        } 
       });
-
+      
+      app.get('/get-templates', (req, res) => {
+        
+        try{
+          db.connection.query("select * from forms",
+        [req.params.name],(err,results,fields)=>{
+        if(err) {
+          throw err; 
+        } 
+        else{
+          const templateNames = results.map(result => result.name);
+          res.json({ templates: templateNames });
+      
+        }
+        });
+        }catch(err){
+          console.log(err); 
+        } 
+        
+      });
+      
       //STATUS DISPLAY
       app.get('/status/:name',(req,res)=>{
         try{
@@ -835,22 +863,18 @@ app.get('/hod/:name', isAuth, (req, res) => {
     })
 
     //REQUEST DISPLAY
-    app.get('/form/:formId', (req, res) => {
-      const formId = req.params.formId;
-    
-      db.connection.query("SELECT formdata FROM forms WHERE formid = ?", [formId], (err, results) => {
-        if (err) {
-          console.error(err);
-          res.status(500).send('Error retrieving HTML content');
-        } else {
-          if (results.length > 0) {
-            const fetchedHTML = results[0].formdata;
-            console.log(fetchedHTML);
-            res.send(fetchedHTML);
-          } else {
-            res.status(404).send('HTML content not found');
-          }
-        }
+    app.get('/requests',(req,res)=>{
+      try{
+        db.connection.query("select name,formid,formdata from forms ",
+      [req.query.name],(err,results,fields)=>{ 
+      if(err) {
+        throw err; 
+      } 
+      else{
+        const formdata = results.length ? results[0].formdata : null;
+        const forms = results; // Empty array, can be populated later if needed
+        res.render('requests', { forms });
+      }
       });
     });
     
@@ -871,8 +895,21 @@ app.get('/hod/:name', isAuth, (req, res) => {
           }    
        });
        });
-          
-
+     
+     //ADD OR EDIT FORMS
+     app.get('/addnewform',isAuth,(req, res) => {
+      const templateName = req.query.name; // Get the template name from the query parameter
+  
+      // Fetch the template content from the server
+      db.connection.query('SELECT formdata FROM forms WHERE name = ?', [templateName], (err, results, fields) => {
+        if (err) {
+          throw err;
+        } else {
+          const templateContent = results.length > 0 ? results[0].formdata : ''; // Get the template content or set it as an empty string if not found
+          res.render('addnewform', { templateName: templateName, templateContent: templateContent });
+        }
+      });;
+     }); 
 
 /*----------- other control routes -------------*/
 
