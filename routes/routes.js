@@ -84,17 +84,21 @@ var routes =function(app,isAuth,encoder){
     app.get('/pform/:name', (req, res) => {
 
        var name=req.params.name;
-        db.connection.query("select collegeid from principal where id=?",
+        db.connection.query("select * from principal where id=?",
         [name],(err,results,fields)=>{
         if(err) {
           throw err;
-          
+           
         }
-        else{
+        else{ 
  
+          var n1=results[0].name;
           var collegeid=results[0].collegeid;
-          console.log(collegeid);
-          res.render('pform',{name,collegeid}); 
+          var address=results[0].address;
+          var phno=results[0].phno;
+          var email=results[0].email;
+          console.log(address);
+          res.render('pform',{n1,name,address,phno,email,collegeid}); 
          }
       }); 
     });
@@ -395,12 +399,13 @@ var routes =function(app,isAuth,encoder){
            }
            else{
               console.log(results);
-              var Name=results[0].name;
+              var Name=results[0].name; 
               var Id=results[0].id;
               var Mobile=results[0].phno;  
               var Address=results[0].address
               var Email=results[0].email;
-              var Photo=results[0].photo;
+              var imagePath=results[0].photo;
+              const Photo = path.relative('public',imagePath);
               applications=[];
               res.render('Principal',{Name,Id,Mobile,Address,Email,Photo,applications})
            }

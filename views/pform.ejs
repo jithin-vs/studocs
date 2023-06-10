@@ -39,7 +39,7 @@
         <div class="form-row">
           <div class="form-group col-md-4">
             <label for="cname">Name</label>
-            <input type="name" class="form-control" id="cname" placeholder="Name" name="name" required>
+            <input type="name" class="form-control" id="cname" placeholder="Name" name="name" value="<%=n1 %>" required>
           </div>
           <div class="form-group col-md-4">
             <label for="pid">Id</label>
@@ -47,27 +47,27 @@
           </div>
           <div class="form-group col-md-4">
             <label for="image1" class="form-label">Photo</label>
-            <input class="form-control form-control-sm" id="image1" type="file" placeholder="Size 1360 X 245" name="photo" required>
+            <input class="form-control form-control-sm" id="image1" type="file" placeholder="Size 1360 X 245" name="photo">
           </div>
         </div>
         <div class="form-row">
           <div class="form-group col-lg-8" style="padding-left: 0px;">
             <label for="inputAddress">Address</label>
-            <textarea type="textarea" rows="1" class="form-control" id="inputAddress" placeholder="1234 Main St" name="address"required></textarea>
+            <textarea type="textarea" rows="1" class="form-control" id="inputAddress" placeholder="1234 Main St" name="address"required><%= address%></textarea>
           </div>
           <div class="form-group col-md-4">
             <label for="image1" class="form-label">signature</label>
-            <input class="form-control form-control-sm" id="image1" type="file" placeholder="Size 10 X 15" name="signature"required>
+            <input class="form-control form-control-sm" id="image1" type="file" placeholder="Size 10 X 15" name="signature">
           </div>
         </div>
         <div class="form-row">
             <div class="form-group col-md-4">
               <label for="phno">Mobile Number</label>
-              <input type="name" class="form-control" id="phno" placeholder="Number" name="phno" required>
+              <input type="name" class="form-control" id="phno" placeholder="Number" name="phno"value="<%= phno%>" required>
             </div>
             <div class="form-group col-md-4">
               <label for="email">Email</label>
-              <input type="email" class="form-control" id="email" placeholder="Email" name="email"required>
+              <input type="email" class="form-control" id="email" placeholder="Email" name="email"value="<%= email%>"required>
             </div>
           <div class="form-group col-md-4">
             <label for="id" class="form-label">College Id</label>
