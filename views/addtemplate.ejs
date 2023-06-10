@@ -36,50 +36,63 @@
         </div>
       </nav>
   
-    <div class="container">
-    <div id="cardContainer">
-        <div class="card" id="newCard" onclick="NewForm()">
-          <span class="plus-icon"><i class="fas fa-plus"></i></span>
-          <span class="name">New</span>
+      <div class="container">
+        <div id="cardContainer">
+          <div class="card" id="newCard" onclick="NewForm()">
+            <span class="plus-icon"><i class="fas fa-plus"></i></span>
+            <span class="name">New</span>
+          </div>
+          <!-- Existing template cards will be dynamically added here -->
         </div>
       </div>
-    </div>
-    
-    
     
       <script>
-        let cardCount = 0;
-    
-        function createNewCard(name) {
+        document.addEventListener('DOMContentLoaded', function() {
           const cardContainer = document.getElementById('cardContainer');
-          const newCard = document.createElement('div');
-          newCard.className = 'card';
-          newCard.innerHTML = `
-            <span class="name" >${name}</span>
-            <span class="icon" onclick="deleteCard(this)"><i class="fas fa-trash-alt"></i></span>
-          `;
-          cardContainer.insertBefore(newCard, document.getElementById('newCard'));
-          newCard.addEventListener('dblclick', () => {
-            openNewForm(name);
-          });
-        }
-    
-        function openNewForm(name) {
-          window.location.href = '/addnewform?name=' + encodeURIComponent(name);
-        }
-    
-        function NewForm() {
-          const name = prompt('Enter the name of form:');
-          if (name !== null && name !== '') {
-            createNewCard(name);
+      
+          // Fetch the existing template names from the server
+          fetch('/get-templates')
+            .then(response => response.json())
+            .then(data => {
+              // Loop through the template names and create the card elements
+              data.templates.forEach(template => {
+                createCard(template);
+              });
+      
+              // Add the "New Card" option at the end
+              createNewCardOption();
+            })
+            .catch(error => console.error(error));
+      
+          function createCard(template) {
+            const card = document.createElement('div');
+            card.classList.add('card');
+            card.onclick = function() {
+              // Redirect to the "template-display" page with the template name as a query parameter
+              window.location.href = '/addnewform?name=' + encodeURIComponent(template);
+            };
+      
+            const nameSpan = document.createElement('span');
+            nameSpan.classList.add('name');
+            nameSpan.textContent = template;
+      
+            card.appendChild(nameSpan);
+            cardContainer.insertBefore(card, document.getElementById('newCard'));
           }
-        }
-    
-        function deleteCard(element) {
-          const card = element.parentNode;
-          card.parentNode.removeChild(card);
-        }
+      
+          function createNewCardOption() {
+            const newCard = document.getElementById('newCard');
+            newCard.onclick = function() {
+              const name = prompt('Enter the name of the new card:');
+              if (name !== null && name !== '') {
+                createCard(name);
+              }
+            };
+          }
+        });
       </script>
+      
+      
 
 
 
