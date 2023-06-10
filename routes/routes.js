@@ -396,8 +396,8 @@ var routes =function(app,isAuth,encoder){
            if(err) {
              throw err;
              
-           }
-           else{
+           } 
+           else{ 
               console.log(results);
               var Name=results[0].name; 
               var Id=results[0].id;
