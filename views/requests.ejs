@@ -53,7 +53,8 @@
                 <td><%= forms[i].name %></td>
                 <td><%= forms[i].date %></td>
                 <td>
-                  <button type="button" class="btn btn-success" data-toggle="dwd"  data-target="#dwd">view</button>
+                  <button type="button" class="btn btn-success view-button" data-form-id="<%= forms[i].formid %>">view</button>
+
                 </td>
               </tr>
             <% } %>
@@ -66,7 +67,7 @@
         <div class="arrow-left">
           <i class="fa fa-arrow-circle-left fa-3x" ></i>
         </div>
-        <div class="col-sm-6 panel">
+        <div class="col-sm-6 panel" id="displayContainer">
           <!-- Existing code for the panel -->
 
         </div>
@@ -143,6 +144,30 @@
             <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
             <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
             <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+            <script>
+              document.addEventListener('DOMContentLoaded', function() {
+                const viewButtons = document.querySelectorAll('.view-button');
+                const displayContainer = document.getElementById('displayContainer');
+            
+                viewButtons.forEach(function(button) {
+                  button.addEventListener('click', function() {
+                    const formId = button.dataset.formId;
+            
+                    // Make a request to fetch the HTML content from the server
+                    fetch(`/form/${formId}`)
+                      .then(response => response.text())
+                      .then(html => {
+                        // Update the HTML content of the display container
+                        displayContainer.innerHTML = html;
+                      })
+                      .catch(error => console.error(error));
+                  });
+                });
+              });
+            </script>
+            
+            
+            
 
 
    </body>

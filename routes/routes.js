@@ -761,20 +761,19 @@ app.get('/hod/:name', isAuth, (req, res) => {
       /*-----------REQUEST HANDLING ROUTES ------*/
       
   // SENDING REQUEST ROUTE FOR STUDENTS    
-  app.get('/requests',(req,res)=>{         
-    try{
-          db.connection.query("select * from forms ",(err,results,fields)=>{
-          if(err) {
-            throw err; 
-          } 
-          else{
-            res.render('requests',{forms:results});
-          }
-        });
-      }catch(err){
-        console.log(err); 
-      }
-   });
+  app.get('/requests', (req, res) => {
+    try {
+      db.connection.query("SELECT * FROM forms", (err, results, fields) => {
+        if (err) {
+          throw err;
+        } else {
+          res.render('requests', { forms: results });
+        }
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  });
          
    // SENDING REQUEST ROUTE FOR STUDENTS 
    app.get('/verified-requests',(req,res)=>{         
@@ -836,24 +835,25 @@ app.get('/hod/:name', isAuth, (req, res) => {
     })
 
     //REQUEST DISPLAY
-    app.get('/requests',(req,res)=>{
-      try{
-        db.connection.query("select name,formid,formdata from forms ",
-      [req.query.name],(err,results,fields)=>{ 
-      if(err) {
-        throw err; 
-      } 
-      else{
-        const formdata = results.length ? results[0].formdata : null;
-        const forms = results; // Empty array, can be populated later if needed
-        res.render('requests', { forms });
-      }
+    app.get('/form/:formId', (req, res) => {
+      const formId = req.params.formId;
+    
+      db.connection.query("SELECT formdata FROM forms WHERE formid = ?", [formId], (err, results) => {
+        if (err) {
+          console.error(err);
+          res.status(500).send('Error retrieving HTML content');
+        } else {
+          if (results.length > 0) {
+            const fetchedHTML = results[0].formdata;
+            console.log(fetchedHTML);
+            res.send(fetchedHTML);
+          } else {
+            res.status(404).send('HTML content not found');
+          }
+        }
       });
-      }catch(err){
-        console.log(err);
-      }
-
-    })
+    });
+    
 
      //SAVING TEMPLATE
      app.post('/save-template',(req,res)=>{   
@@ -1089,8 +1089,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
           var applications=[]
           res.render('addnewtutor', { applications:results,id:req.query.id,searchTerm });
         });
-      });
-      
+      });   
 //       app.post('/reload', (req, res) => {
 //   // Perform the query to retrieve all students
 //   const query = 'SELECT * FROM tutor';
@@ -1101,7 +1100,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
 //     res.render('addnewtutor', { applications, id: req.query.id });
 //   });
 // });
-      
+       
 
       
       
