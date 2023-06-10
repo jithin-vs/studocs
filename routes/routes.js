@@ -70,7 +70,7 @@ var routes =function(app,isAuth,encoder){
 
           var result=results[0];
           console.log(result);
-          res.render('sform',{name,result}); 
+          res.render('sform',{name,result,address}); 
          }
       });    
     }); 
