@@ -337,55 +337,60 @@ var routes =function(app,isAuth,encoder){
  
     });
     
-    //hod
-    app.get('/hod/:name',isAuth,(req, res) => {
-       
-      if(req.session.user){
-        try {
-          const query1 = new Promise((resolve, reject) => {
-            db.connection.query("select * from requests", (err, results, fields) => {
-              if (err) {
-                reject(err);
-              } else { 
-                resolve(results);
-              }
-            }); 
-          });
-        
-          const query2 = new Promise((resolve, reject) => {
-            var username=req.params.name;
-            console.log(username);
-            db.connection.query("select name,id,phno,department,address,email,photo from hod where id=?",[username],(err,results,fields)=>{
-            if(err) {
-                        reject(err);      
-              }
-              else{ 
-                console.log(results);
-                const { name, id, phno, department, address, email, photo } = results[0];
-                const data = { Name: name, Id: id, Phno: phno, Dept: department, Addr: address, Email: email, Photo: photo };
-                resolve(data); 
-                
-              }
-            }); 
+//hod
 
-          });
-          Promise.all([query1, query2])
-          .then(([requests, tutorData]) => {
-            console.log(tutorData.Photo);
-            res.render('hod', { tutorData, applications: requests });
-          })
-          .catch((err) => {
-            console.log(err);
-            res.send('server error');
-          });
-        }catch(err){
-            console.log(err);
-        }
-      }else{
-        res.send('unauthorized user');
-      }
+app.get('/hod/:name', isAuth, (req, res) => {
+  if (req.session.user) {
+    try {
+      const username = req.params.name;
+      
+      const query1 = new Promise((resolve, reject) => {
+        db.connection.query("SELECT * FROM requests", (err, results, fields) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(results);
+          }
+        });
+      });
+
+      const query2 = new Promise((resolve, reject) => {
+        db.connection.query("SELECT name, id, phno, department, address, email, photo FROM hod WHERE id = ?", [username], (err, results, fields) => {
+          if (err) {
+            reject(err);
+          } else {
+            if (results.length === 0) {
+              reject(new Error('No data found for the specified username.'));
+            } else {
+              resolve(results[0]);
+            }
+          }
+        });
+      });
+
+      Promise.all([query1, query2])
+        .then(([requests, tutorData]) => {
+          const imagePath = tutorData.photo ? path.relative('public', tutorData.photo) : 'default/path/to/image.jpg';
+          const Photo = imagePath.replace(/\\/g, '/'); // Convert backslashes to forward slashes for URL compatibility
+
+          const applications = [];
+          res.render('hod', { Photo, tutorData, applications });
+        })
+        .catch((err) => {
+          console.log(err);
+          res.send('Server error: ' + err.message);
+        });
+    } catch (err) {
+      console.log(err);
+      res.send('Server error: ' + err.message);
+    }
+  } else {
+    res.send('Unauthorized user');
+  }
+});
+
+    //hod
  
-    });
     //Principal
     app.get('/Principal/:name',isAuth,(req, res) => {
       console.log(req.params.name);

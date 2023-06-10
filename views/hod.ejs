@@ -44,16 +44,16 @@
         <div class="row dp">
           <div class="col-lg-4">
             <div class="imag">
-              <img src="Photo" alt="hhfh" ><br><br>
+              <img src="/<%=Photo %>" alt="hhfh" ><br><br>
             </div>
-             <b> &nbsp;NAME&nbsp;&nbsp;&nbsp;:<%= tutorData.Name %><input type="text"id="name"></b>
+             <b> &nbsp;NAME&nbsp;&nbsp;&nbsp;:<%= tutorData.name %><input type="text"id="name"></b>
           </div>
           <div class="col-lg-6 address" ><b>
-              ID&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:<%= tutorData.Id %><input type="text"id="id"><br>
-              DEPT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  :<%= tutorData.Dept %><input type="text"id="dept"><br>
-              ADDRESS&nbsp;&nbsp;&nbsp;&nbsp;  :<%= tutorData.Addr%><input type="text"id="address"><br>
-              PHONE NO &nbsp;&nbsp;:<%= tutorData.Mobile%><input type="text"id="phno"><br>
-              EMAIL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:<%= tutorData.Email %><input type="text"id="email"><br>
+              ID&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:<%= tutorData.id %><br>
+              DEPT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  :<%= tutorData.department %><br>
+              ADDRESS&nbsp;&nbsp;&nbsp;&nbsp;  :<%= tutorData.address%><br>
+              PHONE NO &nbsp;&nbsp;:<%= tutorData.phno%><br>
+              EMAIL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:<%= tutorData.email %><br>
             </b>
             <div class="edit">
               <a href="/pform/<%= tutorData.Id%>">Edit</a>
