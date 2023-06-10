@@ -44,16 +44,16 @@
         <div class="row dp">
           <div class="col-lg-4">
             <div class="imag" style="width: 225px; height: 225px; object-fit: cover; overflow: hidden;">
-              <img src="<%= tutorData.Photo %>" style="width: 100%; height: 100%;object-fit: cover; border-radius: 50%; box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);">
+              <img src="/<%= Photo %>" style="width: 100%; height: 100%;object-fit: cover; border-radius: 50%; box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);">
             </div>
-             <b> &nbsp;NAME&nbsp;&nbsp;&nbsp;:<%= tutorData.Name %></b>
+             <b> &nbsp;NAME&nbsp;&nbsp;&nbsp;:<%= tutorData.id %></b>
         </div>
           <div class="col-lg-6 address" ><b>
-              ID&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:<%= tutorData.Id %><br>
-              DEPT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  :<%=  tutorData.Dept%><br>
-              ADDRESS&nbsp;&nbsp;&nbsp;&nbsp;  :<%=  tutorData.Addr%><br>
-              PHONE NO &nbsp;&nbsp;:<%= tutorData.Phno %><br>
-              EMAIL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:<%=  tutorData.Email%><br>
+              ID&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:<%= tutorData.id %><br>
+              DEPT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  :<%=  tutorData.department%><br>
+              ADDRESS&nbsp;&nbsp;&nbsp;&nbsp;  :<%=  tutorData.address%><br>
+              PHONE NO &nbsp;&nbsp;:<%= tutorData.phno %><br>
+              EMAIL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:<%=  tutorData.email%><br>
             </b>
             <div class="edit">
               Edit
