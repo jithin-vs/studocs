@@ -863,20 +863,25 @@ app.get('/hod/:name', isAuth, (req, res) => {
     })
 
     //REQUEST DISPLAY
-    app.get('/requests',(req,res)=>{
-      try{
-        db.connection.query("select name,formid,formdata from forms ",
-      [req.query.name],(err,results,fields)=>{ 
-      if(err) {
-        throw err; 
-      } 
-      else{
-        const formdata = results.length ? results[0].formdata : null;
-        const forms = results; // Empty array, can be populated later if needed
-        res.render('requests', { forms });
-      }
+    app.get('/form/:formId', (req, res) => {
+      const formId = req.params.formId;
+    
+      db.connection.query("SELECT formdata FROM forms WHERE formid = ?", [formId], (err, results) => {
+        if (err) {
+          console.error(err);
+          res.status(500).send('Error retrieving HTML content');
+        } else {
+          if (results.length > 0) {
+            const fetchedHTML = results[0].formdata;
+            console.log('here');
+            res.send(fetchedHTML);
+          } else {
+            res.status(404).send('HTML content not found');
+          }
+        }
       });
     });
+    
     
 
      //SAVING TEMPLATE
