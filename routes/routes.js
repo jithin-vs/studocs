@@ -529,7 +529,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
      //tutor
       app.get('/tutoradd',(req,res)=>{     
           
-        db.connection.query("select * from tutor",
+        db.connection.query("select * from tutor ",
         [req.body.name],(err,results,fields)=>{
         if(err) {
           throw err;
@@ -538,7 +538,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
         else{
            console.log(results);
            var id=req.query.id;
-           if(id === null)
+           if(id === null) 
                     id='12345'
            console.log(id);
             res.render('addnewtutor',{applications:results,id});
@@ -556,22 +556,24 @@ app.get('/hod/:name', isAuth, (req, res) => {
             try {
              
               const hodQueryResult = await new Promise((resolve, reject) => {
-                db.connection.query("SELECT collegeid FROM hod WHERE id=?", [hodid], (err, results, fields) => {
+                db.connection.query("SELECT collegeid,department FROM hod WHERE id=?", [hodid], (err, results, fields) => {
                   if (err) {
                     reject(err);
-                  } else { console.log(results);
+                  } else { 
 
-                    resolve(results);
+                    //console.log(results);
+                    resolve(results);  
                   }   
                 });
               });
 
               Collegeid = hodQueryResult[0].collegeid;
-              console.log(Collegeid); // Output the updated Collegeid value here
+              var department=hodQueryResult[0].department;
+              //console.log(Collegeid); // Output the updated Collegeid value here
               const studentsQueryResult = await new Promise((resolve, reject) => {
                 var genPassword=verify.randomPassword;
                 mail.sendcredEmail(name,email,id,genPassword);  
-                db.connection.query("insert into tutor (name,id,collegeid,email,batch) values(?,?,?,?,?)", [name,id,Collegeid,email,batch], (err, results, fields) => {
+                db.connection.query("insert into tutor (name,id,collegeid,email,department,batch,password) values(?,?,?,?,?,?,?)", [name,id,Collegeid,email,department,batch,genPassword], (err, results, fields) => {
                   if (err) {
                     reject(err);
                   } else {
@@ -1068,7 +1070,8 @@ app.get('/hod/:name', isAuth, (req, res) => {
   
       //delete user
       app.post('/deleteuser',encoder,(req,res)=>{ 
-
+        
+        var id =req.query.id;
         var user=req.query.user   
         db.connection.query("delete from ?? where id=?",[req.query.user,req.query.id],(err,results,fields)=>{
           if(err) {
@@ -1078,13 +1081,13 @@ app.get('/hod/:name', isAuth, (req, res) => {
           }
           else{
             if(user ==='student')
-               return res.redirect('/studentadd');
+               return res.redirect(`/studentadd?id=${id}`);
             if(user ==='tutor')
-               return res.redirect('/tutoradd');
+               return res.redirect(`/tutoradd?id=${id}`);
             if(user ==='hod')
-               return res.redirect('/hodadd');
+               return res.redirect(`/hodadd?id=${id}`);
             if(user ==='principal')
-               return res.redirect('/principaladd');
+               return res.redirect(`/principaladd?id=${id}`);
           }
         }); 
        })
