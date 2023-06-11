@@ -42,7 +42,7 @@
       <div class="form-row">
         <div class="form-group col-md-4">
           <label for="cname">Name</label>
-          <input type="text" class="form-control" id="cname" placeholder="Name" required name="name">
+          <input type="text" class="form-control" id="cname" value="<%=result.name%>"placeholder="Name" required name="name">
         </div>
         <div class="form-group col-md-4">
           <label for="pid">Id</label>
@@ -56,7 +56,7 @@
       <div class="form-row">
         <div class="form-group col-lg-12" style="padding-left: 0px;">
           <label for="inputAddress">Address</label>
-          <textarea rows="1" class="form-control" id="inputAddress" placeholder="1234 Main St" name="address" required></textarea>
+          <textarea rows="1" class="form-control" id="inputAddress" placeholder="1234 Main St" name="address" required><%=result.address%></textarea>
         </div>
         <div class="form-group col-md-4">
           <label for="image2" class="form-label">Signature</label>
@@ -64,11 +64,11 @@
         </div>
         <div class="form-group col-md-4">
           <label for="phno">Mobile Number</label>
-          <input type="tel" class="form-control" id="phno" placeholder="Number" name="phno"required>
+          <input type="tel" class="form-control" id="phno" placeholder="Number"value="<%= result.phno%>" name="phno"required>
         </div>
         <div class="form-group col-md-4">
           <label for="email">Email</label>
-          <input type="email" class="form-control" id="email" placeholder="Email" name="email"required>
+          <input type="email" class="form-control" id="email" placeholder="Email"value="<%= result.email%>" name="email"required>
         </div>
         <div class="form-group col-md-4">
           <label for="Designation">Designation</label>
@@ -80,7 +80,7 @@
         </div>
         <div class="form-group col-md-4">
           <label for="dept" class="form-label">Department</label>
-          <input class="form-control form-control-sm" id="dept" type="text" placeholder="Department" name="dept"required>
+          <input class="form-control form-control-sm" id="dept" type="text" placeholder="Department"value="<%= result.department%>" name="dept"required>
         </div>
         <div class="form-group col-md-4">
           <label for="collegeId" class="form-label">College ID</label>

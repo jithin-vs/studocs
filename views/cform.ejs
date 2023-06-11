@@ -41,7 +41,7 @@
         <div class="form-row">
           <div class="form-group col-md-4">
             <label for="cname">College Name</label>
-            <input type="name" class="form-control" id="cname" placeholder="College Name" name="collegename" required>
+            <input type="name" class="form-control" id="cname" placeholder="College Name"value='<%= result.collegename%>' name="collegename" required>
           </div>
           <div class="form-group col-md-4">
             <label for="id">Id</label>
@@ -49,26 +49,26 @@
           </div>
           <div class="form-group col-md-4">
             <label for="university">University</label>
-            <input type="name" class="form-control" id="university" placeholder="university" name="university" required>
+            <input type="name" class="form-control" id="university" placeholder="university"value='<%= result.university%>' name="university" required>
           </div>
         </div>
         <div class="form-row">
         <div class="form-group col-md-4" style="padding-left: 0px;">
           <label for="inputAddress">Address</label>
-          <textarea type="textarea" rows="1" class="form-control" id="inputAddress" placeholder="1234 Main St" name="address"required></textarea>
+          <textarea type="textarea" rows="1" class="form-control" id="inputAddress" placeholder="1234 Main St" name="address"required><%= result.address%></textarea>
         </div>
 
             <div class="form-group col-md-4">
               <label for="phno">Mobile Number</label>
-              <input type="name" class="form-control" id="phno" placeholder="Number" name="mobile"required>
+              <input type="name" class="form-control" id="phno" placeholder="Number" name="mobile"required value='<%= result.phno%>'>
             </div>
             <div class="form-group col-md-4">
               <label for="email">Email</label>
-              <input type="email" class="form-control" id="email" placeholder="Email" name="email"required>
+              <input type="email" class="form-control" id="email" placeholder="Email" name="email"required value='<%= result.email%>'>
             </div>
             <div class="form-group col-md-4">
               <label for="website">Website</label>
-              <input type="name" class="form-control" id="website" placeholder="Website" name="website"required>
+              <input type="name" class="form-control" id="website" placeholder="Website" name="website"required value='<%= result.website%>'>
             </div>
             <div class="form-group col-md-4">
                 <label for="logo" class="form-label">College Logo</label>

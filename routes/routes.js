@@ -40,23 +40,23 @@ var routes =function(app,isAuth,encoder){
     });
 
       //forms
-    app.get('/tform',isAuth,(req, res) => {
-        var name=req.query.id;
-        var user=req.query.user;
-        db.connection.query("select collegeid from ?? where id=?",
-        [user,name],(err,results,fields)=>{
-        if(err) {
-          throw err;
-          
-        }
-        else{
-
-          var collegeid=results[0].collegeid;
-          console.log(collegeid);
-          res.render('tform',{name,collegeid,user}); 
-         }
+      app.get('/tform', isAuth, (req, res) => {
+        var name = req.query.id;
+        var user = req.query.user;
+        console.log('ID:', name);
+        console.log('User:', user);
+        db.connection.query("select * from ?? where id=?", [user, name], (err, results, fields) => {
+            if (err) {
+                throw err;
+            } else {
+                var collegeid = results[0].collegeid;
+                console.log(collegeid); 
+                var result = results[0];
+                res.render('tform', { name, collegeid, user, result });
+            }
         });
-    }); 
+    });
+    
     app.get('/sform/:name',isAuth,(req, res) => {
 
         var name=req.params.name;
@@ -70,12 +70,24 @@ var routes =function(app,isAuth,encoder){
 
           var result=results[0];
           console.log(result);
-          res.render('sform',{name,result,address}); 
+          res.render('sform',{name,result}); 
          }
       });    
     }); 
     app.get('/cform/:name', (req, res) => {
-        res.render('cform',{name:req.params.name});
+      var name=req.params.name;
+      db.connection.query("select * from college where collegeid=?",
+      [name],(err,results,fields)=>{
+      if(err) {
+        throw err;
+        
+      }
+      else{
+
+        var result=results[0];
+        res.render('cform',{name,result});
+      }
+      });
     });
     app.get('/pform/:name', (req, res) => {
 
@@ -274,10 +286,11 @@ var routes =function(app,isAuth,encoder){
     /*------dashboards-------*/   
 
     //staffadvisor
-    app.get('/staffadvisor/:name',isAuth,(req, res) => {
+    app.get('/staffadvisor/:id',isAuth,(req, res) => {
        
       if(req.session.user){
-        const username = req.params.name;
+        const username = req.params.id;
+        console.log('Username:', username);
         try {
           const query1 = new Promise((resolve, reject) => {
             db.connection.query("select * from requests", (err, results, fields) => {
@@ -294,6 +307,7 @@ var routes =function(app,isAuth,encoder){
               if (err) {
                 reject(err);
               } else {
+                console.log('Query Results:', results);
                 if (results.length === 0) {
                   reject(new Error('No data found for the specified username.'));
                 } else {
@@ -309,7 +323,8 @@ var routes =function(app,isAuth,encoder){
               const Photo = imagePath.replace(/\\/g, '/'); // Convert backslashes to forward slashes for URL compatibility
     
               const applications = [];
-              res.render('staffadvisor', { Photo, tutorData, applications });
+              const user='tutor';
+              res.render('staffadvisor', { Photo, tutorData, applications,user });
             })
             .catch((err) => {
               console.log(err);
@@ -360,7 +375,8 @@ app.get('/hod/:name', isAuth, (req, res) => {
           const Photo = imagePath.replace(/\\/g, '/'); // Convert backslashes to forward slashes for URL compatibility
 
           const applications = [];
-          res.render('hod', { Photo, tutorData, applications });
+          const user='hod';
+          res.render('hod', { Photo, tutorData, applications,user });
         })
         .catch((err) => {
           console.log(err);
