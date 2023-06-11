@@ -34,6 +34,8 @@
     padding: 20px;
     margin: 10px;
     width: 86%;
+    box-shadow: 0px 2px 15px rgba(42, 0, 250, 0.2);
+    border-radius: 10px;
     margin-left: 10%;
     height: 100%;
     float: auto;
@@ -48,6 +50,11 @@
     background-position-x: right;
     background-repeat: no-repeat;
   }
+  .banner h3{
+  margin-left: 0px!important;
+  text-align: center;
+  position: relative;
+}
    .pic hr {
     
     width: 100%;
@@ -71,6 +78,15 @@
 .abc{
     padding-left: 0%;
 }
+.abc h3{
+  padding-top:50px ;
+  margin-bottom: 20px;
+  text-align: center;
+  position: relative;
+  text-decoration-line: underline ;
+  text-decoration-color: #989898;
+}
+
 .button1{
     background-color: #ffffff;
     border: 2px solid;
@@ -81,7 +97,18 @@
     display: inline-block;
     padding-right: 15px; 
     margin: 10px; 
+    box-shadow: 0px 2px 15px rgba(0, 0, 0, 0.5);
+    border-radius: 5px;
+    transition: 0.5s;
+    word-wrap: break-word;
 
+}
+.button1:hover {
+  transform: translateY(-10px);
+}
+.service {
+  justify-content: center;
+  padding-left: 70px;
 }
 .container {
     width: 100%;
@@ -96,6 +123,8 @@ border-radius: 50%;
 }
 .banner h3{
     padding-top: 100px;
+    text-decoration-line: underline ;
+  text-decoration-color: #989898;
 }
 .fa-stack[data-count]:after{
     position:absolute;
@@ -149,14 +178,14 @@ border-radius: 50%;
     padding-top: 0px!important;
 }  
 .button1{
-    padding: 25px 32px!important;
-    width: 250px;
-    margin-left: 33px;
+    word-wrap: break-word;
 }
 
 
   
 .banner{
+    justify-content: center;
+    align-items: center;
     background-image: url(../assets/img/stu.png)!important;
     height: 420px!important;
     background-position: center;

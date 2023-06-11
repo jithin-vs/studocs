@@ -565,7 +565,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
                   }   
                 });
               });
-
+ 
               Collegeid = hodQueryResult[0].collegeid;
               console.log(Collegeid); // Output the updated Collegeid value here
               const studentsQueryResult = await new Promise((resolve, reject) => {
@@ -699,7 +699,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
                   resolve(results);
                   res.redirect(`/studentadd?id=${tutorid}`);
                 };
-              });
+              }); 
             });
         
           } catch (error) {
@@ -712,7 +712,8 @@ app.get('/hod/:name', isAuth, (req, res) => {
 
     //principal add
         app.get('/principaladd',(req,res)=>{
-                
+           
+             
           db.connection.query("select * from  principal",
               [req.body.name],(err,results,fields)=>{
               if(err) {
@@ -720,13 +721,15 @@ app.get('/hod/:name', isAuth, (req, res) => {
                 
               }
               else{
-                  res.render('addnewprincipal',{applications:results});
+                var id=req.query.id;
+                console.log(id);
+                  res.render('addnewprincipal',{applications:results,id});
               }
             }); 
-            
+             
         });
         
-        app.post('/principaladd',encoder,(req,res)=>{
+        app.post('/principaladd',encoder,(req,res)=>{ 
 
           var {name,id,email}=req.body;
           
@@ -997,7 +1000,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
                                           
                                               
                                     break;
-
+ 
                         case 'Tutor':
                                         try{   
 
@@ -1041,7 +1044,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
                                             }catch{
                                               console.log(err);
                                               res.send('server error');
-                                            }
+                                           }
                             
                                                   break;  
                     }
@@ -1065,7 +1068,8 @@ app.get('/hod/:name', isAuth, (req, res) => {
              
            var{name,email}=req.body;
            mail.sendregisterEmail(name,email);
-        })   
+        })  
+       
   
       //delete user
       app.post('/deleteuser',encoder,(req,res)=>{ 
@@ -1076,7 +1080,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
             res.send('server error');
             throw err;  
                 
-          }
+          } 
           else{
             if(user ==='student')
                return res.redirect('/studentadd');
@@ -1102,7 +1106,8 @@ app.get('/hod/:name', isAuth, (req, res) => {
         })
       });
 
-      app.post('/search', (req, res) => {
+
+      app.post('/staffadvisor/:name/search', (req, res) => { // Specify the URL for search with the name parameter
         const searchTerm = req.body.search;
       
         // Perform search query
@@ -1110,15 +1115,18 @@ app.get('/hod/:name', isAuth, (req, res) => {
           name LIKE '%${searchTerm}%' OR
           id LIKE '%${searchTerm}%'`;
       
-        db.connection.query(query, (err, results) => { 
-          if (err) throw err; 
-          var applications=[]
-          res.render('addnewstudent', { applications:results,id:req.query.id,searchTerm });
+        db.connection.query(query, (err, results) => {
+          if (err) {
+            console.log(err);
+            res.send('Server error: ' + err.message);
+          } else {
+            const applications = results;
+            res.render('addnewstudent', { applications, id: req.params.name, searchTerm });
+          }
         });
       });
-    
-
-      app.post('/search1', (req, res) => {
+ 
+      app.post('/hod/:name/search', (req, res) => { // Specify the URL for search with the name parameter
         const searchTerm = req.body.search;
       
         // Perform search query
@@ -1126,12 +1134,79 @@ app.get('/hod/:name', isAuth, (req, res) => {
           name LIKE '%${searchTerm}%' OR
           id LIKE '%${searchTerm}%'`;
       
-        db.connection.query(query, (err, results) => { 
-          if (err) throw err; 
-          var applications=[]
-          res.render('addnewtutor', { applications:results,id:req.query.id,searchTerm });
+        db.connection.query(query, (err, results) => {
+          if (err) {
+            console.log(err);
+            res.send('Server error: ' + err.message);
+          } else {
+            const applications = results;
+            res.render('addnewtutor', { applications, id: req.params.name, searchTerm });
+          }
         });
-      });   
+      });
+
+
+      app.post('/principal/:name/search', (req, res) => { // Specify the URL for search with the name parameter
+        const searchTerm = req.body.search;
+      
+        // Perform search query
+        const query = `SELECT * FROM hod WHERE
+          name LIKE '%${searchTerm}%' OR
+          id LIKE '%${searchTerm}%'`;
+      
+        db.connection.query(query, (err, results) => {
+          if (err) {
+            console.log(err);
+            res.send('Server error: ' + err.message);
+          } else {
+            const applications = results;
+            res.render('addnewhod', { applications, id: req.params.name, searchTerm });
+          }
+        });
+      });
+         
+      app.post('/college/:name/search', (req, res) => { // Specify the URL for search with the name parameter
+        const searchTerm = req.body.search;
+      
+        // Perform search query
+        const query = `SELECT * FROM principal WHERE
+          name LIKE '%${searchTerm}%' OR
+          id LIKE '%${searchTerm}%'`;
+      
+        db.connection.query(query, (err, results) => {
+          if (err) {
+            console.log(err);
+            res.send('Server error: ' + err.message);
+          } else {
+            const applications = results;
+            res.render('addnewprincipal', { applications, id: req.params.name, searchTerm });
+          }
+        });
+      });    
+       
+      
+      
+      
+      
+      
+      
+      // app.post('/search', (req, res) => {
+      //   const searchTerm = req.body.search;
+      
+      //   // Perform search query
+      //   const query = `SELECT * FROM student WHERE
+      //     name LIKE '%${searchTerm}%' OR
+      //     id LIKE '%${searchTerm}%'`; 
+      
+      //   db.connection.query(query, (err, results) => { 
+      //     if (err) throw err; 
+      //     var applications=[]
+      //     res.render('addnewstudent', { applications:results,id:req.query.id,searchTerm });
+      //   });
+      // }); 
+
+
+     
 //       app.post('/reload', (req, res) => {
 //   // Perform the query to retrieve all students
 //   const query = 'SELECT * FROM tutor';
