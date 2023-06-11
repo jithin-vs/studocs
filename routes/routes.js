@@ -40,23 +40,23 @@ var routes =function(app,isAuth,encoder){
     });
 
       //forms
-    app.get('/tform',isAuth,(req, res) => {
-        var name=req.query.id;
-        var user=req.query.user;
-        db.connection.query("select collegeid from ?? where id=?",
-        [user,name],(err,results,fields)=>{
-        if(err) {
-          throw err;
-          
-        }
-        else{
-
-          var collegeid=results[0].collegeid;
-          console.log(collegeid);
-          res.render('tform',{name,collegeid,user}); 
-         }
+      app.get('/tform', isAuth, (req, res) => {
+        var name = req.query.id;
+        var user = req.query.user;
+        console.log('ID:', name);
+        console.log('User:', user);
+        db.connection.query("select * from ?? where id=?", [user, name], (err, results, fields) => {
+            if (err) {
+                throw err;
+            } else {
+                var collegeid = results[0].collegeid;
+                console.log(collegeid); 
+                var result = results[0];
+                res.render('tform', { name, collegeid, user, result });
+            }
         });
-    }); 
+    });
+    
     app.get('/sform/:name',isAuth,(req, res) => {
 
         var name=req.params.name;
@@ -70,12 +70,24 @@ var routes =function(app,isAuth,encoder){
 
           var result=results[0];
           console.log(result);
-          res.render('sform',{name,result,address}); 
+          res.render('sform',{name,result}); 
          }
       });    
     }); 
     app.get('/cform/:name', (req, res) => {
-        res.render('cform',{name:req.params.name});
+      var name=req.params.name;
+      db.connection.query("select * from college where collegeid=?",
+      [name],(err,results,fields)=>{
+      if(err) {
+        throw err;
+        
+      }
+      else{
+
+        var result=results[0];
+        res.render('cform',{name,result});
+      }
+      });
     });
     app.get('/pform/:name', (req, res) => {
 
@@ -274,10 +286,11 @@ var routes =function(app,isAuth,encoder){
     /*------dashboards-------*/   
 
     //staffadvisor
-    app.get('/staffadvisor/:name',isAuth,(req, res) => {
+    app.get('/staffadvisor/:id',isAuth,(req, res) => {
        
       if(req.session.user){
-        const username = req.params.name;
+        const username = req.params.id;
+        console.log('Username:', username);
         try {
           const query1 = new Promise((resolve, reject) => {
             db.connection.query("select * from requests", (err, results, fields) => {
@@ -294,6 +307,7 @@ var routes =function(app,isAuth,encoder){
               if (err) {
                 reject(err);
               } else {
+                console.log('Query Results:', results);
                 if (results.length === 0) {
                   reject(new Error('No data found for the specified username.'));
                 } else {
@@ -309,7 +323,8 @@ var routes =function(app,isAuth,encoder){
               const Photo = imagePath.replace(/\\/g, '/'); // Convert backslashes to forward slashes for URL compatibility
     
               const applications = [];
-              res.render('staffadvisor', { Photo, tutorData, applications });
+              const user='tutor';
+              res.render('staffadvisor', { Photo, tutorData, applications,user });
             })
             .catch((err) => {
               console.log(err);
@@ -360,7 +375,8 @@ app.get('/hod/:name', isAuth, (req, res) => {
           const Photo = imagePath.replace(/\\/g, '/'); // Convert backslashes to forward slashes for URL compatibility
 
           const applications = [];
-          res.render('hod', { Photo, tutorData, applications });
+          const user='hod';
+          res.render('hod', { Photo, tutorData, applications,user });
         })
         .catch((err) => {
           console.log(err);
@@ -529,7 +545,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
      //tutor
       app.get('/tutoradd',(req,res)=>{     
           
-        db.connection.query("select * from tutor",
+        db.connection.query("select * from tutor ",
         [req.body.name],(err,results,fields)=>{
         if(err) {
           throw err;
@@ -538,7 +554,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
         else{
            console.log(results);
            var id=req.query.id;
-           if(id === null)
+           if(id === null) 
                     id='12345'
            console.log(id);
             res.render('addnewtutor',{applications:results,id});
@@ -556,22 +572,24 @@ app.get('/hod/:name', isAuth, (req, res) => {
             try {
              
               const hodQueryResult = await new Promise((resolve, reject) => {
-                db.connection.query("SELECT collegeid FROM hod WHERE id=?", [hodid], (err, results, fields) => {
+                db.connection.query("SELECT collegeid,department FROM hod WHERE id=?", [hodid], (err, results, fields) => {
                   if (err) {
                     reject(err);
-                  } else { console.log(results);
+                  } else { 
 
-                    resolve(results);
+                    //console.log(results);
+                    resolve(results);  
                   }   
                 });
               });
  
               Collegeid = hodQueryResult[0].collegeid;
-              console.log(Collegeid); // Output the updated Collegeid value here
+              var department=hodQueryResult[0].department;
+              //console.log(Collegeid); // Output the updated Collegeid value here
               const studentsQueryResult = await new Promise((resolve, reject) => {
                 var genPassword=verify.randomPassword;
                 mail.sendcredEmail(name,email,id,genPassword);  
-                db.connection.query("insert into tutor (name,id,collegeid,email,batch) values(?,?,?,?,?)", [name,id,Collegeid,email,batch], (err, results, fields) => {
+                db.connection.query("insert into tutor (name,id,collegeid,email,department,batch,password) values(?,?,?,?,?,?,?)", [name,id,Collegeid,email,department,batch,genPassword], (err, results, fields) => {
                   if (err) {
                     reject(err);
                   } else {
@@ -766,7 +784,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
         if (err) {
           throw err;
         } else {
-          res.render('requests', { forms: results });
+          res.render('requests', { forms: results,id1:null});
         }
       });
     } catch (err) {
@@ -917,8 +935,8 @@ app.get('/hod/:name', isAuth, (req, res) => {
           res.render('addnewform', { templateName: templateName, templateContent: templateContent });
         }
       });;
-     }); 
-
+     });
+ 
 /*----------- other control routes -------------*/
 
       // Set up a route for the login page
@@ -1073,7 +1091,8 @@ app.get('/hod/:name', isAuth, (req, res) => {
   
       //delete user
       app.post('/deleteuser',encoder,(req,res)=>{ 
-
+        
+        var id =req.query.id;
         var user=req.query.user   
         db.connection.query("delete from ?? where id=?",[req.query.user,req.query.id],(err,results,fields)=>{
           if(err) {
@@ -1083,13 +1102,13 @@ app.get('/hod/:name', isAuth, (req, res) => {
           } 
           else{
             if(user ==='student')
-               return res.redirect('/studentadd');
+               return res.redirect(`/studentadd?id=${id}`);
             if(user ==='tutor')
-               return res.redirect('/tutoradd');
+               return res.redirect(`/tutoradd?id=${id}`);
             if(user ==='hod')
-               return res.redirect('/hodadd');
+               return res.redirect(`/hodadd?id=${id}`);
             if(user ==='principal')
-               return res.redirect('/principaladd');
+               return res.redirect(`/principaladd?id=${id}`);
           }
         }); 
        })
@@ -1219,10 +1238,21 @@ app.get('/hod/:name', isAuth, (req, res) => {
 // });
        
 
+      //render in edit in student requestes
+      app.get('/edit/:formId', (req, res) => {
+        const formId = req.params.formId;
       
+        // Retrieve the form data from the database based on the formId
+        db.connection.query("SELECT * FROM forms WHERE formid = ?", [formId], (err, results) => {
+          if (err) {
+            throw err;
+          } else {
+            const templateContent = results.length > 0 ? results[0].formdata : ''; // Get the template content or set it as an empty string if not found
+            res.render('addnewform', { formId, templateContent: templateContent });
+          }
+        });;
+      });
       
-      
-    
       /* app.get('/verify',(req,res)=>{ 
           
       var token = verify.generateVerificationToken();

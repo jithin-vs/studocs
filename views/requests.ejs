@@ -47,9 +47,9 @@
               </tr>
             </thead>
           <tbody>
-            <% for (let i = 0; i < forms.length; i++) { %>
+            <% for (let i = 0; i < forms.length; i++) { id1= forms[i].formid %>
               <tr>
-                <td><%= forms[i].formid %></td>
+                <td ><%=id1%></td>
                 <td><%= forms[i].name %></td>
                 <td><%= forms[i].date %></td>
                 <td>
@@ -60,7 +60,7 @@
             <% } %>
           </tbody>
           </table>
-        </div>
+        </div> 
       </div>
     <div class="col-sm-6 side2">
       <div class="d-flex justify-content-center align-items-center">
@@ -77,7 +77,9 @@
       </div>
       <br>
       <div class="subm">
-        <button class="btn btn-secondary scc" style="background-color: rgb(208, 66, 23);">Edit</button>
+        <button class="btn btn-secondary scc" style="background-color: rgb(208, 66, 23);">
+          <a href="/edit/<%= id1%>" style="color: white;">Edit</a>
+        </button>
           <button class="btn btn-secondary scc dropdown-toggle" style="background-color: blue;">Add Attachment</button>
           <span class="dropdown show">
             <select class="btn btn-secondary scc">
@@ -165,9 +167,11 @@
                 });
               });
             </script>
-            
-            
-            
+<script>
+  function updateId(id) {
+    document.getElementById('id1').innerHTML = id;
+  }
+</script>
 
 
    </body>
