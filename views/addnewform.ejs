@@ -75,7 +75,7 @@
             <hr>
             <p class="p1">Salutation
               <span class="box1" onclick="showtextarea(5)"><i class="fa fa-plus fa-big"></i></span>
-              <textarea cols="50" rows="1" name="text" id="text5" class="form-control" style="resize:vertical;display:none" placeholder='Respected sir/madam' oninput="displayText()"></textarea>
+              <textarea cols="50" rows="1" name="text" id="text5" class="form-control" style="resize:vertical;display:none" value='Respected sir/madam' oninput="displayText()"></textarea>
             </p>
             <hr>
             <p class="p1">Paragraph 1
@@ -102,7 +102,7 @@
       
       <div class="col-sm-6 side2">
         <div id="letter-preview" class="col-sm-6 panel">
-        
+           <%- templateContent %>
         </div>
       </div>
     </div>
