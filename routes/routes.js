@@ -1145,42 +1145,32 @@ app.get('/hod/:name', isAuth, (req, res) => {
        
 
       //render in edit in student requestes
-      app.get('/edit', (req, res) => {
+      app.get('/edit/:formId', (req, res) => {
         const formId = req.params.formId;
       
         // Retrieve the form data from the database based on the formId
-        db.connection.query("SELECT formdata FROM forms WHERE formid = ?", [formId], (err, results,fields) => {
+        db.connection.query("SELECT * FROM forms WHERE formid = ?", [formId], (err, results) => {
           if (err) {
             console.error(err);
             // Handle the error appropriately
             res.status(500).send('Error retrieving form data');
           } else { 
-            if (results.length > 0) {
+            if (results.length > 0) { 
               const formData = results[0];
               console.log(formData);
+              const  formDataHTML = formData.formdata;
+              const templateContent='';
               // Render the addnewform.ejs template with the retrieved form data
-              res.render('addnewform', { formData, templateContent: '' }); // Pass an empty string as the value for templateContent
+              res.render('addnewform', {  formDataHTML,templateContent }); // Pass an empty string as the value for templateContent
             } else {
               // Handle the case where the form data is not found
               res.status(404).send('Form data not found');
             }
           }
-        });
+        }); 
       });
       
-      app.get('/addnewform',isAuth,(req, res) => {
-        const templateName = req.query.name; // Get the template name from the query parameter
-    
-        // Fetch the template content from the server
-        db.connection.query('SELECT formdata FROM forms WHERE name = ?', [templateName], (err, results, fields) => {
-          if (err) {
-            throw err;
-          } else {
-            const templateContent = results.length > 0 ? results[0].formdata : ''; // Get the template content or set it as an empty string if not found
-            res.render('addnewform', { templateName: templateName, templateContent: templateContent });
-          }
-        });;
-       });
+      
     
       /* app.get('/verify',(req,res)=>{ 
           
