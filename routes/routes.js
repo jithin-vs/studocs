@@ -1088,31 +1088,27 @@ app.get('/hod/:name', isAuth, (req, res) => {
            mail.sendregisterEmail(name,email);
         })  
        
-  
-      //delete user
-      app.post('/deleteuser',encoder,(req,res)=>{ 
-        
-        var id =req.query.id;
-        var user=req.query.user   
-        db.connection.query("delete from ?? where id=?",[req.query.user,req.query.id],(err,results,fields)=>{
-          if(err) {
+
+      app.post('/deleteuser', encoder, (req, res) => { 
+        var id = req.query.id;
+        var user = req.query.user;
+        db.connection.query("DELETE FROM ?? WHERE id = ?", [req.query.user, req.query.id], (err, results, fields) => {
+          if (err) {
             res.send('server error');
-            throw err;  
-                
-          } 
-          else{
-            if(user ==='student')
-               return res.redirect(`/studentadd?id=${id}`);
-            if(user ==='tutor')
-               return res.redirect(`/tutoradd?id=${id}`);
-            if(user ==='hod')
-               return res.redirect(`/hodadd?id=${id}`);
-            if(user ==='principal')
-               return res.redirect(`/principaladd?id=${id}`);
+            throw err;
+          } else {
+            if (user === 'student')
+              return res.redirect(`/studentadd?id=${id}`);
+            if (user === 'tutor')
+              return res.redirect(`/tutoradd?id=${id}`);
+            if (user === 'hod')
+              return res.redirect(`/hodadd?id=${id}`);
+            if (user === 'principal')
+              return res.redirect(`/principaladd?id=${id}`);
           }
         }); 
-       })
-    
+      });
+      
      //logout
       app.get('/logout',(req,res)=>{
         req.session.destroy(function(err){  
@@ -1205,37 +1201,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
        
       
       
-      
-      
-      
-      
-      // app.post('/search', (req, res) => {
-      //   const searchTerm = req.body.search;
-      
-      //   // Perform search query
-      //   const query = `SELECT * FROM student WHERE
-      //     name LIKE '%${searchTerm}%' OR
-      //     id LIKE '%${searchTerm}%'`; 
-      
-      //   db.connection.query(query, (err, results) => { 
-      //     if (err) throw err; 
-      //     var applications=[]
-      //     res.render('addnewstudent', { applications:results,id:req.query.id,searchTerm });
-      //   });
-      // }); 
 
-
-     
-//       app.post('/reload', (req, res) => {
-//   // Perform the query to retrieve all students
-//   const query = 'SELECT * FROM tutor';
-  
-//   db.connection.query(query, (err, results) => {
-//     if (err) throw err;
-//     var applications = results;
-//     res.render('addnewtutor', { applications, id: req.query.id });
-//   });
-// });
        
 
       //render in edit in student requestes
