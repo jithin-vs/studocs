@@ -753,7 +753,8 @@ app.get('/hod/:name', isAuth, (req, res) => {
           
           async function getData() {  
             try {
-              let Collegeid='98765432';    
+              let Collegeid=req.query.id;
+              const id1=Collegeid;    
               var genPassword=verify.randomPassword;
               mail.sendcredEmail(name,email,id,genPassword)  
               const studentsQueryResult = await new Promise((resolve, reject) => {
@@ -762,7 +763,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
                     reject(err);
                   } else {
                     resolve(results);
-                    res.redirect('/principaladd');
+                    res.redirect(`/principaladd?id=${Collegeid}`);
                   };
                 });
               });
