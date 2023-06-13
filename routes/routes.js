@@ -8,7 +8,7 @@ const { query } = require('express');
 var routes =function(app,isAuth,encoder){     
   
 
-   
+    
      
     app.get('/', (req, res) => {
         res.render('index'); 
@@ -834,14 +834,14 @@ app.get('/hod/:name', isAuth, (req, res) => {
           throw err; 
         } 
         else{
-          const divContent = results[0].name;
-          const applications = results[0].name;// Empty array, can be populated later if needed
+          const divContent = results.length>0?results[0].name:null;
+          const applications = results.length>0?results[0].name:null;// Empty array, can be populated later if needed
           res.render('addtemplate',{applications:results});
         }
         });
         }catch(err){
           console.log(err); 
-        } 
+        }  
       });
       
       app.get('/get-templates', (req, res) => {
@@ -885,9 +885,9 @@ app.get('/hod/:name', isAuth, (req, res) => {
     })
 
     //REQUEST DISPLAY
-    app.get('/form/:formId', (req, res) => {
-      const formId = req.params.formId;
-    
+    app.get('/form/:selectedFormId', (req, res) => {
+      const formId = req.params.selectedFormId;
+    console.log(formId);
       db.connection.query("SELECT formdata FROM forms WHERE formid = ?", [formId], (err, results) => {
         if (err) {
           console.error(err);
@@ -895,7 +895,6 @@ app.get('/hod/:name', isAuth, (req, res) => {
         } else {
           if (results.length > 0) {
             const fetchedHTML = results[0].formdata;
-            console.log('here');
             res.send(fetchedHTML);
           } else {
             res.status(404).send('HTML content not found');
@@ -904,7 +903,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
       });
     });
     
-    
+       
 
      //SAVING TEMPLATE
      app.post('/save-template',(req,res)=>{   
@@ -1206,8 +1205,8 @@ app.get('/hod/:name', isAuth, (req, res) => {
        
 
       //render in edit in student requestes
-      app.get('/edit/:formId', (req, res) => {
-        const formId = req.params.formId;
+      app.get('/edit/:selectedFormId', (req, res) => {
+        const formId = req.params.selectedFormId;
       
         // Retrieve the form data from the database based on the formId
         db.connection.query("SELECT * FROM forms WHERE formid = ?", [formId], (err, results) => {
@@ -1215,7 +1214,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
             throw err;
           } else {
             const templateContent = results.length > 0 ? results[0].formdata : ''; // Get the template content or set it as an empty string if not found
-            res.render('addnewform', { formId, templateContent: templateContent });
+            res.render('newform', { formId, templateContent: templateContent });
           }
         });;
       });
