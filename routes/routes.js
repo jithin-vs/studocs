@@ -20,7 +20,7 @@ var routes =function(app,isAuth,encoder){
       });
     };
 
-   
+    
      
     app.get('/', (req, res) => {
         res.render('index'); 
@@ -52,23 +52,23 @@ var routes =function(app,isAuth,encoder){
     });
 
       //forms
-    app.get('/tform',isAuth,(req, res) => {
-        var name=req.query.id;
-        var user=req.query.user;
-        db.connection.query("select collegeid from ?? where id=?",
-        [user,name],(err,results,fields)=>{
-        if(err) {
-          throw err;
-          
-        }
-        else{
-
-          var collegeid=results[0].collegeid;
-          console.log(collegeid);
-          res.render('tform',{name,collegeid,user}); 
-         }
+      app.get('/tform', isAuth, (req, res) => {
+        var name = req.query.id;
+        var user = req.query.user;
+        console.log('ID:', name);
+        console.log('User:', user);
+        db.connection.query("select * from ?? where id=?", [user, name], (err, results, fields) => {
+            if (err) {
+                throw err;
+            } else {
+                var collegeid = results[0].collegeid;
+                console.log(collegeid); 
+                var result = results[0];
+                res.render('tform', { name, collegeid, user, result });
+            }
         });
-    }); 
+    });
+    
     app.get('/sform/:name',isAuth,(req, res) => {
 
         var name=req.params.name;
@@ -82,12 +82,24 @@ var routes =function(app,isAuth,encoder){
 
           var result=results[0];
           console.log(result);
-          res.render('sform',{name,result,address}); 
+          res.render('sform',{name,result}); 
          }
       });    
     }); 
     app.get('/cform/:name', (req, res) => {
-        res.render('cform',{name:req.params.name});
+      var name=req.params.name;
+      db.connection.query("select * from college where collegeid=?",
+      [name],(err,results,fields)=>{
+      if(err) {
+        throw err;
+        
+      }
+      else{
+
+        var result=results[0];
+        res.render('cform',{name,result});
+      }
+      });
     });
     app.get('/pform/:name', (req, res) => {
 
@@ -286,10 +298,11 @@ var routes =function(app,isAuth,encoder){
     /*------dashboards-------*/   
 
     //staffadvisor
-    app.get('/staffadvisor/:name',isAuth,(req, res) => {
+    app.get('/staffadvisor/:id',isAuth,(req, res) => {
        
       if(req.session.user){
-        const username = req.params.name;
+        const username = req.params.id;
+        console.log('Username:', username);
         try {
           const query1 = new Promise((resolve, reject) => {
             db.connection.query("select * from requests", (err, results, fields) => {
@@ -306,6 +319,7 @@ var routes =function(app,isAuth,encoder){
               if (err) {
                 reject(err);
               } else {
+                console.log('Query Results:', results);
                 if (results.length === 0) {
                   reject(new Error('No data found for the specified username.'));
                 } else {
@@ -321,7 +335,8 @@ var routes =function(app,isAuth,encoder){
               const Photo = imagePath.replace(/\\/g, '/'); // Convert backslashes to forward slashes for URL compatibility
     
               const applications = [];
-              res.render('staffadvisor', { Photo, tutorData, applications });
+              const user='tutor';
+              res.render('staffadvisor', { Photo, tutorData, applications,user });
             })
             .catch((err) => {
               console.log(err);
@@ -372,7 +387,8 @@ app.get('/hod/:name', isAuth, (req, res) => {
           const Photo = imagePath.replace(/\\/g, '/'); // Convert backslashes to forward slashes for URL compatibility
 
           const applications = [];
-          res.render('hod', { Photo, tutorData, applications });
+          const user='hod';
+          res.render('hod', { Photo, tutorData, applications,user });
         })
         .catch((err) => {
           console.log(err);
@@ -578,7 +594,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
                   }   
                 });
               });
-
+ 
               Collegeid = hodQueryResult[0].collegeid;
               var department=hodQueryResult[0].department;
               //console.log(Collegeid); // Output the updated Collegeid value here
@@ -713,7 +729,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
                   resolve(results);
                   res.redirect(`/studentadd?id=${tutorid}`);
                 };
-              });
+              }); 
             });
         
           } catch (error) {
@@ -726,7 +742,8 @@ app.get('/hod/:name', isAuth, (req, res) => {
 
     //principal add
         app.get('/principaladd',(req,res)=>{
-                
+           
+             
           db.connection.query("select * from  principal",
               [req.body.name],(err,results,fields)=>{
               if(err) {
@@ -734,19 +751,22 @@ app.get('/hod/:name', isAuth, (req, res) => {
                 
               }
               else{
-                  res.render('addnewprincipal',{applications:results});
+                var id=req.query.id;
+                console.log(id);
+                  res.render('addnewprincipal',{applications:results,id});
               }
             }); 
-            
+             
         });
         
-        app.post('/principaladd',encoder,(req,res)=>{
+        app.post('/principaladd',encoder,(req,res)=>{ 
 
           var {name,id,email}=req.body;
           
           async function getData() {  
             try {
-              let Collegeid='98765432';    
+              let Collegeid=req.query.id;
+              const id1=Collegeid;    
               var genPassword=verify.randomPassword;
               mail.sendcredEmail(name,email,id,genPassword)  
               const studentsQueryResult = await new Promise((resolve, reject) => {
@@ -755,7 +775,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
                     reject(err);
                   } else {
                     resolve(results);
-                    res.redirect('/principaladd');
+                    res.redirect(`/principaladd?id=${Collegeid}`);
                   };
                 });
               });
@@ -872,14 +892,14 @@ app.get('/hod/:name', isAuth, (req, res) => {
           throw err; 
         } 
         else{
-          const divContent = results[0].name;
-          const applications = results[0].name;// Empty array, can be populated later if needed
+          const divContent = results.length>0?results[0].name:null;
+          const applications = results.length>0?results[0].name:null;// Empty array, can be populated later if needed
           res.render('addtemplate',{applications:results});
         }
         });
         }catch(err){
           console.log(err); 
-        } 
+        }  
       });
       
       app.get('/get-templates', (req, res) => {
@@ -923,9 +943,9 @@ app.get('/hod/:name', isAuth, (req, res) => {
     })
 
     //REQUEST DISPLAY
-    app.get('/form/:formId', (req, res) => {
-      const formId = req.params.formId;
-    
+    app.get('/form/:selectedFormId', (req, res) => {
+      const formId = req.params.selectedFormId;
+    console.log(formId);
       db.connection.query("SELECT formdata FROM forms WHERE formid = ?", [formId], (err, results) => {
         if (err) {
           console.error(err);
@@ -933,7 +953,6 @@ app.get('/hod/:name', isAuth, (req, res) => {
         } else {
           if (results.length > 0) {
             const fetchedHTML = results[0].formdata;
-            console.log('here');
             res.send(fetchedHTML);
           } else {
             res.status(404).send('HTML content not found');
@@ -942,7 +961,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
       });
     });
     
-    
+       
 
      //SAVING TEMPLATE
      app.post('/save-template',(req,res)=>{   
@@ -1057,7 +1076,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
                                           
                                               
                                     break;
-
+ 
                         case 'Tutor':
                                         try{   
 
@@ -1101,7 +1120,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
                                             }catch{
                                               console.log(err);
                                               res.send('server error');
-                                            }
+                                           }
                             
                                                   break;  
                     }
@@ -1124,33 +1143,30 @@ app.get('/hod/:name', isAuth, (req, res) => {
              
            var{name,email}=req.body;
            mail.sendregisterEmail(name,email);
-        })   
-  
-      //delete user
-      app.post('/deleteuser',encoder,(req,res)=>{ 
-        
-        var id =req.query.id; 
-        var user=req.query.user;
-        var returnid=req.query.returnid;   
-        db.connection.query("delete from ?? where id=?",[req.query.user,req.query.id],(err,results,fields)=>{
-          if(err) {
+        })  
+       
+
+      app.post('/deleteuser', encoder, (req, res) => { 
+        var id = req.query.id; 
+        var user = req.query.user;
+        var returnid=req.query.returnid;;
+        db.connection.query("DELETE FROM ?? WHERE id = ?", [req.query.user, req.query.id], (err, results, fields) => {
+          if (err) {
             res.send('server error');  
-            throw err;  
-                
-          }
-          else{
-            if(user ==='student')
-               return res.redirect(`/studentadd?id=${id}`);
-            if(user ==='tutor')
-               return res.redirect(`/tutoradd?id=${returnid}`);
-            if(user ==='hod')
-               return res.redirect(`/hodadd?id=${id}`);
-            if(user ==='principal')
-               return res.redirect(`/principaladd?id=${id}`);
+            throw err;
+          } else {
+            if (user === 'student')
+              return res.redirect(`/studentadd?id=${id}`);
+            if (user === 'tutor')
+              return res.redirect(`/tutoradd?id=${returnid}`);
+            if (user === 'hod')
+              return res.redirect(`/hodadd?id=${id}`);
+            if (user === 'principal')
+              return res.redirect(`/principaladd?id=${id}`);
           }
         }); 
-       })
-    
+      });
+      
      //logout
       app.get('/logout',(req,res)=>{
         req.session.destroy(function(err){  
@@ -1163,7 +1179,8 @@ app.get('/hod/:name', isAuth, (req, res) => {
         })
       });
 
-      app.post('/search', (req, res) => {
+
+      app.post('/staffadvisor/:name/search', (req, res) => { // Specify the URL for search with the name parameter
         const searchTerm = req.body.search;
       
         // Perform search query
@@ -1171,15 +1188,18 @@ app.get('/hod/:name', isAuth, (req, res) => {
           name LIKE '%${searchTerm}%' OR
           id LIKE '%${searchTerm}%'`;
       
-        db.connection.query(query, (err, results) => { 
-          if (err) throw err; 
-          var applications=[]
-          res.render('addnewstudent', { applications:results,id:req.query.id,searchTerm });
+        db.connection.query(query, (err, results) => {
+          if (err) {
+            console.log(err);
+            res.send('Server error: ' + err.message);
+          } else {
+            const applications = results;
+            res.render('addnewstudent', { applications, id: req.params.name, searchTerm });
+          }
         });
       });
-    
-
-      app.post('/search1', (req, res) => {
+ 
+      app.post('/hod/:name/search', (req, res) => { // Specify the URL for search with the name parameter
         const searchTerm = req.body.search;
       
         // Perform search query
@@ -1187,27 +1207,64 @@ app.get('/hod/:name', isAuth, (req, res) => {
           name LIKE '%${searchTerm}%' OR
           id LIKE '%${searchTerm}%'`;
       
-        db.connection.query(query, (err, results) => { 
-          if (err) throw err; 
-          var applications=[]
-          res.render('addnewtutor', { applications:results,id:req.query.id,searchTerm });
+        db.connection.query(query, (err, results) => {
+          if (err) {
+            console.log(err);
+            res.send('Server error: ' + err.message);
+          } else {
+            const applications = results;
+            res.render('addnewtutor', { applications, id: req.params.name, searchTerm });
+          }
         });
-      });   
-//       app.post('/reload', (req, res) => {
-//   // Perform the query to retrieve all students
-//   const query = 'SELECT * FROM tutor';
-  
-//   db.connection.query(query, (err, results) => {
-//     if (err) throw err;
-//     var applications = results;
-//     res.render('addnewtutor', { applications, id: req.query.id });
-//   });
-// });
+      });
+
+
+      app.post('/principal/:name/search', (req, res) => { // Specify the URL for search with the name parameter
+        const searchTerm = req.body.search;
+      
+        // Perform search query
+        const query = `SELECT * FROM hod WHERE
+          name LIKE '%${searchTerm}%' OR
+          id LIKE '%${searchTerm}%'`;
+      
+        db.connection.query(query, (err, results) => {
+          if (err) {
+            console.log(err);
+            res.send('Server error: ' + err.message);
+          } else {
+            const applications = results;
+            res.render('addnewhod', { applications, id: req.params.name, searchTerm });
+          }
+        });
+      });
+         
+      app.post('/college/:name/search', (req, res) => { // Specify the URL for search with the name parameter
+        const searchTerm = req.body.search;
+      
+        // Perform search query
+        const query = `SELECT * FROM principal WHERE
+          name LIKE '%${searchTerm}%' OR
+          id LIKE '%${searchTerm}%'`;
+      
+        db.connection.query(query, (err, results) => {
+          if (err) {
+            console.log(err);
+            res.send('Server error: ' + err.message);
+          } else {
+            const applications = results;
+            res.render('addnewprincipal', { applications, id: req.params.name, searchTerm });
+          }
+        });
+      });    
+       
+      
+      
+
        
 
       //render in edit in student requestes
-      app.get('/edit/:formId', (req, res) => {
-        const formId = req.params.formId;
+      app.get('/edit/:selectedFormId', (req, res) => {
+        const formId = req.params.selectedFormId;
       
         // Retrieve the form data from the database based on the formId
         db.connection.query("SELECT * FROM forms WHERE formid = ?", [formId], (err, results) => {
@@ -1215,7 +1272,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
             throw err;
           } else {
             const templateContent = results.length > 0 ? results[0].formdata : ''; // Get the template content or set it as an empty string if not found
-            res.render('addnewform', { formId, templateContent: templateContent });
+            res.render('newform', { formId, templateContent: templateContent });
           }
         });;
       });

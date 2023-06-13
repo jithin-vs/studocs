@@ -53,7 +53,7 @@
                 <td><%= forms[i].name %></td>
                 <td><%= forms[i].date %></td>
                 <td>
-                  <button type="button" class="btn btn-success view-button" data-form-id="<%= forms[i].formid %>">view</button>
+                  <button type="button" class="btn btn-success view-button" id="<%= forms[i].formid %>" onclick="fetchid()" data-form-id="<%= forms[i].formid %>">view</button>
 
                 </td>
               </tr>
@@ -77,8 +77,8 @@
       </div>
       <br>
       <div class="subm">
-        <button class="btn btn-secondary scc" style="background-color: rgb(208, 66, 23);">
-          <a href="/edit/<%= id1%>" style="color: white;">Edit</a>
+        <button class="btn btn-secondary scc edit-button" style="background-color: rgb(208, 66, 23);">
+          <a  style="color: white;">Edit</a>
         </button>
           <button class="btn btn-secondary scc dropdown-toggle" style="background-color: blue;">Add Attachment</button>
           <span class="dropdown show">
@@ -147,29 +147,42 @@
             <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
             <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
             <script>
-              document.addEventListener('DOMContentLoaded', function() {
-                const viewButtons = document.querySelectorAll('.view-button');
-                const displayContainer = document.getElementById('displayContainer');
-            
-                viewButtons.forEach(function(button) {
-                  button.addEventListener('click', function() {
-                    const formId = button.dataset.formId;
-            
-                    // Make a request to fetch the HTML content from the server
-                    fetch(`/form/${formId}`)
-                      .then(response => response.text())
-                      .then(html => {
-                        // Update the HTML content of the display container
-                        displayContainer.innerHTML = html;
-                      })
-                      .catch(error => console.error(error));
-                  });
-                });
-              });
-              function getParameterValue() {
-                      const urlParams = new URLSearchParams(window.location.search);
-                      return urlParams.get('id');
-                  }
+               let selectedFormId; // Variable to store the selected form ID
+
+  function fetchid() {
+  // Get the selected form ID from the clicked button's data attribute
+  selectedFormId = event.target.dataset.formId;
+  console.log('Selected Form ID:', selectedFormId);
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    const viewButtons = document.querySelectorAll('.view-button');
+    const editButton=document.querySelectorAll('.edit-button')
+    const displayContainer = document.getElementById('displayContainer');
+
+    viewButtons.forEach(function(button) {
+      button.addEventListener('click', function(event) {
+        fetchid(); // Call the fetchid() function to save the form ID
+        
+        // Make a request to fetch the HTML content from the server
+        fetch(`/form/${selectedFormId}`)
+          .then(response => response.text())
+          .then(html => {
+            // Update the HTML content of the display container
+            displayContainer.innerHTML = html;
+          })
+          .catch(error => console.error(error));
+      });
+      
+    });
+    editButton.forEach(function(button) {
+  button.addEventListener('click', function(event) {
+    console.log('Selected Form ID is:', selectedFormId);
+    // Redirect to the edit page with the selected form ID
+    window.location.href = `/edit/${selectedFormId}`;
+  });
+})
+  });
+  
             </script>
 <script>
   function updateId(id) {

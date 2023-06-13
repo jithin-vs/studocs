@@ -58,7 +58,7 @@
               EMAIL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:<%= tutorData.email %><br>
             </b>
             <div class="edit">
-              <a href="/pform/<%= tutorData.id%>">Edit</a>
+              <a href="/tform?id=<%= tutorData.id %>&user=<%= user %>">Edit</a>
             </div> </div>
             
         </div>
@@ -106,17 +106,21 @@
       </div>
       <br>
       <div class="banner" id="banner"><br>
-      <h3>SERVICES</h3><br>
-    <div Class="service">
-    
-      <br>
-      <input type="button" class="button1 col-sm-3" onclick="window.location.href='/pending-requests'" value="PENDING REQUESTS">&nbsp;&nbsp;
-      <input type="button" class="button1 col-sm-3" value="PROCESSED REQUESTS" onclick="window.location.href='/teacher_verified_requests'">&nbsp;&nbsp;
-      <input type="button" class="button1 col-sm-3" onclick="window.location.href='/tutoradd?id=<%= tutorData.id %>&dept=<%= tutorData.dept%>'" value="STAFF ADVISORS">&nbsp;&nbsp;
-       
+        <h3>SERVICES</h3><br>
+        <br>
+        <div Class="row">
+          <div class="col-sm-12 col-md-4"> 
+            <input type="button" class="button1 btn-block" onclick="window.location.href='/pending-requests'" value="PENDING REQUESTS">&nbsp;&nbsp;
+          </div>
+          <div class="col-sm-12 col-md-4">
+            <input type="button" class="button1 btn-block" value="PROCESSED REQUESTS" onclick="window.location.href='/teacher_verified_requests'">&nbsp;&nbsp;
+          </div>
+          <div class="col-sm-12 col-md-4">
+            <input type="button" class="button1 btn-block" onclick="window.location.href='/tutoradd?id=<%= tutorData.id %>'" value="STAFF ADVISORS">&nbsp;&nbsp;
+          </div>   
+        </div>
+      </div>
     </div>
-    </div>
-  </div>
   <div class="modal fade" id="myModal">
 		<div class="modal-dialog">
 			<div class="modal-content">
@@ -132,7 +136,7 @@
 				<!-- Modal footer -->
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-					<button type="button" class="btn btn-danger" data-dismiss="modal" onclick="window.location.href='/inner-page'" >Sign Out</button>
+					<button type="button" class="btn btn-danger" data-dismiss="modal" onclick="window.location.href='/logout'" >Sign Out</button>
 				</div>
 			</div>
 		</div>

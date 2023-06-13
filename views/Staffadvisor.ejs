@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>STUDOCS</title>
-  <link href="assets/img/logo.png" rel="icon">
+  <link href="/assets/img/logo.png" rel="icon">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
   <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -50,13 +50,13 @@
         </div>
           <div class="col-lg-6 address" ><b>
               ID&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:<%= tutorData.id %><br>
-              DEPT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  :<%=  tutorData.department%><br>
-              ADDRESS&nbsp;&nbsp;&nbsp;&nbsp;  :<%=  tutorData.address%><br>
+              DEPT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:<%=  tutorData.department%><br>
+              ADDRESS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  :<%=  tutorData.address%><br>
               PHONE NO &nbsp;&nbsp;:<%= tutorData.phno %><br>
-              EMAIL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:<%=  tutorData.email%><br>
+              EMAIL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:<%=  tutorData.email%><br>
             </b>
             <div class="edit">
-              Edit
+              <a href="/tform?id=<%= tutorData.id %>&user=<%= user %>">Edit</a>
             </div> </div>  
 
             
@@ -102,14 +102,17 @@
       <br>
       <div class="banner" id="banner"><br>
       <h3>SERVICES</h3><br>
-    <div Class="service">
-    
-      <br>
-      <input type="button" class="button1 col-sm-3" onclick="window.location.href='/pending-requests'" value="PENDING REQUESTS">&nbsp;&nbsp;
-      <input type="button" class="button1 col-sm-3" onclick="window.location.href='/teacher_verified_requests'" value="PROCESSED REQUESTS">&nbsp;&nbsp;
-      <input type="button" class="button1 col-sm-3" onclick="window.location.href='/studentadd?id=<%= tutorData.Id%>'" value="STUDENTS">&nbsp;&nbsp;
-
-    </div>
+      <div class="row">
+        <div class="col-sm-12 col-md-4">
+          <input type="button" class="button1 btn-block" onclick="window.location.href='/pending-requests'" value="PENDING REQUESTS">&nbsp;&nbsp;
+        </div>
+        <div class="col-sm-12 col-md-4">
+          <input type="button" class="button1 btn-block" onclick="window.location.href='/teacher_verified_requests'" value="PROCESSED REQUESTS">&nbsp;&nbsp;
+        </div>
+        <div class="col-sm-12 col-md-4">
+          <input type="button" class="button1 btn-block" onclick="window.location.href='/studentadd?id=<%= tutorData.id%>'" value="STUDENTS">&nbsp;&nbsp;
+        </div>
+      </div>
     </div>
   </div>
   <div class="modal fade" id="myModal">
@@ -127,7 +130,7 @@
 				<!-- Modal footer -->
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-					<button type="button" class="btn btn-danger" data-dismiss="modal" onclick="window.location.href='/inner-page'" >Sign Out</button>
+					<button type="button" class="btn btn-danger" data-dismiss="modal" onclick="window.location.href='/logout'" >Sign Out</button>
 				</div>
 			</div>
 		</div>

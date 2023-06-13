@@ -68,7 +68,7 @@
               PHONE NO&emsp;&nbsp;&nbsp;&emsp;&nbsp;&emsp;:<%= collegeData.Phno %> <br>
             </b>
             <div class="edit ">
-              <a href="/cform">Edit</a>
+              <a href="/cform/<%= collegeData.Id%>">Edit</a>
             </div>
         </div>
         <div class="pic" style="padding-left: 20px;">   
@@ -114,20 +114,24 @@
       <br>
       
       <div class="banner" id="banner"><br>
-      <h3 class="underlined-heading justify-content-center">SERVICES</h3><br>
-      
-    <div Class="service">
-    
-      <br>
-      <input type="button" class="button1 col-sm-3"  onclick="window.location.href='/pending-requests'" value="PENDING REQUESTS">&nbsp;&nbsp;
-      <input type="button" class="button1 col-sm-3"  onclick="window.location.href='/teacher_verified_requests'" value="VERIFIED REQUESTS">&nbsp;&nbsp;
-      <input type="button" class="button1 col-sm-3"  onclick="window.location.href='/principaladd?id=<%= collegeData.Id %>'" value="PRINCIPAL">&nbsp;&nbsp;
-      <input type="button" class="button1 col-sm-3"  onclick="window.location.href='/addtemplate'" value="FORMS">&nbsp;&nbsp;
-    
-    </div>
-    </div>
-    
-  </div>
+        <h3 class="underlined-heading justify-content-center">SERVICES</h3><br>
+        
+        <div Class="row">
+          <div class="col-sm-12 col-md-4">
+            <input type="button" class="button1 btn-block"  onclick="window.location.href='/pending-requests'" value="PENDING REQUESTS">&nbsp;&nbsp;
+          </div>
+          <div class="col-sm-12 col-md-4">
+            <input type="button" class="button1 btn-block"  onclick="window.location.href='/teacher_verified_requests'" value="VERIFIED REQUESTS">&nbsp;&nbsp;
+          </div>
+          <div class="col-sm-12 col-md-4">
+            <input type="button" class="button1 btn-block"  onclick="window.location.href='/principaladd?id=<%= collegeData.Id %>'" value="PRINCIPAL">&nbsp;&nbsp;
+          </div>
+          <div class="col-sm-12 col-md-4">
+            <input type="button" class="button1 btn-block"  onclick="window.location.href='/addtemplate'" value="FORMS">&nbsp;&nbsp;
+          </div>
+        </div>
+      </div>
+     </div>
   
   
   <div class="modal fade" id="myModal">
@@ -145,7 +149,7 @@
 				<!-- Modal footer -->
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-					<button type="button" class="btn btn-danger" data-dismiss="modal" onclick="window.location.href='/inner-page'" >Sign Out</button>
+					<button type="button" class="btn btn-danger" data-dismiss="modal" onclick="window.location.href='/logout'" >Sign Out</button>
 				</div>
 			</div>
 		</div>
