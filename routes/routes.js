@@ -792,12 +792,13 @@ app.get('/hod/:name', isAuth, (req, res) => {
       
   // SENDING REQUEST ROUTE FOR STUDENTS    
   app.get('/requests', (req, res) => {
+    let id=req.query.id;
     try {
       db.connection.query("SELECT * FROM forms", (err, results, fields) => {
         if (err) {
           throw err;
         } else {
-          res.render('requests', { forms: results,id1:null});
+          res.render('requests', { forms: results,id1:null,id});
         }
       });
     } catch (err) {
@@ -808,7 +809,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
   //SUBMIT FORM
   app.get('/submit',async(req,res)=>{  
       const stdid = '123456';
-      const formid='15';
+      const formid=query.id;
       try {
     
         // Execute the first query with arguments
@@ -1263,16 +1264,18 @@ app.get('/hod/:name', isAuth, (req, res) => {
        
 
       //render in edit in student requestes
-      app.get('/edit/:selectedFormId', (req, res) => {
-        const formId = req.params.selectedFormId;
-      
+      app.get('/edit', (req, res) => {
+        const formid = req.query.Formid;
+        const id=req.query.id
+console.log(formid);
+        
         // Retrieve the form data from the database based on the formId
-        db.connection.query("SELECT * FROM forms WHERE formid = ?", [formId], (err, results) => {
+        db.connection.query("SELECT * FROM forms WHERE formid = ?", [formid], (err, results) => {
           if (err) {
-            throw err;
+            throw err; 
           } else {
             const templateContent = results.length > 0 ? results[0].formdata : ''; // Get the template content or set it as an empty string if not found
-            res.render('newform', { formId, templateContent: templateContent });
+            res.render('newform', { formid, templateContent: templateContent,id });
           }
         });;
       });
