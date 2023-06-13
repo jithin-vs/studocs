@@ -1,41 +1,41 @@
 
 function sendDivContent() {
-   function getURLParameters() {
-        const queryString = window.location.search.slice(1);
-        const params = {};
+  function getURLParameters() {
+       const queryString = window.location.search.slice(1);
+       const params = {};
 
-        if (queryString) {
-          const paramPairs = queryString.split('&');
-          paramPairs.forEach(pair => {
-            const [key, value] = pair.split('=');
-            params[key] = decodeURIComponent(value);
-          });
-        }
+       if (queryString) {
+         const paramPairs = queryString.split('&');
+         paramPairs.forEach(pair => {
+           const [key, value] = pair.split('=');
+           params[key] = decodeURIComponent(value);
+         });
+       }
 
-        return params;
-      }
+       return params;
+     }
 
-    const parameters = getURLParameters();
-    const name = parameters.name;
+   const parameters = getURLParameters();
+   const name = parameters.name;
 
-  var divContent = document.getElementById("letter-preview").innerHTML;
- 
+ var divContent = document.getElementById("letter-preview").innerHTML;
 
-  // Create an AJAX request
-  var xhr = new XMLHttpRequest();
-  xhr.open("POST", "/save-template?name=" + encodeURIComponent(name), true);
-  xhr.setRequestHeader("Content-Type", "application/json");
 
-  // Send the div content to the server
-  xhr.send(JSON.stringify({ content: divContent }));
+ // Create an AJAX request
+ var xhr = new XMLHttpRequest();
+ xhr.open("POST", "/save-template?name=" + encodeURIComponent(name) , true);
+ xhr.setRequestHeader("Content-Type", "application/json");
 
-  // Handle the response from the server
-  xhr.onreadystatechange = function() {
-    if (xhr.readyState === 4 && xhr.status === 200) {
-      var response = JSON.parse(xhr.responseText);
-      console.log(response.message);
-    }
-  };
+ // Send the div content to the server
+ xhr.send(JSON.stringify({ content: divContent }));
+
+ // Handle the response from the server
+ xhr.onreadystatechange = function() {
+   if (xhr.readyState === 4 && xhr.status === 200) {
+     var response = JSON.parse(xhr.responseText);
+     console.log(response.message);
+   }
+ };
 }
 
 // Retrieve the content from the respective elements with class "letter-preview"
@@ -51,16 +51,16 @@ var endContent = document.querySelector("#letter-preview .end").innerHTML.trim()
 var text = 1;
 function replaceWithInputField(content) {
 var replacedContent = content.replace(/#(\w+)/g, function (match, followingWord) {
-  var inputId = "text" + (text++);
-  return '<input type="textn" value="' + followingWord + '" class="' + inputId + '">';
+ var inputId = "text" + (text++);
+ return '<input type="textn" value="' + followingWord + '" class="' + inputId + '">';
 });
 return replacedContent;
 }
 
 function replaceWithInput(content) {
 var replacedContent = content.replace(/#(\w+)/g, function (match, followingWord) {
-  var inputId = "text" + (text++);
-  return '<a class="' + inputId + '">' + followingWord + '</a>';
+ var inputId = "text" + (text++);
+ return '<a class="' + inputId + '">' + followingWord + '</a>';
 });
 return replacedContent;
 }
@@ -88,9 +88,9 @@ document.querySelector("#letter-preview .end").innerHTML = replaceWithInput(endC
 $(document).ready(function() {
 // Bind event handler to all input fields with class names starting with "textn"
 $('body').on('input', 'input[class^="text"]', function() {
-  var newValue = $(this).val();
-  var className = $(this).attr('class');
-  $('a.' + className).text(newValue);
+ var newValue = $(this).val();
+ var className = $(this).attr('class');
+ $('div.' + className).text(newValue);
 });
 $('#letter-preview span').css('color', 'black');
 });

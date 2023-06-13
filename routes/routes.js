@@ -86,7 +86,7 @@ var routes =function(app,isAuth,encoder){
          }
       });    
     }); 
-    app.get('/cform/:name', (req, res) => {
+    app.get('/cform/:name',isAuth, (req, res) => {
       var name=req.params.name;
       db.connection.query("select * from college where collegeid=?",
       [name],(err,results,fields)=>{
@@ -101,7 +101,7 @@ var routes =function(app,isAuth,encoder){
       }
       });
     });
-    app.get('/pform/:name', (req, res) => {
+    app.get('/pform/:name',isAuth, (req, res) => {
 
        var name=req.params.name;
         db.connection.query("select * from principal where id=?",
@@ -555,7 +555,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
      /*-----add user pages-----*/
 
      //tutor
-      app.get('/tutoradd',(req,res)=>{     
+      app.get('/tutoradd',isAuth,(req,res)=>{     
           
         db.connection.query("select * from tutor ",
         [req.body.name],(err,results,fields)=>{
@@ -622,7 +622,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
     
      //add new HOD   
   
-     app.get('/hodadd',(req,res)=>{
+     app.get('/hodadd',isAuth,(req,res)=>{
             
       db.connection.query("select * from hod",
           [req.body.name],(err,results,fields)=>{
@@ -680,7 +680,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
 
  
       //student add  
-          app.get('/studentadd',(req,res)=>{
+          app.get('/studentadd',isAuth,(req,res)=>{
                   
             db.connection.query("select * from Student",
                 [req.body.name],(err,results,fields)=>{
@@ -741,7 +741,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
          });
 
     //principal add
-        app.get('/principaladd',(req,res)=>{
+        app.get('/principaladd',isAuth,(req,res)=>{
            
              
           db.connection.query("select * from  principal",
@@ -791,7 +791,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
       /*-----------REQUEST HANDLING ROUTES ------*/
       
   // SENDING REQUEST ROUTE FOR STUDENTS    
-  app.get('/requests', (req, res) => {
+  app.get('/requests', isAuth,(req, res) => {
     let id=req.query.id;
     try {
       db.connection.query("SELECT * FROM forms", (err, results, fields) => {
@@ -807,9 +807,11 @@ app.get('/hod/:name', isAuth, (req, res) => {
   });
         
   //SUBMIT FORM
-  app.get('/submit',async(req,res)=>{  
-      const stdid = '123456';
-      const formid=query.id;
+  app.get('/submit',isAuth,async(req,res)=>{  
+      const stdid = req.query.data.id;
+      const formid=req.query.data.formid; 
+      console.log(stdid);
+      console.log(formid);
       try {
     
         // Execute the first query with arguments
@@ -853,14 +855,14 @@ app.get('/hod/:name', isAuth, (req, res) => {
    });
 
    // SENDING REQUEST ROUTE FOR STUDENTS 
-   app.get('/verified-requests',(req,res)=>{         
+   app.get('/verified-requests',isAuth,(req,res)=>{         
          
     var results=[];
     res.render('verified_requests',{applications:results});
    });
      
    // PENDING REQUEST ROUTE FOR ADMINS 
-   app.get('/pending-requests/:name',(req,res)=>{         
+   app.get('/pending-requests/:name',isAuth,(req,res)=>{         
          
     try{
       db.connection.query("select formdata from forms where name=?",
@@ -885,8 +887,9 @@ app.get('/hod/:name', isAuth, (req, res) => {
 /*----------- FORM CONTROL AND MAANGEMENT -------------*/
 
       // ADDING TEMPLATE 
-      app.get('/addtemplate',(req,res)=>{         
+      app.get('/addtemplate',isAuth,(req,res)=>{         
         try{
+          var id=req.query.id;
           db.connection.query("select * from forms",
         [req.params.name],(err,results,fields)=>{
         if(err) {
@@ -895,7 +898,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
         else{
           const divContent = results.length>0?results[0].name:null;
           const applications = results.length>0?results[0].name:null;// Empty array, can be populated later if needed
-          res.render('addtemplate',{applications:results});
+          res.render('addtemplate',{applications:results,id});
         }
         });
         }catch(err){
@@ -903,7 +906,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
         }  
       });
       
-      app.get('/get-templates', (req, res) => {
+      app.get('/get-templates',isAuth, (req, res) => {
         
         try{
           db.connection.query("select * from forms",
@@ -924,7 +927,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
       });
       
       //STATUS DISPLAY
-      app.get('/status/:name',(req,res)=>{
+      app.get('/status/:name',isAuth,(req,res)=>{
         try{
           db.connection.query("select formdata from forms",
         [req.params.name],(err,results,fields)=>{
@@ -944,7 +947,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
     })
 
     //REQUEST DISPLAY
-    app.get('/form/:selectedFormId', (req, res) => {
+    app.get('/form/:selectedFormId',isAuth, (req, res) => {
       const formId = req.params.selectedFormId;
     console.log(formId);
       db.connection.query("SELECT formdata FROM forms WHERE formid = ?", [formId], (err, results) => {
@@ -962,13 +965,14 @@ app.get('/hod/:name', isAuth, (req, res) => {
       });
     });
     
-       
+      
 
      //SAVING TEMPLATE
      app.post('/save-template',(req,res)=>{   
       var name=req.query.name; 
       //console.log(name);
-      var collegeid='98765432';
+      var collegeid=req.query.id; 
+      console.log(name);
       var divContent = req.body.content; 
      //  console.log(divContent);
        db.connection.query("insert into forms(name,collegeid,formdata)values(?,?,?)",
@@ -983,6 +987,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
      
      //ADD OR EDIT FORMS
      app.get('/addnewform',isAuth,(req, res) => {
+      const id= req.query.id;
       const templateName = req.query.name; // Get the template name from the query parameter
   
       // Fetch the template content from the server
@@ -991,7 +996,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
           throw err;
         } else {
           const templateContent = results.length > 0 ? results[0].formdata : ''; // Get the template content or set it as an empty string if not found
-          res.render('addnewform', { templateName: templateName, templateContent: templateContent });
+          res.render('addnewform', { templateName: templateName, templateContent: templateContent ,id});
         }
       });;
      });
@@ -1264,7 +1269,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
        
 
       //render in edit in student requestes
-      app.get('/edit', (req, res) => {
+      app.get('/edit', isAuth,(req, res) => {
         const formid = req.query.Formid;
         const id=req.query.id;
         
