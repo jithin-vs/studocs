@@ -7,6 +7,18 @@ const { query } = require('express');
 
 var routes =function(app,isAuth,encoder){     
   
+   // Promisify the pool.query method
+    const query = (sql, args) => {
+      return new Promise((resolve, reject) => {
+        db.connection.query(sql, args, (error, results) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(results);
+          }
+        });
+      });
+    };
 
    
      
@@ -772,7 +784,53 @@ app.get('/hod/:name', isAuth, (req, res) => {
       console.log(err);
     }
   });
-         
+        
+  //SUBMIT FORM
+  app.get('/submit',async(req,res)=>{  
+      const stdid = '123456';
+      const formid='15';
+      try {
+    
+        // Execute the first query with arguments
+        const query1 = 'SELECT collegeid FROM student WHERE  id = ?';
+        const query1Result = await query(query1, [stdid]);
+    
+        // Execute the second query with arguments
+        const query2 = 'SELECT student.collegeid AS collegeId, student.id AS studentId, forms.formid AS formId,student.batch AS batch ,student.department AS dept FROM student JOIN forms ON student.collegeid = forms.collegeid AND student.id = ? AND forms.formid=?';
+        const query2Result = await query(query2, [stdid,formid]);
+        if (query2Result.length === 0) {
+          // Render a template not found message to the client
+          return res.render('template-not-found');
+        }
+            // Generate a unique ID
+              let uniqueId;
+              let idExists = true;
+              while (idExists) {
+                uniqueId = verify.generateUniqueId(8);
+
+                // Check if the ID already exists in the "requests" table
+                const checkQuery = 'SELECT COUNT(*) AS count FROM requests WHERE appid = ?';
+                const checkResult = await query(checkQuery, [uniqueId]);
+
+                idExists = checkResult[0].count > 0;
+              }
+
+
+        // Insert the values into the "requests" table
+        const insertQuery = 'INSERT INTO requests (collegeId, stdid, formid, appid,date,dept) VALUES (?,?,?,?,NOW(),?)';
+        const insertValues = query2Result.map(row => [row.collegeId, row.studentId, row.formId, uniqueId,row.dept]);  
+        const flattenedValues = insertValues.flat(); // Flatten the nested arrays
+        console.log(flattenedValues);
+        await query(insertQuery, flattenedValues);
+
+        // Render the webpage and pass the query results
+        res.redirect(`/requests?id=${stdid}`);
+      } catch (error) {
+        console.error('Error executing queries:', error);
+        res.status(500).send('Error executing queries');
+      }
+   });
+
    // SENDING REQUEST ROUTE FOR STUDENTS 
    app.get('/verified-requests',(req,res)=>{         
          
@@ -1055,7 +1113,6 @@ app.get('/hod/:name', isAuth, (req, res) => {
                     
                   })
                 }catch(err){
-                 console.log();
                   console.log(err);
                   res.redirect(`/inner-page?id=4000`);
               }
@@ -1072,11 +1129,12 @@ app.get('/hod/:name', isAuth, (req, res) => {
       //delete user
       app.post('/deleteuser',encoder,(req,res)=>{ 
         
-        var id =req.query.id;
-        var user=req.query.user   
+        var id =req.query.id; 
+        var user=req.query.user;
+        var returnid=req.query.returnid;   
         db.connection.query("delete from ?? where id=?",[req.query.user,req.query.id],(err,results,fields)=>{
           if(err) {
-            res.send('server error');
+            res.send('server error');  
             throw err;  
                 
           }
@@ -1084,7 +1142,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
             if(user ==='student')
                return res.redirect(`/studentadd?id=${id}`);
             if(user ==='tutor')
-               return res.redirect(`/tutoradd?id=${id}`);
+               return res.redirect(`/tutoradd?id=${returnid}`);
             if(user ==='hod')
                return res.redirect(`/hodadd?id=${id}`);
             if(user ==='principal')
