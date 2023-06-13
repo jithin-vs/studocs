@@ -1266,8 +1266,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
       //render in edit in student requestes
       app.get('/edit', (req, res) => {
         const formid = req.query.Formid;
-        const id=req.query.id
-console.log(formid);
+        const id=req.query.id;
         
         // Retrieve the form data from the database based on the formId
         db.connection.query("SELECT * FROM forms WHERE formid = ?", [formid], (err, results) => {
