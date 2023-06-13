@@ -142,7 +142,8 @@
     } else {
       var data = [{
         formid: '<%=formid%>',
-        id: '<%=id%>'
+        id: '<%=id%>',
+        option:selectedOption
       }];
       var jsonData = encodeURIComponent(JSON.stringify(data));
       var url = '/submit?data=' + jsonData;

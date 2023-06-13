@@ -807,11 +807,14 @@ app.get('/hod/:name', isAuth, (req, res) => {
   });
         
   //SUBMIT FORM
-  app.get('/submit',isAuth,async(req,res)=>{  
-      const stdid = req.query.data.id;
-      const formid=req.query.data.formid; 
+  app.get('/submit',isAuth,async(req,res)=>{ 
+    const jsonData = req.query.data;
+    const data = JSON.parse(jsonData); 
+    const formid = data[0].formid; // Accessing the 'formid' property
+    const stdid = data[0].id; 
+    const option=data[0].option;
       console.log(stdid);
-      console.log(formid);
+      console.log(option);
       try {
     
         // Execute the first query with arguments
@@ -840,8 +843,8 @@ app.get('/hod/:name', isAuth, (req, res) => {
 
 
         // Insert the values into the "requests" table
-        const insertQuery = 'INSERT INTO requests (collegeId, stdid, formid, appid,date,dept) VALUES (?,?,?,?,NOW(),?)';
-        const insertValues = query2Result.map(row => [row.collegeId, row.studentId, row.formId, uniqueId,row.dept]);  
+        const insertQuery = 'INSERT INTO requests (collegeId, stdid, formid, appid,date,dept,dest) VALUES (?,?,?,?,NOW(),?,?)';
+        const insertValues = query2Result.map(row => [row.collegeId, row.studentId, row.formId, uniqueId,row.dept,option]);  
         const flattenedValues = insertValues.flat(); // Flatten the nested arrays
         console.log(flattenedValues);
         await query(insertQuery, flattenedValues);
@@ -855,10 +858,26 @@ app.get('/hod/:name', isAuth, (req, res) => {
    });
 
    // SENDING REQUEST ROUTE FOR STUDENTS 
-   app.get('/verified-requests',isAuth,(req,res)=>{         
-         
-    var results=[];
-    res.render('verified_requests',{applications:results});
+   app.get('/verified-requests/:id',isAuth,(req,res)=>{ 
+   try{
+    const query1 = 'SELECT dest FROM requests WHERE  id = ?';
+    //const query1Result = await query(query1, [req.params.id]);
+
+    db.connection.query("select * from requests where stdid=? and ",
+    [req.params.id],(err,results,fields)=>{
+      if(err) {
+        throw err; 
+      } 
+      else{
+        const applications = [];
+        res.render('verified_requests',{applications:results});
+      }
+    });
+
+   }catch(err){
+    console.log(err); 
+  }  
+   
    });
      
    // PENDING REQUEST ROUTE FOR ADMINS 
