@@ -60,7 +60,7 @@ return replacedContent;
 function replaceWithInput(content) {
 var replacedContent = content.replace(/#(\w+)/g, function (match, followingWord) {
   var inputId = "text" + (text++);
-  return '<div class="' + inputId + '">' + followingWord + '</div>';
+  return '<a class="' + inputId + '">' + followingWord + '</a>';
 });
 return replacedContent;
 }
@@ -90,7 +90,7 @@ $(document).ready(function() {
 $('body').on('input', 'input[class^="text"]', function() {
   var newValue = $(this).val();
   var className = $(this).attr('class');
-  $('div.' + className).text(newValue);
+  $('a.' + className).text(newValue);
 });
 $('#letter-preview span').css('color', 'black');
 });
