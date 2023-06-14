@@ -73,6 +73,12 @@
     margin-top: 700px;
     margin-left: 10%;
   }
+  .edit-button{
+    width: 100px !important;
+    margin-left: 40% !important;
+    text-align: center;
+    border-radius: 10px;
+  }
  }
 /* ... previous styles ... */
 .ha{
@@ -84,4 +90,11 @@
 }
 .subm button{
 width: 145px;
+}
+
+.edit-button{
+  width: 300px;
+  margin-left: 37%;
+  text-align: center;
+  border-radius: 10px;
 }

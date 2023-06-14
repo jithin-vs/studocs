@@ -15,7 +15,7 @@ var routes =function(app,isAuth,encoder){
             reject(error);
           } else {
             resolve(results);
-          }
+          } 
         });
       });
     };
@@ -1006,7 +1006,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
           if(err) {
             throw err; 
           } else{
-             res.redirect('/status');
+             res.render('/addnewform');
           }    
        });
        });
