@@ -5,7 +5,7 @@ const verify =require("../controller/verification");
 const path=require('path');
 const { query } = require('express');
 
-var routes =function(app,isAuth,encoder){     
+var routes =function(app,isAuth,encoder){      
   
    // Promisify the pool.query method
     const query = (sql, args) => {
@@ -15,7 +15,7 @@ var routes =function(app,isAuth,encoder){
             reject(error);
           } else {
             resolve(results);
-          }
+          } 
         });
       });
     };
@@ -1063,7 +1063,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
           if(err) {
             throw err; 
           } else{
-             res.redirect('/status');
+             res.render('/addnewform');
           }    
        });
        });

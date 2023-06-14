@@ -14,7 +14,7 @@ var text = 1;
 function replaceWithInputField(content) {
 var replacedContent = content.replace(/#(\w+)/g, function (match, followingWord) {
  var inputId = "text" + (text++);
- return '<input type="textn" value="' + followingWord + '" class="' + inputId + '">';
+ return '<input type="text" value="' + followingWord + '" class="' + inputId + '">';
 });
 return replacedContent;
 }
