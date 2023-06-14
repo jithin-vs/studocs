@@ -791,10 +791,14 @@ app.get('/hod/:name', isAuth, (req, res) => {
       /*-----------REQUEST HANDLING ROUTES ------*/
       
   // SENDING REQUEST ROUTE FOR STUDENTS    
-  app.get('/requests', isAuth,(req, res) => {
+  app.get('/requests', isAuth,async(req, res) => {
     let id=req.query.id;
+    const query1 = 'SELECT collegeid FROM student WHERE  id = ?';
+    const query1Result = await query(query1, [id]);
+    var Result=query1Result[0].collegeid
+    console.log(Result)
     try {
-      db.connection.query("SELECT * FROM forms", (err, results, fields) => {
+      db.connection.query("SELECT * FROM forms where collegeid=?",[Result],(err, results, fields) => {
         if (err) {
           throw err;
         } else {
