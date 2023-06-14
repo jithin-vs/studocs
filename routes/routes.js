@@ -818,6 +818,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
     const stdid = data[0].id; 
     const option=data[0].option;
     const content=data[0].content;
+
       console.log(stdid);
       console.log(option);
       console.log(content);
@@ -870,7 +871,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
     const query1 = 'SELECT dest FROM requests WHERE  id = ?';
     //const query1Result = await query(query1, [req.params.id]);
 
-    db.connection.query("select * from requests where stdid=? and ",
+    db.connection.query("select * from requests where stdid=? ",
     [req.params.id],(err,results,fields)=>{
       if(err) {
         throw err; 
@@ -888,27 +889,62 @@ app.get('/hod/:name', isAuth, (req, res) => {
    });
      
    // PENDING REQUEST ROUTE FOR ADMINS 
-   app.get('/pending-requests/:name',isAuth,(req,res)=>{         
+   app.get('/pending-requests',isAuth,async(req,res)=>{         
+        
+    const query1 = 'SELECT collegeid FROM college WHERE  collegeid = ?';
+    const query1Result = await query(query1, [req.query.id]);
+     
+    var collegeid=query1Result.collegeid;
          
-    try{
-      db.connection.query("select formdata from forms where name=?",
-    [req.params.name],(err,results,fields)=>{
-    if(err) {
-      throw err; 
-    } 
-    else{
-      const divContent = results[0].formdata;
-      console.log(divContent);
-      const applications = []; // Empty array, can be populated later if needed
-      res.render('pending-requests',{ divContent, applications });
-    }
-    });
-    }catch(err){
-      console.log(err); 
-    }
-
+    const query2 = 'SELECT student.collegeid AS collegeId, student.id AS studentId,requests.formname AS formname,requests.appid AS appid, student.batch AS batch, student.department AS dept ,requests.date AS date FROM student JOIN requests ON student.collegeid = requests.collegeid AND student.collegeid =? ';
+    const query2Result = await query(query2, ['98765432']);
+    console.log(query2Result);
+    res.render('pending-requests',{applications:query2Result});
     });
 
+    //PENDING REQUESTS FOR TUTOR
+    app.get('/tutor-pending-requests',isAuth,async(req,res)=>{         
+        
+      const query1 = 'SELECT collegeid,batch,department FROM tutor WHERE  collegeid = ?';
+      const query1Result = await query(query1, [req.query.id]);
+       
+      var collegeid=query1Result.collegeid;
+      var dept=query1Result.department;
+      
+      const query2 = 'SELECT student.collegeid AS collegeId, student.id AS studentId,requests.formname AS formname,requests.appid AS appid, student.batch AS batch, student.department AS dept ,requests.date AS date FROM student JOIN requests ON student.collegeid = requests.collegeid AND student.collegeid =? AND student.department=? AND student.batch=? ';
+      const query2Result = await query(query2, ['collegeid']);
+      console.log(query2Result);
+      res.render('pending-requests',{applications:query2Result});
+      });
+
+      //PENDING REQUESTS FOR PRINCIPAL
+      app.get('/principal-pending-requests',isAuth,async(req,res)=>{         
+        
+        const query1 = 'SELECT collegeid FROM principal WHERE id = ?';
+        const query1Result = await query(query1, [req.query.id]);
+         
+        var collegeid=query1Result.collegeid;
+             
+        const query2 = 'SELECT student.collegeid AS collegeId, student.id AS studentId,requests.formname AS formname,requests.appid AS appid, student.batch AS batch, student.department AS dept ,requests.date AS date FROM student JOIN requests ON student.collegeid = requests.collegeid AND student.collegeid =? ';
+        const query2Result = await query(query2, [collegeid]);
+        console.log(query2Result);
+        res.render('pending-requests',{applications:query2Result});
+        });
+
+        //PENDING REQUESTS FOR HOD
+        app.get('/hod-pending-requests',isAuth,async(req,res)=>{         
+        
+          const query1 = 'SELECT collegeid,department FROM hod WHERE id = ?';
+          const query1Result = await query(query1, [req.query.id]);
+           
+          var collegeid=query1Result.collegeid;  
+          var dept=query1Result.department;   
+          const query2 = 'SELECT student.collegeid AS collegeId, student.id AS studentId,requests.formname AS formname,requests.appid AS appid, student.batch AS batch, student.department AS dept ,requests.date AS date FROM student JOIN requests ON student.collegeid = requests.collegeid AND student.collegeid =? AND student.department=?';
+          const query2Result = await query(query2, [collegeid,dept]);
+          console.log(query2Result);
+          res.render('pending-requests',{applications:query2Result});
+          });
+  
 
 /*----------- FORM CONTROL AND MAANGEMENT -------------*/
 
@@ -953,19 +989,19 @@ app.get('/hod/:name', isAuth, (req, res) => {
       });
       
       //STATUS DISPLAY
-      app.get('/status/:name',isAuth,(req,res)=>{
+      app.get('/status/:name',isAuth,async(req,res)=>{
         try{
-          db.connection.query("select formdata from forms",
+          db.connection.query("select * from requests  join student on requests.stdid=student.id and student.id=? ",
         [req.params.name],(err,results,fields)=>{
         if(err) {
           throw err; 
         } 
         else{
-          const divContent = results[0].formdata;
-          const applications = []; // Empty array, can be populated later if needed
+          
+          const applications =results; // Empty array, can be populated later if needed
           res.render('status',{ divContent, applications });
         }
-        });
+        }); 
         }catch(err){
           console.log(err); 
         }
