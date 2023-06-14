@@ -1032,15 +1032,13 @@ app.get('/hod/:name', isAuth, (req, res) => {
       //REQUEST DISPLAY
       app.get('/requ/:selectedFormId',isAuth, (req, res) => {
         const formId = req.params.selectedFormId;
-        console.log(formId);
         db.connection.query("SELECT request_data FROM requests WHERE appid = ?", [formId], (err, results) => {
           if (err) {
-            console.error(err);
+            console.error(err);  
             res.status(500).send('Error retrieving HTML content');
           } else {
             if (results.length > 0) {
               const fetchedHTML = results[0].request_data;
-              console.log(fetchedHTML);
               res.send(fetchedHTML);
             } else {
               res.status(404).send('HTML content not found');
@@ -1226,7 +1224,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
               }
             }
           });
-
+        
         //REGISTER COLLEGE
         app.post('/register-college',(req,res)=>{
              
@@ -1346,7 +1344,24 @@ app.get('/hod/:name', isAuth, (req, res) => {
         });
       });    
        
-      
+      //OTP VERIFICATION
+      app.get('/otpverify',isAuth,(req, res) => {
+        const id= req.query.id;
+      //  const templateName = req.query.name; // Get the template name from the query parameter
+    
+        // Fetch the name and email from the server
+        db.connection.query('SELECT name,email FROM student WHERE id = ?', [id], (err, results, fields) => {
+          if (err) {
+            throw err;
+          } else {
+            const email = results.length > 0 ? results[0].email : '';
+            const name=results.length>0?results[0].name:''; // Get the template content or set it as an empty string if not found
+            var otp=verify.generateOTP();        
+            mail.sendOTPEmail(name,email,otp);
+           // res.render('addnewform', { templateName: templateName, templateContent: templateContent ,id});
+          }
+        });;
+       });
       
 
        
