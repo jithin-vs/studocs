@@ -1,4 +1,12 @@
 
+function getUrlValue() {
+  const urlPath = window.location.pathname;
+  const value = urlPath.split('/')[2]; // Assumes the value is at index 2
+  console.log(value);
+  return value;
+
+}
+
 function sendDivContent() {
    function getURLParameters() {
         const queryString = window.location.search.slice(1);
@@ -19,7 +27,7 @@ function sendDivContent() {
     const name = parameters.name;
 
   var divContent = document.getElementById("letter-preview").innerHTML;
- 
+
 
   // Create an AJAX request
   var xhr = new XMLHttpRequest();

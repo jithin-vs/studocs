@@ -485,7 +485,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
       if(req.session.user){
         try {
           const query1 = new Promise((resolve, reject) => {
-            db.connection.query("select * from requests", (err, results, fields) => {
+            db.connection.query("SELECT DISTINCT student.name AS student_name, student.batch AS batch, student.department AS dept, student.collegeid AS collegeid, requests.appid AS appid, requests.date AS date FROM student JOIN requests  ON  student.collegeid=? AND student.collegeid=requests.collegeid ",[req.params.name],(err, results, fields) => {
               if (err) {
                 reject(err);
               } else {
@@ -501,7 +501,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
             if(err) {
                         reject(err);      
               }
-              else{     
+              else{       
                 console.log(results);
                 const { collegename, collegeid, phno, address, email, collegeimage,website } = results[0];
 
@@ -807,8 +807,9 @@ app.get('/hod/:name', isAuth, (req, res) => {
         
   //SUBMIT FORM
   app.get('/submit',async(req,res)=>{  
-      const stdid = '123456';
-      const formid='15';
+      const stdid = req.query.id;
+      const formid=req.query.formid;
+      console.log(req.query);
       try {
     
         // Execute the first query with arguments
@@ -818,9 +819,10 @@ app.get('/hod/:name', isAuth, (req, res) => {
         // Execute the second query with arguments
         const query2 = 'SELECT student.collegeid AS collegeId, student.id AS studentId, forms.formid AS formId,student.batch AS batch ,student.department AS dept FROM student JOIN forms ON student.collegeid = forms.collegeid AND student.id = ? AND forms.formid=?';
         const query2Result = await query(query2, [stdid,formid]);
+        console.log(query2Result);
         if (query2Result.length === 0) {
           // Render a template not found message to the client
-          return res.render('template-not-found');
+          return res.send('template-not-found');
         }
             // Generate a unique ID
               let uniqueId;
@@ -859,19 +861,20 @@ app.get('/hod/:name', isAuth, (req, res) => {
    });
      
    // PENDING REQUEST ROUTE FOR ADMINS 
-   app.get('/pending-requests/:name',(req,res)=>{         
-         
+   app.get('/pending-requests',(req,res)=>{         
+      
+    var collegeid=req.query.id;
     try{
-      db.connection.query("select formdata from forms where name=?",
-    [req.params.name],(err,results,fields)=>{
-    if(err) {
+      db.connection.query("SELECT student.name AS student_name, student.batch, student.department, student.collegeid, requests.appid, requests.date FROM student JOIN requests ON student.collegeid = requests.collegeid and student.collegeid=?",
+    [collegeid],(err,results,fields)=>{
+    if(err) {  
       throw err; 
     } 
     else{
-      const divContent = results[0].formdata;
-      console.log(divContent);
-      const applications = []; // Empty array, can be populated later if needed
-      res.render('pending-requests',{ divContent, applications });
+      const content = results;
+      console.log(content);  
+      const applications = results[0]; // Empty array, can be populated later if needed
+      res.render('pending-requests',{ content, applications:results });
     }
     });
     }catch(err){
@@ -1139,7 +1142,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
           });
 
         //REGISTER COLLEGE
-        app.post('/register-college',(req,res)=>{
+    app.post('/register-college',(req,res)=>{
              
            var{name,email}=req.body;
            mail.sendregisterEmail(name,email);
@@ -1256,23 +1259,72 @@ app.get('/hod/:name', isAuth, (req, res) => {
           }
         });
       });    
-       
+      
+      
+      app.post('/upload', async (req, res) => {
+        try {
+          const { id } = req.query;
+          // Ensure the required fields are present
+          if (!id) {
+            return res.status(400).json({ error: 'Missing required fields' });
+          }
+        
+          // Fetch the collegeId from the students table
+          const studentQuery = 'SELECT collegeId FROM student WHERE id = ?';
+          const [studentRow] = await query(studentQuery, [id]);
+           
+          if (!studentRow) {
+            return res.status(404).json({ error: 'Student not found' });
+          }
+      
+          const collegeId = studentRow.collegeId;
+      
+          if (!req.files || !req.files.file) {
+            const errorMessage = 'No file uploaded';
+            console.error(errorMessage);
+            return res.status(400).json({ error: 'No file uploaded' });
+          }
+      
+          const uploadedFile = req.files.file;
+          console.log('uploadedFile:', uploadedFile);
+
+          // Move the file to the appropriate directory
+          const uploadPath = path.join(__dirname, 'public/uploads/student', id);
+          await uploadedFile.mv(path.join(uploadPath, newFileName));
+      
+          // Insert the file details into the "attachment" table
+          const attachmentData = {
+            id,
+            collegeId,
+            name: uploadedFile.name,
+            path: path.join('/uploads/student', id, newFileName)
+          };
+          await query('INSERT INTO attachment SET ?', attachmentData);
+      
+          // Return a success response
+          res.json({ message: 'File uploaded successfully' });
+        } catch (error) {
+          console.error('Error uploading file:', error);
+          res.status(500).json({ error: 'Error uploading file' });
+        }
+      });
+      
       
       
 
        
 
       //render in edit in student requestes
-      app.get('/edit/:selectedFormId', (req, res) => {
-        const formId = req.params.selectedFormId;
-      
+      app.get('/edit', (req, res) => {
+        const formId = req.query.formid;
+        const id=req.query.id;        
         // Retrieve the form data from the database based on the formId
         db.connection.query("SELECT * FROM forms WHERE formid = ?", [formId], (err, results) => {
           if (err) {
             throw err;
           } else {
-            const templateContent = results.length > 0 ? results[0].formdata : ''; // Get the template content or set it as an empty string if not found
-            res.render('newform', { formId, templateContent: templateContent });
+            const templateContent = results.length > 0 ? results[0].formdata :''; // Get the template content or set it as an empty string if not found
+            res.render('newform', { formId, id,templateContent: templateContent });
           }
         });;
       });

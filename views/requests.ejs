@@ -149,41 +149,45 @@
             <script>
                let selectedFormId; // Variable to store the selected form ID
 
-  function fetchid() {
-  // Get the selected form ID from the clicked button's data attribute
-  selectedFormId = event.target.dataset.formId;
-  console.log('Selected Form ID:', selectedFormId);
-  }
-  document.addEventListener('DOMContentLoaded', function() {
-    const viewButtons = document.querySelectorAll('.view-button');
-    const editButton=document.querySelectorAll('.edit-button')
-    const displayContainer = document.getElementById('displayContainer');
+                function fetchid() {
+                // Get the selected form ID from the clicked button's data attribute
+                selectedFormId = event.target.dataset.formId;
+                console.log('Selected Form ID:', selectedFormId);
+                }
+                document.addEventListener('DOMContentLoaded', function() {
+                  const viewButtons = document.querySelectorAll('.view-button');
+                  const editButton=document.querySelectorAll('.edit-button')
+                  const displayContainer = document.getElementById('displayContainer');
 
-    viewButtons.forEach(function(button) {
-      button.addEventListener('click', function(event) {
-        fetchid(); // Call the fetchid() function to save the form ID
-        
-        // Make a request to fetch the HTML content from the server
-        fetch(`/form/${selectedFormId}`)
-          .then(response => response.text())
-          .then(html => {
-            // Update the HTML content of the display container
-            displayContainer.innerHTML = html;
-          })
-          .catch(error => console.error(error));
-      });
-      
-    });
-    editButton.forEach(function(button) {
-  button.addEventListener('click', function(event) {
-    console.log('Selected Form ID is:', selectedFormId);
-    // Redirect to the edit page with the selected form ID
-    window.location.href = `/edit/${selectedFormId}`;
-  });
-})
-  });
+                  viewButtons.forEach(function(button) {
+                    button.addEventListener('click', function(event) {
+                      fetchid(); // Call the fetchid() function to save the form ID
+                      
+                      // Make a request to fetch the HTML content from the server
+                      fetch(`/form/${selectedFormId}`)
+                        .then(response => response.text())
+                        .then(html => {
+                          // Update the HTML content of the display container
+                          displayContainer.innerHTML = html;
+                        })
+                        .catch(error => console.error(error));
+                    });
+                    
+                  });
+                  editButton.forEach(function(button) {
+                button.addEventListener('click', function(event) {
+                  console.log('Selected Form ID is:', selectedFormId);
+                  // Redirect to the edit page with the selected form ID
+                  window.location.href = `/edit?formid=${selectedFormId}&id=${getParameterValue()}`;
+                });
+              })
+                });
+                function getParameterValue() {
+                          const urlParams = new URLSearchParams(window.location.search);
+                          return urlParams.get('id');
+                        }
   
-            </script>
+         </script>
 <script>
   function updateId(id) {
     document.getElementById('id1').innerHTML = id;

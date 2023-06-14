@@ -30,6 +30,19 @@ function generateVerificationToken() {
   
     return id;
   }
+
+    //generate uniqueid
+    function generateAttachmentId(length) {
+      let id = '';
+      const characters = '0123456789';
+    
+      for (let i = 0; i < length; i++) {
+        const randomIndex = Math.floor(Math.random() * characters.length);
+        id += characters[randomIndex];
+      }
+    
+      return id;
+    }
   
  // const id = generateUniqueId(8);
  // console.log(id);
@@ -39,4 +52,4 @@ function generateVerificationToken() {
   const randomPassword = generateRandomPassword(passwordLength);
 
   
-module.exports ={generateVerificationToken,randomPassword,generateUniqueId};   
+module.exports ={generateVerificationToken,randomPassword,generateUniqueId,generateAttachmentId};   
