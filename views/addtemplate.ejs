@@ -69,7 +69,7 @@
             card.classList.add('card');
             card.onclick = function() {
               // Redirect to the "template-display" page with the template name as a query parameter
-              window.location.href = '/addnewform?name=' + encodeURIComponent(template);
+              window.location.href = '/addnewform?name=' + encodeURIComponent(template) + '&id=<%=id%>';
             };
       
             const nameSpan = document.createElement('span');

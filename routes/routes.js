@@ -86,7 +86,7 @@ var routes =function(app,isAuth,encoder){
          }
       });    
     }); 
-    app.get('/cform/:name', (req, res) => {
+    app.get('/cform/:name',isAuth, (req, res) => {
       var name=req.params.name;
       db.connection.query("select * from college where collegeid=?",
       [name],(err,results,fields)=>{
@@ -101,7 +101,7 @@ var routes =function(app,isAuth,encoder){
       }
       });
     });
-    app.get('/pform/:name', (req, res) => {
+    app.get('/pform/:name',isAuth, (req, res) => {
 
        var name=req.params.name;
         db.connection.query("select * from principal where id=?",
@@ -555,7 +555,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
      /*-----add user pages-----*/
 
      //tutor
-      app.get('/tutoradd',(req,res)=>{     
+      app.get('/tutoradd',isAuth,(req,res)=>{     
           
         db.connection.query("select * from tutor ",
         [req.body.name],(err,results,fields)=>{
@@ -622,7 +622,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
     
      //add new HOD   
   
-     app.get('/hodadd',(req,res)=>{
+     app.get('/hodadd',isAuth,(req,res)=>{
             
       db.connection.query("select * from hod",
           [req.body.name],(err,results,fields)=>{
@@ -680,7 +680,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
 
  
       //student add  
-          app.get('/studentadd',(req,res)=>{
+          app.get('/studentadd',isAuth,(req,res)=>{
                   
             db.connection.query("select * from Student",
                 [req.body.name],(err,results,fields)=>{
@@ -741,7 +741,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
          });
 
     //principal add
-        app.get('/principaladd',(req,res)=>{
+        app.get('/principaladd',isAuth,(req,res)=>{
            
              
           db.connection.query("select * from  principal",
@@ -791,13 +791,14 @@ app.get('/hod/:name', isAuth, (req, res) => {
       /*-----------REQUEST HANDLING ROUTES ------*/
       
   // SENDING REQUEST ROUTE FOR STUDENTS    
-  app.get('/requests', (req, res) => {
+  app.get('/requests', isAuth,(req, res) => {
+    let id=req.query.id;
     try {
       db.connection.query("SELECT * FROM forms", (err, results, fields) => {
         if (err) {
           throw err;
         } else {
-          res.render('requests', { forms: results,id1:null});
+          res.render('requests', { forms: results,id1:null,id});
         }
       });
     } catch (err) {
@@ -806,10 +807,14 @@ app.get('/hod/:name', isAuth, (req, res) => {
   });
         
   //SUBMIT FORM
-  app.get('/submit',async(req,res)=>{  
-      const stdid = req.query.id;
-      const formid=req.query.formid;
-      console.log(req.query);
+  app.get('/submit',isAuth,async(req,res)=>{ 
+    const jsonData = req.query.data;
+    const data = JSON.parse(jsonData); 
+    const formid = data[0].formid; // Accessing the 'formid' property
+    const stdid = data[0].id; 
+    const option=data[0].option;
+      console.log(stdid);
+      console.log(option);
       try {
     
         // Execute the first query with arguments
@@ -839,8 +844,8 @@ app.get('/hod/:name', isAuth, (req, res) => {
 
 
         // Insert the values into the "requests" table
-        const insertQuery = 'INSERT INTO requests (collegeId, stdid, formid, appid,date,dept) VALUES (?,?,?,?,NOW(),?)';
-        const insertValues = query2Result.map(row => [row.collegeId, row.studentId, row.formId, uniqueId,row.dept]);  
+        const insertQuery = 'INSERT INTO requests (collegeId, stdid, formid, appid,date,dept,dest) VALUES (?,?,?,?,NOW(),?,?)';
+        const insertValues = query2Result.map(row => [row.collegeId, row.studentId, row.formId, uniqueId,row.dept,option]);  
         const flattenedValues = insertValues.flat(); // Flatten the nested arrays
         console.log(flattenedValues);
         await query(insertQuery, flattenedValues);
@@ -854,16 +859,31 @@ app.get('/hod/:name', isAuth, (req, res) => {
    });
 
    // SENDING REQUEST ROUTE FOR STUDENTS 
-   app.get('/verified-requests',(req,res)=>{         
-         
-    var results=[];
-    res.render('verified_requests',{applications:results});
+   app.get('/verified-requests/:id',isAuth,(req,res)=>{ 
+   try{
+    const query1 = 'SELECT dest FROM requests WHERE  id = ?';
+    //const query1Result = await query(query1, [req.params.id]);
+
+    db.connection.query("select * from requests where stdid=? and ",
+    [req.params.id],(err,results,fields)=>{
+      if(err) {
+        throw err; 
+      } 
+      else{
+        const applications = [];
+        res.render('verified_requests',{applications:results});
+      }
+    });
+
+   }catch(err){
+    console.log(err); 
+  }  
+   
    });
      
    // PENDING REQUEST ROUTE FOR ADMINS 
-   app.get('/pending-requests',(req,res)=>{         
-      
-    var collegeid=req.query.id;
+   app.get('/pending-requests/:name',isAuth,(req,res)=>{         
+         
     try{
       db.connection.query("SELECT student.name AS student_name, student.batch, student.department, student.collegeid, requests.appid, requests.date FROM student JOIN requests ON student.collegeid = requests.collegeid and student.collegeid=?",
     [collegeid],(err,results,fields)=>{
@@ -887,8 +907,9 @@ app.get('/hod/:name', isAuth, (req, res) => {
 /*----------- FORM CONTROL AND MAANGEMENT -------------*/
 
       // ADDING TEMPLATE 
-      app.get('/addtemplate',(req,res)=>{         
+      app.get('/addtemplate',isAuth,(req,res)=>{         
         try{
+          var id=req.query.id;
           db.connection.query("select * from forms",
         [req.params.name],(err,results,fields)=>{
         if(err) {
@@ -897,7 +918,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
         else{
           const divContent = results.length>0?results[0].name:null;
           const applications = results.length>0?results[0].name:null;// Empty array, can be populated later if needed
-          res.render('addtemplate',{applications:results});
+          res.render('addtemplate',{applications:results,id});
         }
         });
         }catch(err){
@@ -905,7 +926,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
         }  
       });
       
-      app.get('/get-templates', (req, res) => {
+      app.get('/get-templates',isAuth, (req, res) => {
         
         try{
           db.connection.query("select * from forms",
@@ -926,7 +947,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
       });
       
       //STATUS DISPLAY
-      app.get('/status/:name',(req,res)=>{
+      app.get('/status/:name',isAuth,(req,res)=>{
         try{
           db.connection.query("select formdata from forms",
         [req.params.name],(err,results,fields)=>{
@@ -946,7 +967,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
     })
 
     //REQUEST DISPLAY
-    app.get('/form/:selectedFormId', (req, res) => {
+    app.get('/form/:selectedFormId',isAuth, (req, res) => {
       const formId = req.params.selectedFormId;
     console.log(formId);
       db.connection.query("SELECT formdata FROM forms WHERE formid = ?", [formId], (err, results) => {
@@ -964,13 +985,14 @@ app.get('/hod/:name', isAuth, (req, res) => {
       });
     });
     
-       
+      
 
      //SAVING TEMPLATE
      app.post('/save-template',(req,res)=>{   
       var name=req.query.name; 
       //console.log(name);
-      var collegeid='98765432';
+      var collegeid=req.query.id; 
+      console.log(name);
       var divContent = req.body.content; 
      //  console.log(divContent);
        db.connection.query("insert into forms(name,collegeid,formdata)values(?,?,?)",
@@ -985,6 +1007,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
      
      //ADD OR EDIT FORMS
      app.get('/addnewform',isAuth,(req, res) => {
+      const id= req.query.id;
       const templateName = req.query.name; // Get the template name from the query parameter
   
       // Fetch the template content from the server
@@ -993,7 +1016,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
           throw err;
         } else {
           const templateContent = results.length > 0 ? results[0].formdata : ''; // Get the template content or set it as an empty string if not found
-          res.render('addnewform', { templateName: templateName, templateContent: templateContent });
+          res.render('addnewform', { templateName: templateName, templateContent: templateContent ,id});
         }
       });;
      });
@@ -1261,70 +1284,21 @@ app.get('/hod/:name', isAuth, (req, res) => {
       });    
       
       
-      app.post('/upload', async (req, res) => {
-        try {
-          const { id } = req.query;
-          // Ensure the required fields are present
-          if (!id) {
-            return res.status(400).json({ error: 'Missing required fields' });
-          }
-        
-          // Fetch the collegeId from the students table
-          const studentQuery = 'SELECT collegeId FROM student WHERE id = ?';
-          const [studentRow] = await query(studentQuery, [id]);
-           
-          if (!studentRow) {
-            return res.status(404).json({ error: 'Student not found' });
-          }
-      
-          const collegeId = studentRow.collegeId;
-      
-          if (!req.files || !req.files.file) {
-            const errorMessage = 'No file uploaded';
-            console.error(errorMessage);
-            return res.status(400).json({ error: 'No file uploaded' });
-          }
-      
-          const uploadedFile = req.files.file;
-          console.log('uploadedFile:', uploadedFile);
-
-          // Move the file to the appropriate directory
-          const uploadPath = path.join(__dirname, 'public/uploads/student', id);
-          await uploadedFile.mv(path.join(uploadPath, newFileName));
-      
-          // Insert the file details into the "attachment" table
-          const attachmentData = {
-            id,
-            collegeId,
-            name: uploadedFile.name,
-            path: path.join('/uploads/student', id, newFileName)
-          };
-          await query('INSERT INTO attachment SET ?', attachmentData);
-      
-          // Return a success response
-          res.json({ message: 'File uploaded successfully' });
-        } catch (error) {
-          console.error('Error uploading file:', error);
-          res.status(500).json({ error: 'Error uploading file' });
-        }
-      });
-      
-      
       
 
        
 
       //render in edit in student requestes
-      app.get('/edit', (req, res) => {
-        const formId = req.query.formid;
-        const id=req.query.id;        
+      app.get('/edit/:selectedFormId', (req, res) => {
+        const formId = req.params.selectedFormId;
+      
         // Retrieve the form data from the database based on the formId
-        db.connection.query("SELECT * FROM forms WHERE formid = ?", [formId], (err, results) => {
+        db.connection.query("SELECT * FROM forms WHERE formid = ?", [formid], (err, results) => {
           if (err) {
-            throw err;
+            throw err; 
           } else {
             const templateContent = results.length > 0 ? results[0].formdata :''; // Get the template content or set it as an empty string if not found
-            res.render('newform', { formId, id,templateContent: templateContent });
+            res.render('newform', { formid, id,templateContent: templateContent,id });
           }
         });;
       });
