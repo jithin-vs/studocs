@@ -5,7 +5,7 @@ const verify =require("../controller/verification");
 const path=require('path');
 const { query } = require('express');
 
-var routes =function(app,isAuth,encoder){     
+var routes =function(app,isAuth,encoder){      
   
 
    

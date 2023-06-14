@@ -17,7 +17,7 @@ function displayText() {
   var content = "<strong>From,</strong><br> <div class='from'>" + from + "</div><br><br><div class='date'>" +
     date + "</div><br><br>" + "<strong>To,</strong><br> <div class='to'>" + to + "</div><br><br>" +
     "<strong>Sub:</strong><div class='sub'>" + subject + "</div><br><br><div class='salutation'" + salutation + "</div>,<br><br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<div class='pg1'> " +
-    paragraph1 + "</div><br><br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<div class='pag2'>" + paragraph2 + "</div><br><br><div class='end'" + ending+"</div>";
+    paragraph1 + "</div><br><br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<div class='pag2'>" + paragraph2 + "</div><br><br><div class='end'>" + ending+"</div>";
 
   var regex = /#\w+/g;
   var highlightedContent = content.replace(regex, '<span style="color: red;">$&</span>');
