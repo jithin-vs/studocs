@@ -85,16 +85,20 @@
           <tbody>
           <% applications.forEach(function(application) { %>
               <tr>
-                <td data-toggle="mod" data-target="#myMod"><%= application.form_id %></td>
+                <td data-toggle="mod" data-target="#myMod"><%= application.appid %></td>
                 <td data-toggle="moda" data-target="#myModa"><%= application.name %></td>
-                <td data-toggle="moda" data-target="#myM"><%= applicant.name %></td>
-                <td data-toggle="moda" data-target="#myModa"><%= applicant.batch %></td>
-                <td data-toggle="moda" data-target="#myModa"><%= applicant.dept %></td>
-                <td data-toggle="mo" data-target="#myMo"><%= application.date %></td>
-              </tr>
+                <td data-toggle="moda" data-target="#myM"><%= application.name %></td>
+                <td data-toggle="moda" data-target="#myModa"><%= application.batch %></td>
+                <td data-toggle="moda" data-target="#myModa"><%= application.dept %></td>
+                <% const dateFromDatabase = application.date; %>
+                <% const options = { day: '2-digit', month: '2-digit', year: 'numeric' }; %>
+                <% const formattedDate = dateFromDatabase.toLocaleDateString(undefined, options); %> 
+                <td data-toggle="mo" data-target="#myMo"><%= formattedDate %></td>
+              
               <td>
                 <button type="button" class="btn btn-success" data-toggle="dwd" data-target="#dwd">view</button>
               </td>
+            </tr>
           <% }); %>
           </tbody>
           </table>
@@ -107,7 +111,6 @@
         </div>
         <div class="col-sm-6 panel">
           <!-- Existing code for the panel -->
-          <%- divContent%>
         </div>
         <div class="arrow-right">
           <i class="fa fa-arrow-circle-right fa-3x" ></i>
@@ -158,7 +161,7 @@
       <!-- Modal footer -->
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-danger" data-dismiss="modal" onclick="window.location.href='/inner-page'" >Sign Out</button>
+        <button type="button" class="btn btn-danger" data-dismiss="modal" onclick="window.location.href='/logout'" >Sign Out</button>
       </div>
     </div>
   </div>

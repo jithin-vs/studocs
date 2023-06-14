@@ -4,20 +4,19 @@
 }
 
 function displayText() {
-  var from = document.getElementById('text1').value.replace(/\n/g, "<br>");
+  var from = document.getElementById('text1').value.replace(/\n/g, "<br>&nbsp&nbsp");
   var date = document.getElementById('text2').value.replace(/\n/g, "<br>");
-  var to = document.getElementById("text3").value.replace(/\n/g, "<br>");
+  var to = document.getElementById("text3").value.replace(/\n/g, "<br>&nbsp&nbsp");
   var subject = document.getElementById("text4").value.replace(/\n/g, "<br>");
-  var salutation = document.getElementById("text5").value.replace(/\n/g, "<br>");
   var paragraph1 = document.getElementById("text6").value.replace(/\n/g, "<br>");
   var paragraph2 = document.getElementById("text7").value.replace(/\n/g, "<br>");
   var ending = document.getElementById("text8").value.replace(/\n/g, "<br>");
   var letterPreview = document.getElementById("letter-preview");
-
-  var content = "<strong>From,</strong><br> <div class='from'>" + from + "</div><br><br><div class='date'>" +
-    date + "</div><br><br>" + "<strong>To,</strong><br> <div class='to'>" + to + "</div><br><br>" +
-    "<strong>Sub:</strong><div class='sub'>" + subject + "</div><br><br><div class='salutation'" + salutation + "</div>,<br><br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<div class='pg1'> " +
-    paragraph1 + "</div><br><br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<div class='pag2'>" + paragraph2 + "</div><br><br><div class='end'>" + ending+"</div>";
+console.log(ending);
+  var content = "<strong>From,</strong> <div class='from'>&nbsp&nbsp" + from + "</div><div class='date'>" +
+    date + "</div>" + "<strong>To,</strong><br> <div class='to'>&nbsp&nbsp" + to + "</div><br>" +
+    "<div class='sub'><strong>Sub:</strong>" + subject + "</div><br>sir/madam,<br><div class='para1'>&nbsp&nbsp&nbsp&nbsp " +
+    paragraph1 + "</div><div class='para2'>&nbsp&nbsp&nbsp&nbsp" + paragraph2 + "</div><br><div class='end'>" + ending +"</div>";
 
   var regex = /#\w+/g;
   var highlightedContent = content.replace(regex, '<span style="color: red;">$&</span>');
