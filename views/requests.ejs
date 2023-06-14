@@ -132,17 +132,17 @@
             <script>
                  let selectedFormId; // Variable to store the selected form ID
 
-function fetchid() {
-  // Get the selected form ID from the clicked button's data attribute
-  selectedFormId = event.target.dataset.formId;
-  console.log('Selected Form ID:', selectedFormId);
-}
-
+              function fetchid() {
+                // Get the selected form ID from the clicked button's data attribute
+                selectedFormId = event.target.dataset.formId;
+                console.log('Selected Form ID:', selectedFormId);
+              }
+              
 document.addEventListener('DOMContentLoaded', function() {
-  const viewButtons = document.querySelectorAll('.view-button');
-  const editButton = document.querySelectorAll('.edit-button');
+                const viewButtons = document.querySelectorAll('.view-button');
+                const editButton = document.querySelectorAll('.edit-button');
   const subButton = document.querySelectorAll('.sub-button');
-  const displayContainer = document.getElementById('displayContainer');
+                const displayContainer = document.getElementById('displayContainer');
 
   viewButtons.forEach(function(button) {
     button.addEventListener('click', function(event) {
