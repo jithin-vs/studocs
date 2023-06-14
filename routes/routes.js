@@ -852,7 +852,8 @@ app.get('/hod/:name', isAuth, (req, res) => {
         await query(insertQuery, flattenedValues);
 
         // Render the webpage and pass the query results
-        res.redirect(`/requests?id=${stdid}`);
+        res.redirect(`/requests?id=${stdid}&alertMessage=Successful!`);
+
       } catch (error) {
         console.error('Error executing queries:', error);
         res.status(500).send('Error executing queries');

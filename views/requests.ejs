@@ -24,7 +24,7 @@
     <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
       <ul class="navbar-nav">
         <li class="nav-item">
-          <a class="nav-link active" onclick="history.back()">Home</a>
+          <a class="nav-link active" onclick="window.location.href='/student/<%= id%>'">Home</a>
         </li>
         <li class="nav-item">
           <a class="nav-link active btn-danger  edit-button" href="#" data-target="#pub" data-toggle="modal">Edit</a>
@@ -176,6 +176,18 @@ document.addEventListener('DOMContentLoaded', function() {
 <script>
   function updateId(id) {
     document.getElementById('id1').innerHTML = id;
+  }
+
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const alertMessage = urlParams.get('alertMessage');
+
+  // Check if the "alertMessage" parameter exists and display an alert
+  if (alertMessage) {
+    // Use a timeout to ensure the alert is shown after the page is loaded
+    setTimeout(function() {
+      alert(alertMessage);
+    }, 0);
   }
 </script>
 
