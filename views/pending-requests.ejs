@@ -96,7 +96,7 @@
                 <td data-toggle="mo" data-target="#myMo"><%= formattedDate %></td>
               
               <td>
-                <button type="button" class="btn btn-success" data-toggle="dwd" data-target="#dwd">view</button>
+                <button type="button" class="btn btn-success view-button" id="<%= application.appid %>" onclick="fetchid()" data-form-id="<%= application.appid %>">view</button>
               </td>
             </tr>
           <% }); %>
@@ -109,7 +109,7 @@
         <div class="arrow-left">
           <i class="fa fa-arrow-circle-left fa-3x" ></i>
         </div>
-        <div class="col-sm-6 panel">
+        <div class="col-sm-6 panel"id="displayContainer">
           <!-- Existing code for the panel -->
         </div>
         <div class="arrow-right">
@@ -199,6 +199,33 @@
             <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
             <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
     <script>
+           
+                 let selectedFormId; // Variable to store the selected form ID
+
+              function fetchid() {
+                // Get the selected form ID from the clicked button's data attribute
+                selectedFormId = event.target.dataset.formId;
+                console.log('Selected Form ID:', selectedFormId);
+              }    
+              document.addEventListener('DOMContentLoaded', function() {
+                const viewButtons = document.querySelectorAll('.view-button');
+                const displayContainer = document.getElementById('displayContainer');
+                viewButtons.forEach(function(button) {
+    button.addEventListener('click', function(event) {
+      fetchid(); // Call the fetchid() function to save the form ID
+console.log(selectedFormId)
+      // Make a request to fetch the HTML content from the server
+      fetch(`/requ/${selectedFormId}`)
+        .then(response => response.text())
+        .then(html => {
+          // Update the HTML content of the display container
+          displayContainer.innerHTML = html;
+        })
+        .catch(error => console.error(error));
+    });
+  });
+});
+           
         const button1 = document.getElementById('button1');
         const button2 = document.getElementById('button2');
         const button3 = document.getElementById('button3');
@@ -224,9 +251,24 @@
         console.log('Button 2 clicked!');
 
         });
+
+
         button3.addEventListener('click', () => {
         // Toggle the visibility of the text area container
         textAreaContainer.style.display = textAreaContainer.style.display === 'none' ? 'block' : 'none';
+        });
+ 
+        view.addEventListener('click', function(event) {
+          // Call the fetchid() function to save the form ID
+
+          // Make a request to fetch the HTML content from the server
+          fetch(`/form`)
+            .then(response => response.text())
+            .then(html => {
+              // Update the HTML content of the display container
+              displayContainer.innerHTML = html;
+            })
+            .catch(error => console.error(error));
         });
         button4.addEventListener('click', () => {
         // Toggle the visibility of the text area container
@@ -241,7 +283,7 @@
         // Hide the text area container
         textAreaContainer1.style.display = 'none';
         });
-
+         
         closeButton1.addEventListener('click', () => {
         // Hide the text area container
         textAreaContainer1.style.display = 'none';

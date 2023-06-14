@@ -866,7 +866,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
    });
 
    // SENDING REQUEST ROUTE FOR STUDENTS 
-   app.get('/verified-requests/:id',isAuth,(req,res)=>{ 
+   app.get('/verified_requests',isAuth,(req,res)=>{ 
    try{
     const query1 = 'SELECT dest FROM requests WHERE  id = ?';
     //const query1Result = await query(query1, [req.params.id]);
@@ -889,7 +889,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
    });
      
    // PENDING REQUEST ROUTE FOR ADMINS 
-   app.get('/pending-requests',isAuth,async(req,res)=>{         
+     app.get('/pending-requests',isAuth,async(req,res)=>{         
         
     const query1 = 'SELECT collegeid FROM college WHERE  collegeid = ?';
     const query1Result = await query(query1, [req.query.id]);
@@ -924,9 +924,9 @@ app.get('/hod/:name', isAuth, (req, res) => {
         const query1Result = await query(query1, [req.query.id]);
          
         var collegeid=query1Result.collegeid;
-             
-        const query2 = 'SELECT student.collegeid AS collegeId, student.id AS studentId,requests.formname AS formname,requests.appid AS appid, student.batch AS batch, student.department AS dept ,requests.date AS date FROM student JOIN requests ON student.collegeid = requests.collegeid AND student.collegeid =? ';
-        const query2Result = await query(query2, [collegeid]);
+        var pending='pending';    
+        const query2 = 'SELECT student.collegeid AS collegeId, student.id AS studentId,requests.formname AS formname,requests.appid AS appid, student.batch AS batch, student.department AS dept ,requests.date AS date FROM student JOIN requests ON student.collegeid = requests.collegeid AND student.collegeid =? and requests.principal=?';
+        const query2Result = await query(query2, [collegeid,pending]);
         console.log(query2Result);
         res.render('pending-requests',{applications:query2Result});
         });
@@ -939,8 +939,9 @@ app.get('/hod/:name', isAuth, (req, res) => {
            
           var collegeid=query1Result.collegeid;  
           var dept=query1Result.department;   
-          const query2 = 'SELECT student.collegeid AS collegeId, student.id AS studentId,requests.formname AS formname,requests.appid AS appid, student.batch AS batch, student.department AS dept ,requests.date AS date FROM student JOIN requests ON student.collegeid = requests.collegeid AND student.collegeid =? AND student.department=?';
-          const query2Result = await query(query2, [collegeid,dept]);
+          var pending='pending';
+          const query2 = 'SELECT student.collegeid AS collegeId, student.id AS studentId,requests.formname AS formname,requests.appid AS appid, student.batch AS batch, student.department AS dept ,requests.date AS date FROM student JOIN requests ON student.collegeid = requests.collegeid AND student.collegeid =? AND student.department=? AND requests.hod=?';
+          const query2Result = await query(query2, [collegeid,dept,pending]);
           console.log(query2Result);
           res.render('pending-requests',{applications:query2Result});
           });
@@ -1027,6 +1028,26 @@ app.get('/hod/:name', isAuth, (req, res) => {
       });
     });
     
+    //request
+      //REQUEST DISPLAY
+      app.get('/requ/:selectedFormId',isAuth, (req, res) => {
+        const formId = req.params.selectedFormId;
+        console.log(formId);
+        db.connection.query("SELECT request_data FROM requests WHERE appid = ?", [formId], (err, results) => {
+          if (err) {
+            console.error(err);
+            res.status(500).send('Error retrieving HTML content');
+          } else {
+            if (results.length > 0) {
+              const fetchedHTML = results[0].request_data;
+              console.log(fetchedHTML);
+              res.send(fetchedHTML);
+            } else {
+              res.status(404).send('HTML content not found');
+            }
+          }
+        });
+      });
       
 
      //SAVING TEMPLATE
