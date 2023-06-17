@@ -64,21 +64,30 @@
             })
             .catch(error => console.error(error));
       
-          function createCard(template) {
-            const card = document.createElement('div');
-            card.classList.add('card');
-            card.onclick = function() {
-              // Redirect to the "template-display" page with the template name as a query parameter
-              window.location.href = '/addnewform?name=' + encodeURIComponent(template) + '&id=<%=id%>';
-            };
-      
-            const nameSpan = document.createElement('span');
-            nameSpan.classList.add('name');
-            nameSpan.textContent = template;
-      
-            card.appendChild(nameSpan);
-            cardContainer.insertBefore(card, document.getElementById('newCard'));
-          }
+            function createCard(template) {
+    const card = document.createElement('div');
+    card.classList.add('card');
+    card.addEventListener('dblclick', function() {
+      // Redirect to the "template-display" page with the template name as a query parameter
+      window.location.href = '/addnewform?name=' + encodeURIComponent(template) + '&id=<%=id%>';
+    });
+
+    const nameSpan = document.createElement('span');
+    nameSpan.classList.add('name');
+    nameSpan.textContent = template;
+
+    card.appendChild(nameSpan);
+
+    if (!card.classList.contains('new-card')) {
+      const deleteIcon = document.createElement('span');
+      deleteIcon.classList.add('delete-icon');
+      deleteIcon.innerHTML = '<i onclick="delete()"class="fas fa-trash"></i>';
+      deleteIcon.onclick= delete(name);
+      card.appendChild(deleteIcon);
+    }
+
+    cardContainer.insertBefore(card, document.getElementById('newCard'));
+  }
       
           function createNewCardOption() {
             const newCard = document.getElementById('newCard');
@@ -89,6 +98,7 @@
               }
             };
           }
+        
         });
       </script>
       
