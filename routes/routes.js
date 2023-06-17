@@ -816,11 +816,9 @@ app.get('/hod/:name', isAuth, (req, res) => {
     const data = JSON.parse(jsonData); 
     const formid = data[0].formid; // Accessing the 'formid' property
     const stdid = data[0].id; 
-    const option=data[0].option;
     const content=data[0].content;
 
       console.log(stdid);
-      console.log(option);
       console.log(content);
       try {
          
@@ -850,8 +848,8 @@ app.get('/hod/:name', isAuth, (req, res) => {
 
 
         // Insert the values into the "requests" table
-        const insertQuery = 'INSERT INTO requests (collegeId, stdid, formid, appid,date,dept,dest,request_data) VALUES (?,?,?,?,NOW(),?,?,?)';
-        const insertValues = query2Result.map(row => [row.collegeId, row.studentId, row.formId, uniqueId,row.dept,option,content]);  
+        const insertQuery = 'INSERT INTO requests (collegeId, stdid, formid, appid,date,dept,dest,request_data) VALUES (?,?,?,?,NOW(),?,?)';
+        const insertValues = query2Result.map(row => [row.collegeId, row.studentId, row.formId, uniqueId,row.dept,content]);  
         const flattenedValues = insertValues.flat(); // Flatten the nested arrays
         console.log(flattenedValues);
         await query(insertQuery, flattenedValues);
