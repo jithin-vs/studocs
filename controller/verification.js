@@ -1,5 +1,5 @@
 const crypto = require('crypto');
-
+const otpGenerator = require('otp-generator');
 // Generate a verification token
 function generateVerificationToken() {
     return crypto.randomBytes(16).toString('hex');
@@ -43,7 +43,10 @@ function generateVerificationToken() {
     
       return id;
     }
-  
+    function generateOTP() {
+     const otp= otpGenerator.generate(6, { lowerCaseAlphabets: false,upperCaseAlphabets: false, specialChars: false });
+      return otp;
+    }
  // const id = generateUniqueId(8);
  // console.log(id);
   
@@ -51,5 +54,7 @@ function generateVerificationToken() {
   
   const randomPassword = generateRandomPassword(passwordLength);
 
+
+   //console.log(generateOTP());   
   
-module.exports ={generateVerificationToken,randomPassword,generateUniqueId,generateAttachmentId};   
+module.exports ={generateVerificationToken,randomPassword,generateUniqueId,generateAttachmentId,generateOTP};   

@@ -5,7 +5,7 @@ const verify =require("../controller/verification");
 const path=require('path');
 const { query } = require('express');
 
-var routes =function(app,isAuth,encoder){     
+var routes =function(app,isAuth,encoder){      
   
    // Promisify the pool.query method
     const query = (sql, args) => {
@@ -15,7 +15,7 @@ var routes =function(app,isAuth,encoder){
             reject(error);
           } else {
             resolve(results);
-          }
+          } 
         });
       });
     };
@@ -818,11 +818,12 @@ app.get('/hod/:name', isAuth, (req, res) => {
     const stdid = data[0].id; 
     const option=data[0].option;
     const content=data[0].content;
+
       console.log(stdid);
       console.log(option);
       console.log(content);
       try {
-    
+         
         // Execute the first query with arguments
         const query1 = 'SELECT collegeid FROM student WHERE  id = ?';
         const query1Result = await query(query1, [stdid]);
@@ -865,12 +866,12 @@ app.get('/hod/:name', isAuth, (req, res) => {
    });
 
    // SENDING REQUEST ROUTE FOR STUDENTS 
-   app.get('/verified-requests/:id',isAuth,(req,res)=>{ 
+   app.get('/verified_requests',isAuth,(req,res)=>{ 
    try{
     const query1 = 'SELECT dest FROM requests WHERE  id = ?';
     //const query1Result = await query(query1, [req.params.id]);
 
-    db.connection.query("select * from requests where stdid=? and ",
+    db.connection.query("select * from requests where stdid=? ",
     [req.params.id],(err,results,fields)=>{
       if(err) {
         throw err; 
@@ -888,27 +889,63 @@ app.get('/hod/:name', isAuth, (req, res) => {
    });
      
    // PENDING REQUEST ROUTE FOR ADMINS 
-   app.get('/pending-requests/:name',isAuth,(req,res)=>{         
+     app.get('/pending-requests',isAuth,async(req,res)=>{         
+        
+    const query1 = 'SELECT collegeid FROM college WHERE  collegeid = ?';
+    const query1Result = await query(query1, [req.query.id]);
+     
+    var collegeid=query1Result.collegeid;
          
-    try{
-      db.connection.query("select formdata from forms where name=?",
-    [req.params.name],(err,results,fields)=>{
-    if(err) {
-      throw err; 
-    } 
-    else{
-      const divContent = results[0].formdata;
-      console.log(divContent);
-      const applications = []; // Empty array, can be populated later if needed
-      res.render('pending-requests',{ divContent, applications });
-    }
-    });
-    }catch(err){
-      console.log(err); 
-    }
-
+    const query2 = 'SELECT student.collegeid AS collegeId, student.id AS studentId,requests.formname AS formname,requests.appid AS appid, student.batch AS batch, student.department AS dept ,requests.date AS date FROM student JOIN requests ON student.collegeid = requests.collegeid AND student.collegeid =? ';
+    const query2Result = await query(query2, ['98765432']);
+    console.log(query2Result);
+    res.render('pending-requests',{applications:query2Result});
     });
 
+    //PENDING REQUESTS FOR TUTOR
+    app.get('/tutor-pending-requests',isAuth,async(req,res)=>{         
+        
+      const query1 = 'SELECT collegeid,batch,department FROM tutor WHERE  collegeid = ?';
+      const query1Result = await query(query1, [req.query.id]);
+       
+      var collegeid=query1Result.collegeid;
+      var dept=query1Result.department;
+      
+      const query2 = 'SELECT student.collegeid AS collegeId, student.id AS studentId,requests.formname AS formname,requests.appid AS appid, student.batch AS batch, student.department AS dept ,requests.date AS date FROM student JOIN requests ON student.collegeid = requests.collegeid AND student.collegeid =? AND student.department=? AND student.batch=? ';
+      const query2Result = await query(query2, ['collegeid']);
+      console.log(query2Result);
+      res.render('pending-requests',{applications:query2Result});
+      });
+
+      //PENDING REQUESTS FOR PRINCIPAL
+      app.get('/principal-pending-requests',isAuth,async(req,res)=>{         
+        
+        const query1 = 'SELECT collegeid FROM principal WHERE id = ?';
+        const query1Result = await query(query1, [req.query.id]);
+         
+        var collegeid=query1Result.collegeid;
+        var pending='pending';    
+        const query2 = 'SELECT student.collegeid AS collegeId, student.id AS studentId,requests.formname AS formname,requests.appid AS appid, student.batch AS batch, student.department AS dept ,requests.date AS date FROM student JOIN requests ON student.collegeid = requests.collegeid AND student.collegeid =? and requests.principal=?';
+        const query2Result = await query(query2, [collegeid,pending]);
+        console.log(query2Result);
+        res.render('pending-requests',{applications:query2Result});
+        });
+
+        //PENDING REQUESTS FOR HOD
+        app.get('/hod-pending-requests',isAuth,async(req,res)=>{         
+        
+          const query1 = 'SELECT collegeid,department FROM hod WHERE id = ?';
+          const query1Result = await query(query1, [req.query.id]);
+           
+          var collegeid=query1Result.collegeid;  
+          var dept=query1Result.department;   
+          var pending='pending';
+          const query2 = 'SELECT student.collegeid AS collegeId, student.id AS studentId,requests.formname AS formname,requests.appid AS appid, student.batch AS batch, student.department AS dept ,requests.date AS date FROM student JOIN requests ON student.collegeid = requests.collegeid AND student.collegeid =? AND student.department=? AND requests.hod=?';
+          const query2Result = await query(query2, [collegeid,dept,pending]);
+          console.log(query2Result);
+          res.render('pending-requests',{applications:query2Result});
+          });
+  
 
 /*----------- FORM CONTROL AND MAANGEMENT -------------*/
 
@@ -953,19 +990,19 @@ app.get('/hod/:name', isAuth, (req, res) => {
       });
       
       //STATUS DISPLAY
-      app.get('/status/:name',isAuth,(req,res)=>{
+      app.get('/status/:name',isAuth,async(req,res)=>{
         try{
-          db.connection.query("select formdata from forms",
+          db.connection.query("select * from requests  join student on requests.stdid=student.id and student.id=? ",
         [req.params.name],(err,results,fields)=>{
         if(err) {
           throw err; 
         } 
         else{
-          const divContent = results[0].formdata;
-          const applications = []; // Empty array, can be populated later if needed
+          
+          const applications =results; // Empty array, can be populated later if needed
           res.render('status',{ divContent, applications });
         }
-        });
+        }); 
         }catch(err){
           console.log(err); 
         }
@@ -991,6 +1028,24 @@ app.get('/hod/:name', isAuth, (req, res) => {
       });
     });
     
+    //request
+      //REQUEST DISPLAY
+      app.get('/requ/:selectedFormId',isAuth, (req, res) => {
+        const formId = req.params.selectedFormId;
+        db.connection.query("SELECT request_data FROM requests WHERE appid = ?", [formId], (err, results) => {
+          if (err) {
+            console.error(err);  
+            res.status(500).send('Error retrieving HTML content');
+          } else {
+            if (results.length > 0) {
+              const fetchedHTML = results[0].request_data;
+              res.send(fetchedHTML);
+            } else {
+              res.status(404).send('HTML content not found');
+            }
+          }
+        });
+      });
       
 
      //SAVING TEMPLATE
@@ -1006,7 +1061,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
           if(err) {
             throw err; 
           } else{
-             res.redirect('/status');
+             res.redirect(`/addtemplate?id=${collegeid}`);
           }    
        });
        });
@@ -1169,7 +1224,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
               }
             }
           });
-
+        
         //REGISTER COLLEGE
         app.post('/register-college',(req,res)=>{
              
@@ -1289,7 +1344,24 @@ app.get('/hod/:name', isAuth, (req, res) => {
         });
       });    
        
-      
+      //OTP VERIFICATION
+      app.get('/otpverify',isAuth,(req, res) => {
+        const id= req.query.id;
+      //  const templateName = req.query.name; // Get the template name from the query parameter
+    
+        // Fetch the name and email from the server
+        db.connection.query('SELECT name,email FROM student WHERE id = ?', [id], (err, results, fields) => {
+          if (err) {
+            throw err;
+          } else {
+            const email = results.length > 0 ? results[0].email : '';
+            const name=results.length>0?results[0].name:''; // Get the template content or set it as an empty string if not found
+            var otp=verify.generateOTP();        
+            mail.sendOTPEmail(name,email,otp);
+           // res.render('addnewform', { templateName: templateName, templateContent: templateContent ,id});
+          }
+        });;
+       });
       
 
        
