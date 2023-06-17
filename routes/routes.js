@@ -823,7 +823,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
       console.log(option);
       console.log(content);
       try {
-    
+         
         // Execute the first query with arguments
         const query1 = 'SELECT collegeid FROM student WHERE  id = ?';
         const query1Result = await query(query1, [stdid]);
@@ -1061,7 +1061,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
           if(err) {
             throw err; 
           } else{
-             res.render('/addnewform');
+             res.redirect(`/addtemplate?id=${collegeid}`);
           }    
        });
        });
