@@ -827,7 +827,20 @@ app.get('/hod/:name', isAuth, (req, res) => {
         const query1Result = await query(query1, [stdid]);
     
         // Execute the second query with arguments
-        const query2 = 'SELECT student.collegeid AS collegeId, student.id AS studentId, forms.formid AS formId,student.batch AS batch ,student.department AS dept FROM student JOIN forms ON student.collegeid = forms.collegeid AND student.id = ? AND forms.formid=?';
+        const query2 = `
+              SELECT
+                student.collegeid AS collegeId,
+                student.id AS studentId,
+                forms.formid AS formId,
+                student.batch AS batch,
+                student.department AS dept,
+                forms.name AS formname,
+                forms.dest AS dest
+              FROM
+                student
+              JOIN
+                forms ON student.collegeid = forms.collegeid AND student.id = ? AND forms.formid = ?
+            `;      
         const query2Result = await query(query2, [stdid,formid]);
         if (query2Result.length === 0) {
           // Render a template not found message to the client
@@ -845,13 +858,13 @@ app.get('/hod/:name', isAuth, (req, res) => {
 
                 idExists = checkResult[0].count > 0;
               }
-
-
+        var dest=query2Result[0].dest;
+        cpnsole.log('dest=\t'+dest);
+        var final='final';
         // Insert the values into the "requests" table
-        const insertQuery = 'INSERT INTO requests (collegeId, stdid, formid, appid,date,dept,dest,request_data) VALUES (?,?,?,?,NOW(),?,?)';
-        const insertValues = query2Result.map(row => [row.collegeId, row.studentId, row.formId, uniqueId,row.dept,content]);  
+        const insertQuery = `INSERT INTO requests (collegeId, stdid, formid, appid,date,dept,request_data,formname,${dest}) VALUES (?,?,?,?,NOW(),?,?,?,?)`;
+        const insertValues = query2Result.map(row => [row.collegeId, row.studentId, row.formId, uniqueId, row.dept, content, row.formname,final]);
         const flattenedValues = insertValues.flat(); // Flatten the nested arrays
-        console.log(flattenedValues);
         await query(insertQuery, flattenedValues);
 
         // Render the webpage and pass the query results
@@ -1046,7 +1059,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
       });
       
 
-     //SAVING TEMPLATE
+     //SAVING TEMPLATEFORMS
      app.post('/save-template',(req,res)=>{   
       var name=req.query.name; 
       //console.log(name);
@@ -1344,21 +1357,46 @@ app.get('/hod/:name', isAuth, (req, res) => {
        
       //OTP VERIFICATION
       app.get('/otpverify',isAuth,(req, res) => {
-        const id= req.query.id;
-      //  const templateName = req.query.name; // Get the template name from the query parameter
-    
-        // Fetch the name and email from the server
-        db.connection.query('SELECT name,email FROM student WHERE id = ?', [id], (err, results, fields) => {
+        const jsonData = req.query.data;
+        const data = JSON.parse(jsonData); 
+        const formid = data[0].formid; // Accessing the 'formid' property
+        const stdid = data[0].id; 
+       
+        db.connection.query('SELECT name,email FROM student WHERE id = ?', [stdid], (err, results, fields) => {
           if (err) {
             throw err;
           } else {
             const email = results.length > 0 ? results[0].email : '';
             const name=results.length>0?results[0].name:''; // Get the template content or set it as an empty string if not found
-            var otp=verify.generateOTP();        
-            mail.sendOTPEmail(name,email,otp);
-           // res.render('addnewform', { templateName: templateName, templateContent: templateContent ,id});
+            var genOtp=verify.generateOTP();        
+             // mail.sendOTPEmail(name,email,genOtp);
+              req.session.otp = genOtp; 
+              console.log(genOtp)
+              //const jsonData = JSON.stringify(data);
+              res.render('otpverify', {otp:genOtp,jsonData});
           }
         });;
+       });
+
+             //OTP VERIFICATION
+      app.post('/otpverify',isAuth,(req, res) => {
+        console.log(req.body)  
+        const jsonData = req.body.jsonData;
+        const submittedOTP = req.body.otp;
+        const storedOTP = req.session.otp;
+        console.log("in post otp=\t"+storedOTP);
+        if (submittedOTP === storedOTP) {
+          // OTP verification successful  
+          // Handle form submission here
+         
+          // Clear the OTP from the session after successful submission
+          delete req.session.otp;
+          res.redirect(`/submit?data=${encodeURIComponent(jsonData)}`);
+        } else {
+          // Invalid OTP, display an error or redirect to the OTP verification page
+          res.send('Invalid OTP. Please try again.');     
+        }   
+      
        });
       
        //UPLOAD ATTCHMENT FILES FOR STUDENTS

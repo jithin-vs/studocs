@@ -108,7 +108,7 @@
     <div class="modal-dialog" style="max-width: 300px;">
       <div class="modal-content">
         <div class="modal-header">
-          <h4 class="modal-title" id="confirmationModalLabel">Submit</h4>
+          <h4 class="modal-title" id="confirmationModalLabel" >Submit</h4>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -118,14 +118,14 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-          <button type="button" class="btn btn-danger" data-target="#otpModal" data-toggle="modal">Submit</button>
+          <button type="button" class="btn btn-danger" data-target="#otpModal" data-toggle="modal" onclick="submitForm()">Submit</button>
         </div>
       </div>
     </div>
   </div>
  
   <!-- OTP Modal -->
-  <div id="otpModal" class="modal fade ha" tabindex="-1" role="dialog" aria-hidden="true">
+  <!-- <div id="otpModal" class="modal fade ha" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
@@ -134,16 +134,16 @@
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <div class="modal-body">
+         <div class="modal-body">
           <p>PLEASE ENTER THE OTP:</p>
-          <form action="/verify" method="post">
-            <input type="text" name="otp" pattern="[0-9]{4}" maxlength="4" required>
-            <input type="submit" class="btn btn-primary" onclick="submitForm()" value="Submit">
+          <form action="/verifyotp" method="post">
+           <input type="text" name="otp" pattern="[0-9]{4}" maxlength="4" required>
+            <input type="submit" class="btn btn-primary" value="Submit">
           </form>
-        </div>
+        </div> 
       </div>
     </div>
-  </div>
+  </div> -->
 
 <script>
   $(".f2").click(function(){
@@ -174,7 +174,7 @@
     }];
     console.log(divContent);
     var jsonData = encodeURIComponent(JSON.stringify(data));
-    var url = '/submit?data=' + jsonData;
+    var url = '/otpverify?data=' + jsonData;
     window.location.href = url;
   
 }

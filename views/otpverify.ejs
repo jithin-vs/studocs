@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>OTP Verification</title>
+</head>
+<body>
+  <h1>OTP Verification</h1>
+  <% const data= jsonData %>
+  <% const encodedData = encodeURIComponent(JSON.stringify(data)); %>
+  <form action="/otpverify" method="POST">
+    <p>Please enter the OTP received:</p>
+    <input type="hidden" name="jsonData" value="<%= jsonData %>">
+    <input type="text" name="otp" required>
+    <button type="submit">Verify OTP</button>
+  </form>
+  
+  <script>
+    // Optional: Auto-focus the OTP input field
+    window.onload = function() {
+      document.querySelector('input[name="otp"]').focus();
+    };
+  </script>
+</body>
+</html>

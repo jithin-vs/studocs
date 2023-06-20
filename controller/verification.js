@@ -46,7 +46,8 @@ function generateVerificationToken() {
     function generateOTP() {
      const otp= otpGenerator.generate(6, { lowerCaseAlphabets: false,upperCaseAlphabets: false, specialChars: false });
       return otp;
-    }
+    } 
+ 
  // const id = generateUniqueId(8);
  // console.log(id);
   
