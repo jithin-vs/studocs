@@ -19,7 +19,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/latest/html2pdf.bundle.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-
   <script src="/js/addnewform.js"></script>
 </head>
 <body>
@@ -47,53 +46,51 @@
     <div class="row">
       <div class="col-sm-6 side1">
         <div class="col-lg-10 panel2">
-            <p class="p1">From
-                <div class="from"></div>
-            
-            </p>
-            <hr>
-            <p class="p1">Date
-              <div class="date"></div>
-            </p>
-            <hr>
-            <p class="p1">To
-                  <div class="to"></div>         
-            </p>
-            </p>
-            <hr>
-            <p class="p1">Subject
-                <div class="sub"></div>
-            </p>
-            <hr>
-            <p class="p1">Paragraph 1
-                <div class="para1"></div>
-            </p>
-            <hr>
-            <p class="p1">Paragraph 2
-                <div class="para2"></div>
-            </p>
-            <hr>
-            <p class="p1">Ending
-                <div class="end"></div>
-            </p>
-            <hr>
-					
-          <br>
-          <br>
+          <p class="p1">From
+            <div class="from"></div>
+          </p>
+          <hr>
+          <p class="p1">Date
+            <div class="date"></div>
+          </p>
+          <hr>
+          <p class="p1">To
+            <div class="to"></div>
+          </p>
+          </p>
+          <hr>
+          <p class="p1">Subject
+            <div class="sub"></div>
+          </p>
+          <hr>
+          <p class="p1">Paragraph 1
+            <div class="para1"></div>
+          </p>
+          <hr>
+          <p class="p1">Paragraph 2
+            <div class="para2"></div>
+          </p>
+          <hr>
+          <p class="p1">Ending
+            <div class="end"></div>
+          </p>
+          <hr>
 
-          </div>
+          <br>
+          <br>
         </div>
-      
+      </div>
+
       <div class="col-sm-6 side2">
         <div id="letter-preview" class="col-sm-6 panel">
-            <%- templateContent %>
+          <%- templateContent %>
         </div>
         <div class="subm">
           <button class="btn btn-secondary scc dropdown-toggle" style="background-color: blue;">Add Attachment</button>
           <span class="dropdown show">
             <select id="selectOption" class="btn btn-secondary scc">
               <option value="Forward To">Forward To</option>
-              <option value="tutor">Staff-Adviser</option>             
+              <option value="tutor">Staff-Adviser</option>
               <option value="hod">HOD</option>
               <option value="principal">Principal</option>
               <option value="college">Office</option>
@@ -105,27 +102,49 @@
       </div>
     </div>
   </div>
-  
-<!-- Confirmation Modal -->
-<div id="confirmationModal" class="modal fade ha" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel" aria-hidden="true">
-  <div class="modal-dialog" style="max-width: 300px;">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h4 class="modal-title" id="confirmationModalLabel">Submit</h4>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        Would you like to submit the form?
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-danger" onclick="submitForm()">Submit</button>
+
+  <!-- Confirmation Modal -->
+  <div id="confirmationModal" class="modal fade ha" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="max-width: 300px;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title" id="confirmationModalLabel">Submit</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          Would you like to submit the form?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger" data-target="#otpModal" data-toggle="modal">Submit</button>
+        </div>
       </div>
     </div>
   </div>
-</div>
+ 
+  <!-- OTP Modal -->
+  <div id="otpModal" class="modal fade ha" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title" id="confirmationModalLabel">Validate OTP</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>PLEASE ENTER THE OTP:</p>
+          <form action="/verify" method="post">
+            <input type="text" name="otp" pattern="[0-9]{4}" maxlength="4" required>
+            <input type="submit" class="btn btn-primary" onclick="submitForm()" value="Submit">
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
 <script>
   $(".f2").click(function(){
   $("#text2").toggle();
@@ -136,10 +155,6 @@
  <script src="/js/newform.js"></script>
  <script>
   function submitForm() {
-  var selectedOption = document.querySelector('#selectOption').value;
-  if (selectedOption === 'Forward To') {
-    alert('Error: Please select an option other than "Forward To".');
-  } else {
     const queryString = window.location.search.slice(1);
     const params = {};
 
@@ -155,16 +170,14 @@
     var data = [{
       formid: '<%=formid%>',
       id: '<%=id%>',
-      option: selectedOption,
       content: divContent
     }];
     console.log(divContent);
     var jsonData = encodeURIComponent(JSON.stringify(data));
     var url = '/submit?data=' + jsonData;
     window.location.href = url;
-  }
+  
 }
-
 </script>
 
 </body>
