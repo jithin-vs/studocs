@@ -21,57 +21,52 @@ document.addEventListener('DOMContentLoaded', function () {
     const files = Array.from(uploadOption.files);
 
     files.forEach(function (file) {
-      const reader = new FileReader();
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('attaname', uploadOption.getAttribute('data-name'));
 
-      reader.onload = function (event) {
-        const fileData = event.target.result;
-
-        const card = document.createElement('div');
-        card.classList.add('card');
-
-        const cardContent = document.createElement('div');
-        cardContent.classList.add('card-content');
-        cardContent.textContent = file.name;
-
-        const cardActions = document.createElement('div');
-        cardActions.classList.add('card-actions');
-
-        const reuploadIcon = document.createElement('span');
-        reuploadIcon.classList.add('reupload-icon');
-        reuploadIcon.textContent = '↻';
-
-        const deleteIcon = document.createElement('span');
-        deleteIcon.classList.add('delete-icon');
-        deleteIcon.textContent = '❌';
-
-        cardActions.appendChild(reuploadIcon);
-        cardActions.appendChild(deleteIcon);
-
-        card.appendChild(cardContent);
-        card.appendChild(cardActions);
-        uploadContainer.appendChild(card);
-
-        const formData = new FormData();
-        formData.append('attachment', fileData);
-        formData.append('attaname', uploadOption.getAttribute('data-name'));
-
-        fetch(`/upload?id=${getUrlValue()}`, {
-          method: 'POST',
-          body: formData,
+      fetch(`/upload?id=${getUrlValue()}`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+        .then((response) => {
+          if (response.ok) {
+            console.log('Attachment uploaded successfully');
+          } else {
+            throw new Error('Failed to upload attachment');
+          }
         })
-          .then((response) => {
-            if (response.ok) {
-              console.log('Attachment uploaded successfully');
-            } else {
-              throw new Error('Failed to upload attachment');
-            }
-          })
-          .catch((error) => {
-            console.error('Error occurred during attachment upload:', error);
-          });
-      };
+        .catch((error) => {
+          console.error('Error occurred during attachment upload:', error);
+        });
 
-      reader.readAsDataURL(file);
+      const card = document.createElement('div');
+      card.classList.add('card');
+
+      const cardContent = document.createElement('div');
+      cardContent.classList.add('card-content');
+      cardContent.textContent = file.name;
+
+      const cardActions = document.createElement('div');
+      cardActions.classList.add('card-actions');
+
+      const reuploadIcon = document.createElement('span');
+      reuploadIcon.classList.add('reupload-icon');
+      reuploadIcon.textContent = '↻';
+
+      const deleteIcon = document.createElement('span');
+      deleteIcon.classList.add('delete-icon');
+      deleteIcon.textContent = '❌';
+
+      cardActions.appendChild(reuploadIcon);
+      cardActions.appendChild(deleteIcon);
+
+      card.appendChild(cardContent);
+      card.appendChild(cardActions);
+      uploadContainer.appendChild(card);
     });
   });
 

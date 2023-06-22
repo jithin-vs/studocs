@@ -454,7 +454,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
              
            }
            else{
-              console.log(results);
+             // console.log(results);
               var name=results[0].name;
               var admno=results[0].admno;
               var regno=results[0].id; 
@@ -687,7 +687,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
 
  
       //student add  
-          app.get('/studentadd',isAuth,(req,res)=>{
+     app.get('/studentadd',isAuth,(req,res)=>{
                   
             db.connection.query("select * from Student",
                 [req.body.name],(err,results,fields)=>{
@@ -707,7 +707,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
               
           });
    
-         app.post('/studentadd',encoder,(req,res)=>{
+     app.post('/studentadd',encoder,(req,res)=>{
         var tutorid=req.query.id;
         var {name,id,email}=req.body;
         var Collegeid;
@@ -748,7 +748,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
          });
 
     //principal add
-        app.get('/principaladd',isAuth,(req,res)=>{
+     app.get('/principaladd',isAuth,(req,res)=>{
            
              
           db.connection.query("select * from  principal",
@@ -766,7 +766,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
              
         });
         
-        app.post('/principaladd',encoder,(req,res)=>{ 
+     app.post('/principaladd',encoder,(req,res)=>{ 
 
           var {name,id,email}=req.body;
           
@@ -894,7 +894,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
    });
      
    // PENDING REQUEST ROUTE FOR ADMINS 
-     app.get('/pending-requests',isAuth,async(req,res)=>{         
+   app.get('/pending-requests',isAuth,async(req,res)=>{         
         
     const query1 = 'SELECT collegeid FROM college WHERE  collegeid = ?';
     const query1Result = await query(query1, [req.query.id]);
@@ -908,7 +908,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
     });
 
     //PENDING REQUESTS FOR TUTOR
-    app.get('/tutor-pending-requests',isAuth,async(req,res)=>{         
+   app.get('/tutor-pending-requests',isAuth,async(req,res)=>{         
         
       const query1 = 'SELECT collegeid,batch,department FROM tutor WHERE  collegeid = ?';
       const query1Result = await query(query1, [req.query.id]);
@@ -923,7 +923,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
       });
 
       //PENDING REQUESTS FOR PRINCIPAL
-      app.get('/principal-pending-requests',isAuth,async(req,res)=>{         
+   app.get('/principal-pending-requests',isAuth,async(req,res)=>{         
         
         const query1 = 'SELECT collegeid FROM principal WHERE id = ?';
         const query1Result = await query(query1, [req.query.id]);
@@ -937,7 +937,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
         });
 
         //PENDING REQUESTS FOR HOD
-        app.get('/hod-pending-requests',isAuth,async(req,res)=>{         
+   app.get('/hod-pending-requests',isAuth,async(req,res)=>{         
         
           const query1 = 'SELECT collegeid,department FROM hod WHERE id = ?';
           const query1Result = await query(query1, [req.query.id]);
@@ -949,9 +949,9 @@ app.get('/hod/:name', isAuth, (req, res) => {
           const query2Result = await query(query2, [collegeid,dept,pending]);
           console.log(query2Result);
           res.render('pending-requests',{applications:query2Result});
-          });
+        });
   
-
+  
 /*----------- FORM CONTROL AND MAANGEMENT -------------*/
 
       // ADDING TEMPLATE 
@@ -1370,7 +1370,51 @@ app.get('/hod/:name', isAuth, (req, res) => {
         });;
        });
       
+       //UPLOAD ATTCHMENT FILES FOR STUDENTS
+       app.post('/upload', async(req, res) => {
+       
+        const id = req.query.id;
+        console.log('here' + id);
+        console.log(req.body);
+        if (!req.files || !req.files.file) {
 
+          console.log('no file uploaded');
+          return res.status(400).json({ error: 'No file uploaded' });
+        
+        }
+        
+        // Retrieve file information from request
+        const file = req.files.file;
+        console.log(file);
+
+        // Insert file data into the MySQL database
+        const query1 = 'select * from student';
+        const values = [req.body.attaname, file.mimetype, file.size];
+        
+        try {
+          const result = await query(query1,values);
+
+          console.log(result);
+          // Retrieve the generated file ID
+         // const fileId = result.insertId;
+        
+          // Update the file ID in the file object
+         // file.fileId = fileId;
+        
+          // Continue with additional file processing or response handling
+          // For example, you can save the file to a specific location on the server
+          // or perform further operations based on the file ID
+        
+          res.status(200).json({ message: 'File uploaded successfully', fileId });
+        } catch (error) {
+          // Handle database errors
+          console.error(error);
+          res.status(500).json({ error: 'Database error' });
+        }
+        
+  
+      
+      });
        
 
       //render in edit in student requestes
