@@ -70,7 +70,7 @@
             <div class="imag" style="width: 225px; height: 225px; object-fit: cover; overflow: hidden;">
               <img alt="<%= name%>" src="<%= photo %>" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);">
             </div>
-             <b> &nbsp;NAME&nbsp;&nbsp;&nbsp;:<%= name%><input type="text"id="name"></b>
+             <b> &nbsp;NAME&nbsp;&nbsp;&nbsp;:<%= name%></b>
           </div>
           <div class="col-lg-6 address" ><b>
               ADMNO&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:<%= admno %><br>
@@ -92,17 +92,40 @@
       <div class="abc" id="docs">
       <h3 >DOCUMENTS</h3>
       <div class="panel container">
+        <div class="container">
+
+          <form action="/upload/<%= regno%>" method="POST" enctype="multipart/form-data" class="mt-4">
+            <div class="mb-3">
+              <label for="attaname" class="form-label">Attachment Name</label>
+              <input type="text" class="form-control" id="attaname" name="attaname" required>
+            </div>
+            <div class="mb-3">
+              <label for="file" class="form-label">File</label>
+              <input type="file" class="form-control" id="file" name="file" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Upload</button>
+          </form>
       
-         
-       
-          <h2>File Upload Panel</h2>
-          <div class="upload-container">
-              <div class="card plus-icon">
-                  <span>+</span>
-              </div>
-          </div>
-          <input type="file" class="upload-option" multiple>
-  
+          <% if (attachments && attachments.length > 0) { %>
+            <h2 class="mt-5">Attachments</h2>
+            <div class="row mt-3">
+              <% for (let i = 0; i < attachments.length; i++) { %>
+                <div class="col-md-4">
+                  <div class="card mb-3">
+                    <div class="card-body">
+                      <h5 class="card-title"><%= attachments[i].attaname %></h5>
+                      <a href="/download?file=<%= encodeURIComponent(attachments[i].file) %>" class="card-link">Download</a>
+                      <form action="/remove" method="POST" class="mt-3">
+                        <input type="hidden" name="attachmentId" value="<%= attachments[i].id %>">
+                        <button type="submit" class="btn btn-danger">Remove</button>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              <% } %>
+            </div>
+          <% } %>
+        </div>
       <br>
       <br>
       <br>
