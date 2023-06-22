@@ -162,6 +162,11 @@ function sendDivContent() {
   const name = parameters.name;
   const selectedOption = document.getElementById("selectOption").value;
 
+  if (selectedOption === "Forward To" || selectedOption === "") {
+    alert("Please select a valid option");
+    return;
+  }
+
   var divContent = document.getElementById("letter-preview").innerHTML;
 
   // Create an AJAX request
