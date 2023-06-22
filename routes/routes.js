@@ -1480,7 +1480,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
                 const filePath = path.join('./public/uploads/student', regno.toString(), uploadedFile.name);
                 console.log(filePath);
                 const sql = 'INSERT INTO attachment (stdid, collegeid, attaid, attaname, file) VALUES (?, ?, ?, ?, ?)';
-                connection.query(sql, [regno, collegeid, attaid, attaname, filePath], function (error, results) {
+                db.connection.query(sql, [regno, collegeid, attaid, attaname, filePath], function (error, results) {
                   if (error) {
                     console.error('Error saving attachment to the database');
                   }
@@ -1494,6 +1494,39 @@ app.get('/hod/:name', isAuth, (req, res) => {
           }
         });
       });
+      
+      //delete template
+      app.get('/delete', (req, res) => {
+        const templateName = req.query.name;
+      
+        // Delete the corresponding records in the `requests` table first
+        const deleteRequestsQuery = 'DELETE FROM requests WHERE formid IN (SELECT formid FROM forms WHERE name = ?)';
+      
+        db.connection.query(deleteRequestsQuery, [templateName], (err, result) => {
+          if (err) {
+            console.error('Error deleting requests: ', err);
+            res.sendStatus(500);
+            return;
+          }
+      
+          // Delete the template from the `forms` table
+          const deleteFormQuery = 'DELETE FROM forms WHERE name = ?';
+      
+          db.connection.query(deleteFormQuery, [templateName], (err, result) => {
+            if (err) {
+              console.error('Error deleting template: ', err);
+              res.sendStatus(500);
+            } else {
+              console.log('Template deleted successfully');
+              
+              // Render the page with the `id` parameter
+              const id = req.query.id;
+              res.redirect(`/addtemplate?id=${id}`);
+            } 
+          });
+        });
+      });
+      
       
       /* app.get('/verify',(req,res)=>{ 
           
