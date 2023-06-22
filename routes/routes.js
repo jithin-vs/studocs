@@ -1459,7 +1459,6 @@ app.get('/hod/:name', isAuth, (req, res) => {
       app.post('/upload/:name', (req, res) => {
         const { attaname } = req.body;
         const name = req.params.name;
-        console.log(name);
         let collegeid, regno;
       
         db.connection.query("SELECT * FROM student WHERE id = ?", [name], (err, results1, fields) => {
@@ -1468,8 +1467,6 @@ app.get('/hod/:name', isAuth, (req, res) => {
           } else {
             collegeid = results1[0].collegeid;
             regno = results1[0].id;
-            console.log(collegeid);
-            console.log(regno);
       
             generateUniqueID()
               .then(attaid => {
@@ -1484,7 +1481,22 @@ app.get('/hod/:name', isAuth, (req, res) => {
                   if (error) {
                     console.error('Error saving attachment to the database');
                   }
-                  res.redirect('/');
+                  var name=results1[0].name;
+                  var admno=results1[0].admno;
+                  var regno=results1[0].id; 
+                  var dept=results1[0].department;
+                  var phno=results1[0].phno;  
+                  var addr=results1[0].address
+                  var email=results1[0].email;
+                  var photo=results1[0].photo;
+                  db.connection.query('SELECT * FROM attachment', function (error, results2) {
+                    if (error) {
+                      console.error('Error retrieving attachments from the database');
+                    }
+                   else{
+                   
+                  res.render('student',{name,admno,regno,dept,phno,addr,email,photo,attachments: results2})}
+                });
                 });
               })
               .catch(error => {
@@ -1492,7 +1504,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
                 res.status(500).send('Internal Server Error');
               });
           }
-        });
+        }); 
       });
       
       //delete template
