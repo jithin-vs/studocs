@@ -463,7 +463,14 @@ app.get('/hod/:name', isAuth, (req, res) => {
               var addr=results[0].address
               var email=results[0].email;
               var photo=results[0].photo;
-              res.render('student',{name,admno,regno,dept,phno,addr,email,photo})
+              db.connection.query('SELECT * FROM attachment', function (error, results1) {
+                if (error) {
+                  console.error('Error retrieving attachments from the database');
+                }
+               else{
+               
+              res.render('student',{name,admno,regno,dept,phno,addr,email,photo,attachments: results1})}
+            });
            }
          }); 
         }catch(err)
@@ -1066,13 +1073,15 @@ app.get('/hod/:name', isAuth, (req, res) => {
      //SAVING TEMPLATEFORMS
      app.post('/save-template',(req,res)=>{   
       var name=req.query.name; 
+      const selectedOption = req.body.selectedOption;
+      console.log(selectedOption);
       //console.log(name);
       var collegeid=req.query.id; 
       console.log(name);
       var divContent = req.body.content; 
      //  console.log(divContent);
-       db.connection.query("insert into forms(name,collegeid,formdata)values(?,?,?)",
-         [name,collegeid,divContent],(err,results,fields)=>{
+       db.connection.query("insert into forms(name,collegeid,formdata,dest)values(?,?,?,?)",
+         [name,collegeid,divContent,selectedOption],(err,results,fields)=>{
           if(err) {
             throw err; 
           } else{
@@ -1507,10 +1516,117 @@ app.get('/hod/:name', isAuth, (req, res) => {
             throw err; 
           } else {
             const templateContent = results.length > 0 ? results[0].formdata : ''; // Get the template content or set it as an empty string if not found
-            res.render('newform', { formid, templateContent: templateContent,id });
+            res.render('newform', { formid, templateContent: temp
+        });
+      }
+    }); 
+  });
+      
+      //upload student attachment 
+      const otpGenerator = require('otp-generator');
+      
+      function generateUniqueID() {
+        return new Promise((resolve, reject) => {
+          const uniqueID = otpGenerator.generate(6, { digits: true, alphabets: false, upperCase: false, specialChars: false });
+          // Check if the generated ID is already present in the database
+          const sql = 'SELECT attaid FROM attachment WHERE attaid = ?';
+          db.connection.query(sql, [uniqueID], function (error, results) {
+            if (error) {
+              console.error('Error checking uniqueness of attaid');
+              reject(error);
+            }
+            if (results.length === 0) {
+              resolve(uniqueID); // Return the unique ID if it is not present in the database
+            } else {
+              resolve(generateUniqueID()); // Generate a new unique ID recursively if it is already present
+            }
+          });
+        });
+      }
+      
+      app.post('/upload/:name', (req, res) => {
+        const { attaname } = req.body;
+        const name = req.params.name;
+        let collegeid, regno;
+      
+        db.connection.query("SELECT * FROM student WHERE id = ?", [name], (err, results1, fields) => {
+          if (err) {
+            throw err;
+          } else {
+            collegeid = results1[0].collegeid;
+            regno = results1[0].id;
+      
+            generateUniqueID()
+              .then(attaid => {
+                console.log(attaid);
+                console.log(regno);
+                console.log(collegeid);
+                const uploadedFile = req.files.file; // Assuming the file input field name is "file"
+                const filePath = path.join('./public/uploads/student', regno.toString(), uploadedFile.name);
+                console.log(filePath);
+                const sql = 'INSERT INTO attachment (stdid, collegeid, attaid, attaname, file) VALUES (?, ?, ?, ?, ?)';
+                db.connection.query(sql, [regno, collegeid, attaid, attaname, filePath], function (error, results) {
+                  if (error) {
+                    console.error('Error saving attachment to the database');
+                  }
+                  var name=results1[0].name;
+                  var admno=results1[0].admno;
+                  var regno=results1[0].id; 
+                  var dept=results1[0].department;
+                  var phno=results1[0].phno;  
+                  var addr=results1[0].address
+                  var email=results1[0].email;
+                  var photo=results1[0].photo;
+                  db.connection.query('SELECT * FROM attachment', function (error, results2) {
+                    if (error) {
+                      console.error('Error retrieving attachments from the database');
+                    }
+                   else{
+                   
+                  res.render('student',{name,admno,regno,dept,phno,addr,email,photo,attachments: results2})}
+                });
+                });
+              })
+              .catch(error => {
+                console.error('Error generating unique ID', error);
+                res.status(500).send('Internal Server Error');
+              });
           }
-        });;
+        }); 
       });
+      
+      //delete template
+      app.get('/delete', (req, res) => {
+        const templateName = req.query.name;
+      
+        // Delete the corresponding records in the `requests` table first
+        const deleteRequestsQuery = 'DELETE FROM requests WHERE formid IN (SELECT formid FROM forms WHERE name = ?)';
+      
+        db.connection.query(deleteRequestsQuery, [templateName], (err, result) => {
+          if (err) {
+            console.error('Error deleting requests: ', err);
+            res.sendStatus(500);
+            return;
+          }
+      
+          // Delete the template from the `forms` table
+          const deleteFormQuery = 'DELETE FROM forms WHERE name = ?';
+      
+          db.connection.query(deleteFormQuery, [templateName], (err, result) => {
+            if (err) {
+              console.error('Error deleting template: ', err);
+              res.sendStatus(500);
+            } else {
+              console.log('Template deleted successfully');
+              
+              // Render the page with the `id` parameter
+              const id = req.query.id;
+              res.redirect(`/addtemplate?id=${id}`);
+            } 
+          });
+        });
+      });
+      
       
 
     
