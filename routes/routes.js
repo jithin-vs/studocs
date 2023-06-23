@@ -858,12 +858,16 @@ app.get('/hod/:name', isAuth, (req, res) => {
 
                 idExists = checkResult[0].count > 0;
               }
-        var dest=query2Result[0].dest;
-        cpnsole.log('dest=\t'+dest);
+
+        var dest = query2Result[0].dest || 'principal';
+        console.log('dest=\t'+dest);
         var final='final';
+        var pending='pending';
         // Insert the values into the "requests" table
-        const insertQuery = `INSERT INTO requests (collegeId, stdid, formid, appid,date,dept,request_data,formname,${dest}) VALUES (?,?,?,?,NOW(),?,?,?,?)`;
-        const insertValues = query2Result.map(row => [row.collegeId, row.studentId, row.formId, uniqueId, row.dept, content, row.formname,final]);
+        const insertQuery = `INSERT INTO requests 
+                             (collegeId, stdid, formid, appid,date,dept,request_data,formname,${dest},tutor)
+                             VALUES (?,?,?,?,NOW(),?,?,?,?,?)`;
+        const insertValues = query2Result.map(row => [row.collegeId, row.studentId, row.formId, uniqueId, row.dept, content, row.formname,final,pending]);
         const flattenedValues = insertValues.flat(); // Flatten the nested arrays
         await query(insertQuery, flattenedValues);
 
@@ -1092,6 +1096,52 @@ app.get('/hod/:name', isAuth, (req, res) => {
         }
       });;
      });
+
+     //VERIFY FORM BY ADMINISTRATORS
+     app.get('/verify-form',async(req,res)=>{ 
+        var appid=req.query.appdid;
+        var user=req.query.user;
+        var nextUser;
+        switch (user.toLowerCase()) {
+          case 'tutor'    : nextUser = 'hod' ;       break;
+          case 'hod'      : nextUser = 'principal' ; break;
+          case 'principal':nextUser = 'office' ;     break;
+        }  
+       // Check the flag column value before executing the update query
+          const checkQuery = `SELECT ${user} FROM tableName WHERE appid = ?`;
+
+          try {
+            const checkResult = await query(checkQuery, [appid]);
+
+              if (checkResult.length > 0 && checkResult[0].flagColumn === 'final') {
+                console.log('Flag is not true. Print from path ended.');
+                const updateQuery = `UPDATE tableName SET ${user} = 'completed' WHERE appid = ?`;
+                try {
+                  const updateResult = await query(updateQuery, [appid]);
+                  // Process the update result
+                  console.log('Update successful');
+                } catch (error) {
+                  // Handle the error
+                  console.error('Error occurred during update:', error);
+                }
+              } else {
+                const updateQuery = `UPDATE tableName SET ${user} = 'verified' WHERE appid = ?`;
+
+                try {
+                  const updateResult = await query(updateQuery, [appid]);
+                  // Process the update result
+                  console.log('Update successful');
+                } catch (error) {
+                  // Handle the error
+                  console.error('Error occurred during update:', error);
+                }
+              }
+          } catch (error) {
+            // Handle the error
+            console.error('Error occurred during flag check:', error);
+          }
+
+     })
  
 /*----------- other control routes -------------*/
 
@@ -1462,28 +1512,8 @@ app.get('/hod/:name', isAuth, (req, res) => {
         });;
       });
       
-      /* app.get('/verify',(req,res)=>{ 
-          
-      var token = verify.generateVerificationToken();
-           
-        db.connection.query("select email,token from verification where user=? and email=?",[user,email],(err,results,fields)=>{
-          if(err) {
-            res.send('server error');
-            throw err;
-                 
-          }
-          else{
-            var vertoken =results[0].token;
-            if(vertoken==token){
-                   res.render('email-verified');
-            }
-            else{
-               res.send('email not verified');
-            }
-          }
-         });
-      })
-    */
+
+    
 }  
 
 module.exports = routes;
