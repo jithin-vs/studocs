@@ -702,7 +702,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
         async function getData() {
           try {
             const hodQueryResult = await new Promise((resolve, reject) => {
-              db.connection.query("SELECT collegeid FROM tutor WHERE id=?", [tutorid], (err, results, fields) => {
+              db.connection.query("SELECT collegeid,batch,department FROM tutor WHERE id=?", [tutorid], (err, results, fields) => {
                 if (err) {
                   reject(err);
                 } else {
@@ -713,11 +713,13 @@ app.get('/hod/:name', isAuth, (req, res) => {
             });
         
             Collegeid = hodQueryResult[0].collegeid;
+            var batch = hodQueryResult[0].batch;
+            var department = hodQueryResult[0].department;
             console.log(Collegeid); // Output the updated Collegeid value here
             var genPassword=verify.randomPassword;
             mail.sendcredEmail(name,email,id,genPassword);
             const studentsQueryResult = await new Promise((resolve, reject) => {  
-              db.connection.query("insert into student (name,id,collegeid,email,password) values(?,?,?,?,?)", [name,id,Collegeid,email,genPassword], (err, results, fields) => {
+              db.connection.query("insert into student (name,id,collegeid,email,password,batch,department) values(?,?,?,?,?,?,?)", [name,id,Collegeid,email,genPassword,batch,department], (err, results, fields) => {
                 if (err) {
                   reject(err);
                 } else {
@@ -914,7 +916,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
         const query2 = `SELECT 
               student.name AS name, student.id AS studentId, requests.formname AS formname,
               requests.appid AS appid, student.batch AS batch, student.department AS dept, requests.date AS date 
-              FROM student JOIN requests ON student.collegeid = requests.collegeid AND student.collegeid = ? AND student.department=? AND student.batch=? AND requests.tutor IN(?,?)`;
+              FROM student JOIN requests ON student.collegeid = requests.collegeid AND student.collegeid = ?  AND student.id=requests.stdid AND student.department=? AND student.batch=? AND requests.tutor IN(?,?)`;
         const query2Result = await query(query2, [collegeid,dept,batch,checkVal1,checkVal2]);
         //console.log(query2Result);
         res.render('verified-requests',{id:req.query.id,applications:query2Result});
@@ -930,7 +932,11 @@ app.get('/hod/:name', isAuth, (req, res) => {
         var checkVal1='verified';
         var checkVal2='complted';
         console.log('cid='+collegeid+',dept='+dept+'status='+pending)
-        const query2 = 'SELECT student.collegeid AS collegeId, student.id AS studentId,requests.formname AS formname,requests.appid AS appid, student.batch AS batch, student.department AS dept ,requests.date AS date FROM student JOIN requests ON student.collegeid = requests.collegeid AND student.collegeid =? AND student.department=? AND requests.hod IN(?,?)';
+        const query2 = `SELECT
+              student.collegeid AS collegeId, student.id AS studentId,requests.formname AS formname,
+              requests.appid AS appid, student.batch AS batch, student.department AS dept ,requests.date AS date 
+              FROM student JOIN requests ON student.collegeid = requests.collegeid  AND 
+              student.id=requests.stdid AND student.collegeid =?  AND student.id=requests.stdid  AND student.department=? AND requests.hod IN(?,?)`;
         const query2Result = await query(query2, [collegeid,dept,checkVal1,checkVal2]);
         console.log(query2Result);
         res.render('pending-requests',{id:req.query.id,applications:query2Result});
