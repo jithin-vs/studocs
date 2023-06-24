@@ -1737,7 +1737,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
             console.error(error);
           }
           console.log(query);
-          res.redirect(`/student/${Id}`);
+          res.redirect(`/student/${Id}#docs`);
         });
       }); 
       //delete template
