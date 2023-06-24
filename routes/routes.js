@@ -1087,25 +1087,74 @@ app.get('/hod/:name', isAuth, (req, res) => {
         
       });
       
-      //STATUS DISPLAY
+      //STATUS table  DISPLAY
       app.get('/status/:name',isAuth,async(req,res)=>{
+        var active1=" ",active2=" ",active3=" ",active4=" ";
         try{
           db.connection.query("select * from requests  join student on requests.stdid=student.id and student.id=? ",
         [req.params.name],(err,results,fields)=>{
-        if(err) {
+        if(err) { 
           throw err; 
         } 
         else{
           
-          const applications =results; // Empty array, can be populated later if needed
-          res.render('status',{ applications });
+          const applications =results;
+          active1 = "";
+         active2 = "";
+          active3 = "";
+          active4 = "";
+          
+          // Empty array, can be populated later if needed
+          res.render('status',{ applications,active1,active2,active3,active4 });
         }
         }); 
         }catch(err){
           console.log(err); 
         }
 
-    })
+    });
+    //ststus
+    app.post('/fetch-request-data', (req, res) => {
+      const { appid } = req.body;
+   
+          db.connection.query("SELECT * FROM requests WHERE appid = ?", [appid], (err, results, fields) => {
+        if (err) {
+          console.error(err);
+          return res.status(500).send('Error occurred while fetching request data.');
+        } else {
+          const requestData = results[0].request_data;
+          let active1 = '';
+  let active2 = '';
+  let active3 = '';
+  let active4 = '';
+
+  if (results[0].tutor === 'verified') {
+    active1 = 'active';
+  } 
+   if (results[0].hod === 'verified') {
+    active2 = 'active';
+  } 
+   if (results[0].principal === 'verified') {
+    active3 = 'active';
+  } 
+   if (results[0].office === 'verified') {
+    active4 = 'active';
+  }
+    const responseData = {
+      active1: active1, 
+      active2: active2,
+      active3: active3,
+      active4: active4
+    };
+  
+          console.log(responseData);
+        
+          res.send({ requestData: requestData, responseData: responseData });
+        }
+      });
+    });
+    
+    
 
     //REQUEST DISPLAY
     app.get('/form/:selectedFormId',isAuth, (req, res) => {
