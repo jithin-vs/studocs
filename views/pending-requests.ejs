@@ -87,7 +87,7 @@
               <tr>
                 <td data-toggle="mod" data-target="#myMod"><%= application.appid %></td>
                 <td data-toggle="moda" data-target="#myModa"><%= application.formname %></td>
-                <td data-toggle="moda" data-target="#myM"><%= application.studentid %></td>
+                <td data-toggle="moda" data-target="#myM"><%= application.name %></td>
                 <td data-toggle="moda" data-target="#myModa"><%= application.batch %></td>
                 <td data-toggle="moda" data-target="#myModa"><%= application.dept %></td>
                 <% const dateFromDatabase = application.date %>
@@ -123,7 +123,7 @@
             <div id="textAreaWindow">
                 <span id="closeButton">&#10006;</span>
                 <textarea id="myTextArea"  rows="3" style="resize: none; border-radius: 5px;" placeholder="Remarks"></textarea>
-                <button id="button1" data-target="#myModa" data-toggle="modal">Verify</button>
+                <button id="button1" data-target="#myModa" data-toggle="modal" onclick="redirectToVerifyForm()">Verify</button>
             </div>
         </div>
         <button class="btn btn-secondary scc" style="background-color: blue;" id="button2" disabled>Forward</button>
@@ -288,6 +288,11 @@ console.log(selectedFormId)
         // Hide the text area container
         textAreaContainer1.style.display = 'none';
         });
+
+        function redirectToVerifyForm() {
+            const url = `/verify-form?appid=${selectedFormId}&id=<%= id %>&user=tutor`;
+            window.location.href = url;
+          }
     </script>
    </body>
 </html>
