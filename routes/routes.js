@@ -998,7 +998,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
       console.log(query1Result)
       var collegeid=query1Result[0].collegeid;
       var dept=query1Result[0].department;
-      var batch=query1Result[0].batch;
+      var batch=query1Result[0].batch;  
       const pending='pending';
       //console.log('cid='+collegeid+',dept='+dept+',batch='+batch+',status='+pending)
       const query2 = `SELECT 

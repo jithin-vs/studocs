@@ -207,6 +207,8 @@ body {
     padding: 20px;
     border-radius: 5px;
     margin-bottom: 20px;
+    height: 400px;
+    overflow-y: auto;
 }
 
 .card {
