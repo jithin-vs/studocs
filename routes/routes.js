@@ -468,7 +468,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
                   console.error('Error retrieving attachments from the database');
                 }
                else{
-               
+               console.log(results1);
               res.render('student',{name,admno,regno,dept,phno,addr,email,photo,attachments: results1})}
             });
            }
@@ -1014,7 +1014,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
         else{
           
           const applications =results; // Empty array, can be populated later if needed
-          res.render('status',{ divContent, applications });
+          res.render('status',{ applications });
         }
         }); 
         }catch(err){
@@ -1569,7 +1569,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
                   db.connection.query(sql, [regno, collegeid, attaid, attaname, filePath], function (error, results) {
                     if (error) {
                       console.error('Error saving attachment to the database');
-                      res.status(500).send('Internal Server Error');
+                      res.status(500).send('Internal Server Error'+error);
                     } else {
                       var name = results1[0].name;
                       var admno = results1[0].admno;
@@ -1601,11 +1601,25 @@ app.get('/hod/:name', isAuth, (req, res) => {
               console.error('Error generating unique ID', error);
               res.status(500).send('Internal Server Error');
             });
-          
+           
           }
         }); 
       });
-      
+      app.post('/remove', function (req, res) {
+        const attachmentId = req.body.attachmentId;
+        const Id = req.query.regno;
+        console.log(attachmentId);
+        console.log(Id);
+        const sql = 'DELETE FROM attachment WHERE attaid = ?';
+        db.connection.query(sql, [attachmentId], function (error, results) {
+          if (error) {
+            console.error('Error removing attachment from the database',attachmentId);
+            console.error(error);
+          }
+          console.log(query);
+          res.redirect(`/student/${Id}`);
+        });
+      }); 
       //delete template
       app.get('/delete', (req, res) => {
         const templateName = req.query.name;
@@ -1638,7 +1652,131 @@ app.get('/hod/:name', isAuth, (req, res) => {
         });
       });
       
-      
+      app.get('/psw-reset', (req, res) => {
+        res.render('forget');
+      })
+     
+      app.post('/delete', (req, res) => {
+          const { user, username } = req.session.resetPasswordData;
+          const newPassword = req.body.newPassword;
+          
+          // Update the password based on the user type
+          switch (user) {
+            case 'college':
+              // Update the college password in the database
+              db.connection.query(
+                'UPDATE college SET password = ? WHERE collegeid = ?',
+                [newPassword, username],
+                (err, results) => {
+                  if (err) {
+                    console.error(err);
+                    return res.send('Server error');
+                  }
+                  
+                  // Password updated successfully
+                  res.send('Password reset successfully!');
+                }
+              );
+              break;
+              
+            case 'Student':
+              // Update the student password in the database
+              db.connection.query(
+                'UPDATE Student SET password = ? WHERE id = ?',
+                [newPassword, username],
+                (err, results) => {
+                  if (err) {
+                    console.error(err);
+                    return res.send('Server error');
+                  }
+                  
+                  // Password updated successfully
+                  res.send('Password reset successfully!');
+                }
+              );
+              break;
+              
+            case 'Tutor':
+              // Update the tutor password in the database
+              db.connection.query(
+                'UPDATE Tutor SET password = ? WHERE id = ?',
+                [newPassword, username],
+                (err, results) => {
+                  if (err) {
+                    console.error(err);
+                    return res.send('Server error');
+                  }
+                  
+                  // Password updated successfully
+                  res.send('Password reset successfully!');
+                }
+              );
+              break;
+              
+            case 'Hod':
+              // Update the HOD password in the database
+              db.connection.query(
+                'UPDATE Hod SET password = ? WHERE id = ?',
+                [newPassword, username],
+                (err, results) => {
+                  if (err) {
+                    console.error(err);
+                    return res.send('Server error');
+                  }
+                  
+                  // Password updated successfully
+                  res.send('Password reset successfully!');
+                }
+              );
+              break;
+              
+            case 'Principal':
+              // Update the principal password in the database
+              db.connection.query(
+                'UPDATE Principal SET password = ? WHERE id = ?',
+                [newPassword, username],
+                (err, results) => {
+                  if (err) {
+                    console.error(err);
+                    return res.send('Server error');
+                  }
+                  
+                  // Password updated successfully
+                  res.send('Password reset successfully!');
+                }
+              );
+              break;
+              
+            default:
+              res.send('Invalid user type');
+          }
+        });
+        
+
+
+        //downmload pdf
+        const path = require('path');
+
+        app.get('/download', (req, res) => {
+          const filePath = req.query.file; // Get the file path from the query parameter
+        
+          // Check if the file exists
+          if (!filePath) {
+            return res.status(404).send('File not found.');
+          }
+        
+          // Resolve the absolute file path
+          const absolutePath = path.join(__dirname, '..', 'public', filePath);
+        
+          // Set the appropriate headers
+          res.setHeader('Content-Type', 'application/pdf');
+          res.setHeader('Content-Disposition', 'inline'); // Open file in browser tab
+        
+          // Send the file as the response
+          res.sendFile(absolutePath);
+        });
+        
+         
 
     
 }  
