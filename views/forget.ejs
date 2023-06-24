@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>Login - STUDOCS</title>
+  <title>password reset - STUDOCS</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
 
@@ -66,7 +66,8 @@
 
         <ol>
           <li><a href="/home">Home</a></li>
-          <li>LOGIN</li>
+          <li><a href="/inner-page"></a>LOGIN</li>
+          <li>PASSWORD RESET</li>
         </ol>
       </div>
     </section><!-- End Breadcrumbs -->
@@ -87,7 +88,7 @@
                   class="img-fluid" alt="Sample image">
               </div>
               <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
-                <form action="/inner-page" method="POST"> 
+                <form action="/psw-reset" method="POST"> 
                   <div id="dropdown">
                     Login As
                     <br>
@@ -103,34 +104,21 @@
                   <br>    
                   <!-- Email input -->
                   <div class="form-outline mb-4">
-                    <input type="text" id="form3Example3" class="form-control form-control-lg"
-                      placeholder="Enter username"  name="username"/>
-                    <label class="form-label" for="form3Example3">Username</label>
+                    <label class="form-label" for="form3Example3">Email</label>
+                    <input type="email" id="form3Example3" class="form-control form-control-lg"
+                      placeholder="Enter Your Email"  name="Email" required/>
                   </div>
         
                   <!-- Password input -->
-                  <div class="form-outline mb-3">
-                    <input type="password" id="form3Example4" class="form-control form-control-lg"
-                      placeholder="Enter password" name="password"  />
-                    <label class="form-label" for="form3Example4">Password</label>
+                  <div class="form-outline mb-4">
+                    <label class="form-label" for="form3Example4">Username</label>
+                    <input type="username" id="form3Example4" class="form-control form-control-lg"
+                      placeholder="Enter Username" name="username" required />
                   </div>
-        
-                  <div class="d-flex justify-content-between align-items-center">
-                    <!-- Checkbox -->
-                    <div class="form-check mb-0">
-                      <input class="form-check-input me-2" type="checkbox" value="" id="form2Example3" />
-                      <label class="form-check-label" for="form2Example3">
-                        Remember me
-                      </label>
-                    </div>
-                    <a href="/psw-reset" class="text-body">Forgot password?</a>
-                  </div>
-        
-                  <div class="text-center text-lg-start mt-4 pt-2">
+                  <div class="text-center text-lg-start mb-4 pt-2">
                     <button type="submit" class="btn btn-primary btn-lg"
-                      style="padding-left: 2.5rem; padding-right: 2.5rem;">Login</button>
+                      style="padding-left: 2.5rem; padding-right: 2.5rem;">Reset Password</button>
                   </div>
-        
                 </form>
               </div>
             </div>
