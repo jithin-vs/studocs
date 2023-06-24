@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en">  
+<html lang="en"> 
+    
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -176,7 +177,35 @@
 		</div>
 	</div>
     <br><br>
+    <script>
+        function confirmDelete(id) {
+    if (confirm("Are you sure you want to delete this entry?")) {
+      deleteEntry(id);
+    }
+  }
+  
+  function deleteEntry(id) {
+    fetch(`/deleteuser?id=${id}&user=student`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+    })
+    .then(response => {
+      if (response.ok) {
+        // Refresh the page without changing the URL
+        window.location.reload(false);
+      } else {
+        alert('Server error occurred. Entry could not be deleted.');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('An error occurred. Entry could not be deleted.');
+    });
+  }
+    </script> 
 
-    <script src src="/js/add.js"></script>    
+    
 </body>
 </html>
