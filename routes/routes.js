@@ -994,10 +994,10 @@ app.get('/hod/:name', isAuth, (req, res) => {
           db.connection.query("select * from requests  join student on requests.stdid=student.id and student.id=? ",
         [req.params.name],(err,results,fields)=>{
         if(err) {
-          throw err; 
+          throw err;  
         } 
         else{
-          
+          var divContent=null;
           const applications =results; // Empty array, can be populated later if needed
           res.render('status',{ divContent, applications });
         }
@@ -1217,10 +1217,12 @@ app.get('/hod/:name', isAuth, (req, res) => {
       app.post('/deleteuser', encoder, (req, res) => { 
         var id = req.query.id; 
         var user = req.query.user;
-        var returnid=req.query.returnid;;
+        var returnid=req.query.returnid;
+        console.log('user'+user);
+        console.log('hererdfxf'); 
         db.connection.query("DELETE FROM ?? WHERE id = ?", [req.query.user, req.query.id], (err, results, fields) => {
           if (err) {
-            res.send('server error');  
+            res.send('server error');    
             throw err;
           } else {
             if (user === 'student')
