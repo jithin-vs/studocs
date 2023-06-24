@@ -51,9 +51,12 @@
               <tbody>
               <% applications.forEach(function(application) { %>
                   <tr>
-                    <td data-toggle="mod" data-target="#myMod"><%= application.form_id %></td>
+                    <td data-toggle="mod" data-target="#myMod"><%= application.studentId %></td>
                     <td data-toggle="moda" data-target="#myModa"><%= application.name %></td>
-                    <td data-toggle="mo" data-target="#myMo"><%= application.date %></td>
+                    <% const dateFromDatabase = application.date %>
+                    <% const options = { day: '2-digit', month: '2-digit', year: 'numeric' }; %>
+                    <% const formattedDate = dateFromDatabase ? dateFromDatabase.toLocaleDateString(undefined, options) : null; %>
+                    <td data-toggle="mo" data-target="#myMo"><%= formattedDate %></td>
                     <td>
                       <button type="button" class="btn btn-success" data-toggle="dwd" data-target="#dwd">download</button>
                     </td>
