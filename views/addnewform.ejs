@@ -152,6 +152,7 @@ function sendDivContent() {
       paramPairs.forEach(pair => {
         const [key, value] = pair.split('=');
         params[key] = decodeURIComponent(value);
+        console.log(params);
       });
     }
 
