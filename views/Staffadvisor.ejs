@@ -104,10 +104,10 @@
       <h3>SERVICES</h3><br>
       <div class="row">
         <div class="col-sm-12 col-md-4">
-          <input type="button" class="button1 btn-block" onclick="window.location.href='/pending-requests?id=<%= tutorData.id%>'" value="PENDING REQUESTS">&nbsp;&nbsp;
+          <input type="button" class="button1 btn-block" onclick="window.location.href='/tutor-pending-requests?id=<%= tutorData.id%>&user=tutor'" value="PENDING REQUESTS">&nbsp;&nbsp;
         </div>
         <div class="col-sm-12 col-md-4">
-          <input type="button" class="button1 btn-block" onclick="window.location.href='/teacher_verified_requests'" value="PROCESSED REQUESTS">&nbsp;&nbsp;
+          <input type="button" class="button1 btn-block" onclick="window.location.href='/tutor-verified-requests?id=<%= tutorData.id%>'" value="PROCESSED REQUESTS">&nbsp;&nbsp;
         </div>
         <div class="col-sm-12 col-md-4">
           <input type="button" class="button1 btn-block" onclick="window.location.href='/studentadd?id=<%= tutorData.id%>'" value="STUDENTS">&nbsp;&nbsp;

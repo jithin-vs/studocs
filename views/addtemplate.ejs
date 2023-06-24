@@ -14,6 +14,27 @@
   <link rel="stylesheet" href="./css/addtemp.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
   <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'>
+  <style>
+    .card {
+      position: relative;
+    }
+  
+    .delete-icon {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      padding: 5px;
+      cursor: pointer;
+      color: red;
+      transition: color 0.3s ease-in-out;
+    }
+  
+    .delete-icon:hover {
+      color: darkred;
+    }
+  </style>
+  
+  
 </head>
 <body>
       <nav class="navbar navbar-expand-sm navbar-dark">
@@ -45,7 +66,6 @@
           <!-- Existing template cards will be dynamically added here -->
         </div>
       </div>
-    
       <script>
         document.addEventListener('DOMContentLoaded', function() {
           const cardContainer = document.getElementById('cardContainer');
@@ -67,16 +87,28 @@
           function createCard(template) {
             const card = document.createElement('div');
             card.classList.add('card');
-            card.onclick = function() {
+            card.addEventListener('dblclick', function() {
               // Redirect to the "template-display" page with the template name as a query parameter
               window.location.href = '/addnewform?name=' + encodeURIComponent(template) + '&id=<%=id%>';
-            };
+            });
       
             const nameSpan = document.createElement('span');
             nameSpan.classList.add('name');
             nameSpan.textContent = template;
       
             card.appendChild(nameSpan);
+      
+            if (!card.classList.contains('new-card')) {
+              const deleteIcon = document.createElement('span');
+              deleteIcon.classList.add('delete-icon');
+              deleteIcon.innerHTML = '<i class="fas fa-trash"></i>';
+              deleteIcon.addEventListener('click', function(event) {
+                event.stopPropagation();
+                deleteCard(template);
+              });
+              card.appendChild(deleteIcon);
+            }
+      
             cardContainer.insertBefore(card, document.getElementById('newCard'));
           }
       
@@ -89,14 +121,17 @@
               }
             };
           }
+      
+          function deleteCard(template) {
+            // Redirect to the "delete" page with the template name as a query parameter
+            window.location.href = '/delete?name=' + encodeURIComponent(template)+ '&id=<%=id%>';
+          }
+      
         });
       </script>
       
-      
 
-
-
-  <div class="modal fade" id="myModal">
+  <div class="modal fade" id="myModal">  
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<!-- Modal Header -->

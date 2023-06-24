@@ -388,7 +388,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
 
           const applications = [];
           const user='hod';
-          res.render('hod', { Photo, tutorData, applications,user });
+          res.render('hod', {Photo, tutorData, applications,user });
         })
         .catch((err) => {
           console.log(err);
@@ -454,7 +454,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
              
            }
            else{
-              console.log(results);
+             // console.log(results);
               var name=results[0].name;
               var admno=results[0].admno;
               var regno=results[0].id; 
@@ -463,7 +463,14 @@ app.get('/hod/:name', isAuth, (req, res) => {
               var addr=results[0].address
               var email=results[0].email;
               var photo=results[0].photo;
-              res.render('student',{name,admno,regno,dept,phno,addr,email,photo})
+              db.connection.query('SELECT * FROM attachment', function (error, results1) {
+                if (error) {
+                  console.error('Error retrieving attachments from the database');
+                }
+               else{
+               console.log(results1);
+              res.render('student',{name,admno,regno,dept,phno,addr,email,photo,attachments: results1})}
+            });
            }
          }); 
         }catch(err)
@@ -481,70 +488,58 @@ app.get('/hod/:name', isAuth, (req, res) => {
     
     //Office
 
-     app.get('/college/:name',isAuth,(req, res) => {
+     app.get('/college/:name',isAuth,async(req, res) => {
+      var username=req.params.name;    
       if(req.session.user){
-        try {
-          const query1 = new Promise((resolve, reject) => {
-            db.connection.query("select * from requests", (err, results, fields) => {
-              if (err) {
-                reject(err);
+        if (req.session.user) {
+          try {
+            const query1 = `SELECT 
+                              student.name AS name, student.id AS studentId, requests.formname AS formname,
+                              requests.appid AS appid, student.batch AS batch, student.department AS dept, requests.date AS date 
+                              FROM student JOIN requests ON student.collegeid = requests.collegeid AND student.collegeid = ?`;
+            const query1Result = await query(query1, [username]);
+           console.log(query1Result);
+            const selectQuery = "SELECT * FROM college WHERE collegeid = ?";
+        
+            try {
+              const results = await query(selectQuery, [username]);
+        
+              if (results.length > 0) {
+                const { collegename, collegeid, phno, address, email, collegeimage, website } = results[0];
+        
+                const imagePath = path.relative('public', collegeimage);
+        
+                const collegeData = {
+                  Name: collegename || 'N/A',
+                  Id: collegeid || 'N/A',
+                  Phno: phno || 'N/A',
+                  Addr: address || 'N/A',
+                  Email: email || 'N/A',
+                  Photo: imagePath || 'N/A',
+                  Website: website || 'N/A'
+                };
+        
+                console.log(collegeData);
+        
+                // Render the 'college' template and pass the query results and collegeData
+                res.render('college', { applications: query1Result, collegeData });
               } else {
-                resolve(results);
+                // Handle case when no college is found for the given username
+                console.log('No college found for the given username');
+                res.render('college', { applications: query1Result, collegeData: null });
               }
-            }); 
-          });
-         
-          const query2 = new Promise((resolve, reject) => {
-            var username=req.params.name;
-            console.log(username);
-            db.connection.query("select * from college where collegeid=?",[username],(err,results,fields)=>{
-            if(err) {
-                        reject(err);      
-              }
-              else{     
-                console.log(results);
-                const { collegename, collegeid, phno, address, email, collegeimage,website } = results[0];
-
-                var data = { Name: collegename, Id: collegeid, Phno: phno, Addr: address, Email: email, Photo: collegeimage, Website:website};
-                const imagePath = path.relative('public', data.Photo);
-                // Check and handle the undefined values
-                  const name1 = data.Name || 'N/A';
-                  const id1 = data.Id || 'N/A';   
-                  const phno1 = data.Phno || 'N/A';
-                  const addr1 = data.Addr || 'N/A';  
-                  const email1 = data.Email || 'N/A';
-                  const photo1 = imagePath|| 'N/A';
-                  const website1 = data.Website || 'N/A';
-
-                  // Now you can use these variables in your code
-                  console.log(name1); 
-                  console.log(id1);
-                  console.log(phno1);
-                  console.log(addr1);
-                  console.log(email1);
-                  console.log(photo1);
-                  console.log(website1);
-                   data = { Name: name1, Id: id1, Phno: phno1, Addr: addr1, Email: email1, Photo: photo1, Website:website1};
-
-                resolve(data);
-                
-              }
-            }); 
-
-          });
-          Promise.all([query1, query2])
-          .then(([requests, collegeData]) => {
-            //console.log(tutorData.Photo);
-            console.log(collegeData);
-            res.render('college', { applications:requests,collegeData });
-          })
-          .catch((err) => { 
-            console.log(err);
-            res.send('server error');
-          });
-        }catch(err){
-            console.log(err); 
+            } catch (error) {
+              // Handle the error
+              console.error('Error occurred during college retrieval:', error);
+              res.render('college', { applications: query1Result, collegeData: null });
+            }
+          } catch (error) {
+            // Handle the error
+            console.error('Error occurred during query execution:', error);
+            res.render('college', { applications: null, collegeData: null });
+          }
         }
+        
       }else{
         res.send('unauthorized user');
       }
@@ -680,7 +675,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
 
  
       //student add  
-          app.get('/studentadd',isAuth,(req,res)=>{
+     app.get('/studentadd',isAuth,(req,res)=>{
                   
             db.connection.query("select * from Student",
                 [req.body.name],(err,results,fields)=>{
@@ -700,14 +695,14 @@ app.get('/hod/:name', isAuth, (req, res) => {
               
           });
    
-         app.post('/studentadd',encoder,(req,res)=>{
+     app.post('/studentadd',encoder,(req,res)=>{
         var tutorid=req.query.id;
         var {name,id,email}=req.body;
         var Collegeid;
         async function getData() {
           try {
             const hodQueryResult = await new Promise((resolve, reject) => {
-              db.connection.query("SELECT collegeid FROM tutor WHERE id=?", [tutorid], (err, results, fields) => {
+              db.connection.query("SELECT collegeid,batch,department FROM tutor WHERE id=?", [tutorid], (err, results, fields) => {
                 if (err) {
                   reject(err);
                 } else {
@@ -718,11 +713,13 @@ app.get('/hod/:name', isAuth, (req, res) => {
             });
         
             Collegeid = hodQueryResult[0].collegeid;
+            var batch = hodQueryResult[0].batch;
+            var department = hodQueryResult[0].department;
             console.log(Collegeid); // Output the updated Collegeid value here
             var genPassword=verify.randomPassword;
             mail.sendcredEmail(name,email,id,genPassword);
             const studentsQueryResult = await new Promise((resolve, reject) => {  
-              db.connection.query("insert into student (name,id,collegeid,email,password) values(?,?,?,?,?)", [name,id,Collegeid,email,genPassword], (err, results, fields) => {
+              db.connection.query("insert into student (name,id,collegeid,email,password,batch,department) values(?,?,?,?,?,?,?)", [name,id,Collegeid,email,genPassword,batch,department], (err, results, fields) => {
                 if (err) {
                   reject(err);
                 } else {
@@ -741,7 +738,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
          });
 
     //principal add
-        app.get('/principaladd',isAuth,(req,res)=>{
+     app.get('/principaladd',isAuth,(req,res)=>{
            
              
           db.connection.query("select * from  principal",
@@ -759,7 +756,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
              
         });
         
-        app.post('/principaladd',encoder,(req,res)=>{ 
+     app.post('/principaladd',encoder,(req,res)=>{ 
 
           var {name,id,email}=req.body;
           
@@ -816,20 +813,31 @@ app.get('/hod/:name', isAuth, (req, res) => {
     const data = JSON.parse(jsonData); 
     const formid = data[0].formid; // Accessing the 'formid' property
     const stdid = data[0].id; 
-    const option=data[0].option;
     const content=data[0].content;
 
       console.log(stdid);
-      console.log(option);
       console.log(content);
       try {
-    
+         
         // Execute the first query with arguments
         const query1 = 'SELECT collegeid FROM student WHERE  id = ?';
         const query1Result = await query(query1, [stdid]);
     
         // Execute the second query with arguments
-        const query2 = 'SELECT student.collegeid AS collegeId, student.id AS studentId, forms.formid AS formId,student.batch AS batch ,student.department AS dept FROM student JOIN forms ON student.collegeid = forms.collegeid AND student.id = ? AND forms.formid=?';
+        const query2 = `
+              SELECT
+                student.collegeid AS collegeId,
+                student.id AS studentId,
+                forms.formid AS formId,
+                student.batch AS batch,
+                student.department AS dept,
+                forms.name AS formname,
+                forms.dest AS dest
+              FROM
+                student
+              JOIN
+                forms ON student.collegeid = forms.collegeid AND student.id = ? AND forms.formid = ?
+            `;      
         const query2Result = await query(query2, [stdid,formid]);
         if (query2Result.length === 0) {
           // Render a template not found message to the client
@@ -848,12 +856,16 @@ app.get('/hod/:name', isAuth, (req, res) => {
                 idExists = checkResult[0].count > 0;
               }
 
-
+        var dest = query2Result[0].dest || 'principal';
+        console.log('dest=\t'+dest);
+        var final='final';
+        var pending='pending';
         // Insert the values into the "requests" table
-        const insertQuery = 'INSERT INTO requests (collegeId, stdid, formid, appid,date,dept,dest,request_data) VALUES (?,?,?,?,NOW(),?,?,?)';
-        const insertValues = query2Result.map(row => [row.collegeId, row.studentId, row.formId, uniqueId,row.dept,option,content]);  
+        const insertQuery = `INSERT INTO requests 
+                             (collegeId, stdid, formid, appid,date,dept,request_data,formname,${dest},tutor,dest)
+                             VALUES (?,?,?,?,NOW(),?,?,?,?,?,?)`;
+        const insertValues = query2Result.map(row => [row.collegeId, row.studentId, row.formId, uniqueId, row.dept, content, row.formname,final,pending,row.dest]);
         const flattenedValues = insertValues.flat(); // Flatten the nested arrays
-        console.log(flattenedValues);
         await query(insertQuery, flattenedValues);
 
         // Render the webpage and pass the query results
@@ -865,8 +877,10 @@ app.get('/hod/:name', isAuth, (req, res) => {
       }
    });
 
+         /*-------------------- VERIFIED REQUESTS  --------------------*/
+
    // SENDING REQUEST ROUTE FOR STUDENTS 
-   app.get('/verified-requests/:id',isAuth,(req,res)=>{ 
+   app.get('/verified-requests',isAuth,(req,res)=>{ 
    try{
     const query1 = 'SELECT dest FROM requests WHERE  id = ?';
     //const query1Result = await query(query1, [req.params.id]);
@@ -887,65 +901,150 @@ app.get('/hod/:name', isAuth, (req, res) => {
   }  
    
    });
+
+   app.get('/tutor-verified-requests',isAuth,async(req,res)=>{ 
+      
+        const query1 = 'SELECT collegeid,batch,department FROM tutor WHERE  id = ?';
+        const query1Result = await query(query1, [req.query.id]);
+        console.log(query1Result)
+        var collegeid=query1Result[0].collegeid;
+        var dept=query1Result[0].department;
+        var batch=query1Result[0].batch;
+        var checkVal1='verified';
+        var checkVal2='complted';
+        //console.log('cid='+collegeid+',dept='+dept+',batch='+batch+',status='+pending)
+        const query2 = `SELECT 
+              student.name AS name, student.id AS studentId, requests.formname AS formname,
+              requests.appid AS appid, student.batch AS batch, student.department AS dept, requests.date AS date 
+              FROM student JOIN requests ON student.collegeid = requests.collegeid AND student.collegeid = ?  AND student.id=requests.stdid AND student.department=? AND student.batch=? AND requests.tutor IN(?,?)`;
+        const query2Result = await query(query2, [collegeid,dept,batch,checkVal1,checkVal2]);
+        //console.log(query2Result);
+        res.render('verified-requests',{id:req.query.id,applications:query2Result});
+    });
+
+   app.get('/hod-verified-requests',isAuth,async(req,res)=>{ 
+                
+        const query1 = 'SELECT collegeid,department FROM hod WHERE id = ?';
+        const query1Result = await query(query1, [req.query.id]);
+        
+        var collegeid=query1Result[0].collegeid;  
+        var dept=query1Result[0].department;   
+        var checkVal1='verified';
+        var checkVal2='complted';
+        console.log('cid='+collegeid+',dept='+dept+'status='+pending)
+        const query2 = `SELECT
+              student.collegeid AS collegeId, student.id AS studentId,requests.formname AS formname,
+              requests.appid AS appid, student.batch AS batch, student.department AS dept ,requests.date AS date 
+              FROM student JOIN requests ON student.collegeid = requests.collegeid  AND 
+              student.id=requests.stdid AND student.collegeid =?  AND student.id=requests.stdid  AND student.department=? AND requests.hod IN(?,?)`;
+        const query2Result = await query(query2, [collegeid,dept,checkVal1,checkVal2]);
+        console.log(query2Result);
+        res.render('pending-requests',{id:req.query.id,applications:query2Result});
+      });
+
+   app.get('/principal-verified-requests',isAuth,async(req,res)=>{ 
+      
+        const query1 = 'SELECT collegeid FROM principal WHERE id = ?';
+        const query1Result = await query(query1, [req.query.id]); 
+        var collegeid=query1Result[0].collegeid;
+        var checkVal1='verified';
+        var checkVal2='completed';
+        console.log(collegeid)
+        const query2 = `SELECT 
+        student.name AS name, student.id AS studentId, requests.formname AS formname,
+        requests.appid AS appid, student.batch AS batch, student.department AS dept, requests.date AS date 
+        FROM student JOIN requests ON student.collegeid = requests.collegeid AND student.collegeid = ? AND student.id=requests.stdid AND requests.principal IN (?,?)`;
+        const query2Result = await query(query2, [collegeid,checkVal1,checkVal2]);
+        console.log(query2Result);
+        res.render('verified-requests',{applications:query2Result});
+        
+        });
+
+   app.get('/office-verified-requests',isAuth,async(req,res)=>{ 
+            
+            var checkVal1='verified';
+            var checkVal2='complted';
+
+            const query1 = `SELECT 
+                    student.name AS name, student.id AS studentId, requests.formname AS formname,
+                    requests.appid AS appid, student.batch AS batch, student.department AS dept, requests.date AS date 
+                    FROM student JOIN requests ON student.collegeid = requests.collegeid AND student.collegeid = ?  AND student.id=requests.stdid AND  requests.office IN(?,?)`;
+            const query1Result = await query(query1, [req.query.id,checkVal1,checkVal2]);
+            console.log(query1Result);
+            res.render('verified-requests',{id:req.query.id,applications:query1Result}); 
+          
+          });
+
+       /*-------------------- PENDING REQUESTS  --------------------*/  
      
    // PENDING REQUEST ROUTE FOR ADMINS 
-   app.get('/pending-requests',isAuth,async(req,res)=>{         
+   app.get('/office-pending-requests',isAuth,async(req,res)=>{         
         
-    const query1 = 'SELECT collegeid FROM college WHERE  collegeid = ?';
-    const query1Result = await query(query1, [req.query.id]);
-     
-    var collegeid=query1Result.collegeid;
          
-    const query2 = 'SELECT student.collegeid AS collegeId, student.id AS studentId,requests.formname AS formname,requests.appid AS appid, student.batch AS batch, student.department AS dept ,requests.date AS date FROM student JOIN requests ON student.collegeid = requests.collegeid AND student.collegeid =? ';
-    const query2Result = await query(query2, ['98765432']);
-    console.log(query2Result);
-    res.render('pending-requests',{applications:query2Result});
+    const query1 = `SELECT 
+    student.name AS name, student.id AS studentId, requests.formname AS formname,
+    requests.appid AS appid, student.batch AS batch, student.department AS dept, requests.date AS date 
+    FROM student JOIN requests ON student.collegeid = requests.collegeid AND student.id=requests.stdid AND student.collegeid = ?`;
+    const query1Result = await query(query1, [req.query.id]);
+    console.log(query1Result);
+    res.render('pending-requests',{id:req.query.id,applications:query1Result}); 
     });
 
     //PENDING REQUESTS FOR TUTOR
-    app.get('/tutor-pending-requests',isAuth,async(req,res)=>{         
+   app.get('/tutor-pending-requests',isAuth,async(req,res)=>{         
         
-      const query1 = 'SELECT collegeid,batch,department FROM tutor WHERE  collegeid = ?';
+      const query1 = 'SELECT collegeid,batch,department FROM tutor WHERE  id = ?';
       const query1Result = await query(query1, [req.query.id]);
-       
-      var collegeid=query1Result.collegeid;
-      var dept=query1Result.department;
-      
-      const query2 = 'SELECT student.collegeid AS collegeId, student.id AS studentId,requests.formname AS formname,requests.appid AS appid, student.batch AS batch, student.department AS dept ,requests.date AS date FROM student JOIN requests ON student.collegeid = requests.collegeid AND student.collegeid =? AND student.department=? AND student.batch=? ';
-      const query2Result = await query(query2, ['collegeid']);
-      console.log(query2Result);
-      res.render('pending-requests',{applications:query2Result});
+      console.log(query1Result)
+      var collegeid=query1Result[0].collegeid;
+      var dept=query1Result[0].department;
+      var batch=query1Result[0].batch;
+      const pending='pending';
+      //console.log('cid='+collegeid+',dept='+dept+',batch='+batch+',status='+pending)
+      const query2 = `SELECT 
+            student.name AS name, student.id AS studentId, requests.formname AS formname,
+            requests.appid AS appid, student.batch AS batch, student.department AS dept, requests.date AS date 
+            FROM student JOIN requests ON student.collegeid = requests.collegeid AND student.collegeid = ? AND student.department=? AND student.batch=? AND requests.tutor=?`;
+      const query2Result = await query(query2, [collegeid,dept,batch,pending]);
+      //console.log(query2Result);
+      res.render('pending-requests',{id:req.query.id,applications:query2Result});
       });
 
       //PENDING REQUESTS FOR PRINCIPAL
-      app.get('/principal-pending-requests',isAuth,async(req,res)=>{         
+   app.get('/principal-pending-requests',isAuth,async(req,res)=>{         
         
         const query1 = 'SELECT collegeid FROM principal WHERE id = ?';
-        const query1Result = await query(query1, [req.query.id]);
+        const query1Result = await query(query1, [req.query.id]);  
          
-        var collegeid=query1Result.collegeid;
-             
-        const query2 = 'SELECT student.collegeid AS collegeId, student.id AS studentId,requests.formname AS formname,requests.appid AS appid, student.batch AS batch, student.department AS dept ,requests.date AS date FROM student JOIN requests ON student.collegeid = requests.collegeid AND student.collegeid =? ';
-        const query2Result = await query(query2, [collegeid]);
+        var collegeid=query1Result[0].collegeid;
+        var pending1='pending';
+        var pending2='final:pending';
+        const query2 = `SELECT 
+        student.name AS name, student.id AS studentId, requests.formname AS formname,
+        requests.appid AS appid, student.batch AS batch, student.department AS dept, requests.date AS date 
+        FROM student JOIN requests ON student.collegeid = requests.collegeid AND student.collegeid = ? AND student.id=requests.stdid AND requests.principal IN (?,?)`;
+        const query2Result = await query(query2, [collegeid,pending1,pending2]);
         console.log(query2Result);
         res.render('pending-requests',{applications:query2Result});
         });
 
         //PENDING REQUESTS FOR HOD
-        app.get('/hod-pending-requests',isAuth,async(req,res)=>{         
+   app.get('/hod-pending-requests',isAuth,async(req,res)=>{         
         
           const query1 = 'SELECT collegeid,department FROM hod WHERE id = ?';
           const query1Result = await query(query1, [req.query.id]);
            
-          var collegeid=query1Result.collegeid;  
-          var dept=query1Result.department;   
-          const query2 = 'SELECT student.collegeid AS collegeId, student.id AS studentId,requests.formname AS formname,requests.appid AS appid, student.batch AS batch, student.department AS dept ,requests.date AS date FROM student JOIN requests ON student.collegeid = requests.collegeid AND student.collegeid =? AND student.department=?';
-          const query2Result = await query(query2, [collegeid,dept]);
+          var collegeid=query1Result[0].collegeid;  
+          var dept=query1Result[0].department;   
+          var pending='pending';
+          console.log('cid='+collegeid+',dept='+dept+'status='+pending)
+          const query2 = 'SELECT student.collegeid AS collegeId, student.id AS studentId,requests.formname AS formname,requests.appid AS appid, student.batch AS batch, student.department AS dept ,requests.date AS date FROM student JOIN requests ON student.collegeid = requests.collegeid AND student.collegeid =? AND student.department=? AND requests.hod=?';
+          const query2Result = await query(query2, [collegeid,dept,pending]);
           console.log(query2Result);
-          res.render('pending-requests',{applications:query2Result});
-          });
+          res.render('pending-requests',{id:req.query.id,applications:query2Result});
+        });
   
-
+  
 /*----------- FORM CONTROL AND MAANGEMENT -------------*/
 
       // ADDING TEMPLATE 
@@ -999,7 +1098,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
         else{
           var divContent=null;
           const applications =results; // Empty array, can be populated later if needed
-          res.render('status',{ divContent, applications });
+          res.render('status',{ applications });
         }
         }); 
         }catch(err){
@@ -1027,22 +1126,41 @@ app.get('/hod/:name', isAuth, (req, res) => {
       });
     });
     
+      //REQUEST DISPLAY
+      app.get('/requ/:selectedFormId',isAuth, (req, res) => {
+        const formId = req.params.selectedFormId;
+        db.connection.query("SELECT request_data FROM requests WHERE appid = ?", [formId], (err, results) => {
+          if (err) {
+            console.error(err);  
+            res.status(500).send('Error retrieving HTML content');
+          } else {
+            if (results.length > 0) {
+              const fetchedHTML = results[0].request_data;
+              res.send(fetchedHTML);
+            } else {
+              res.status(404).send('HTML content not found');
+            }
+          }
+        });
+      });
       
 
-     //SAVING TEMPLATE
+     //SAVING TEMPLATEFORMS
      app.post('/save-template',(req,res)=>{   
       var name=req.query.name; 
+      const selectedOption = req.body.selectedOption;
+      console.log(selectedOption);
       //console.log(name);
       var collegeid=req.query.id; 
       console.log(name);
       var divContent = req.body.content; 
      //  console.log(divContent);
-       db.connection.query("insert into forms(name,collegeid,formdata)values(?,?,?)",
-         [name,collegeid,divContent],(err,results,fields)=>{
+       db.connection.query("insert into forms(name,collegeid,formdata,dest)values(?,?,?,?)",
+         [name,collegeid,divContent,selectedOption],(err,results,fields)=>{
           if(err) {
             throw err; 
           } else{
-             res.render('/addnewform');
+             res.redirect(`/addtemplate?id=${collegeid}`);
           }    
        });
        });
@@ -1062,7 +1180,89 @@ app.get('/hod/:name', isAuth, (req, res) => {
         }
       });;
      });
+
+     //VERIFY FORM BY ADMINISTRATORS
+     app.get('/verify-form',async(req,res)=>{ 
+        var appid=req.query.appid;
+        var user=req.query.user;
+        var nextUser;
+        console.log('user'+user)
+        switch (user.toLowerCase()) {
+          case 'tutor'    : nextUser = 'hod' ;       break;
+          case 'hod'      : nextUser = 'principal' ; break;
+          case 'principal': nextUser = 'office' ;    break;
+        }    
+        console.log(nextUser+','+appid);
+       // Check the flag column value before executing the update query
+          const checkQuery = `SELECT ${user},${nextUser} FROM requests WHERE appid =?`;  
+          
+          try {
+            const checkResult = await query(checkQuery, [appid]);
+            console.log(checkResult);
+            const userValue = checkResult[0][user];
+            const nextUserValue= checkResult[0][nextUser];
+            console.log("user value="+userValue);
+              if (checkResult.length > 0 && checkResult[0][user]=== 'final:pending') {
+                console.log('form path ended.');
+                const updateQuery = `UPDATE requests SET ${user} = 'completed' WHERE appid = ?`;
+                try {
+                  const updateResult = await query(updateQuery, [appid]);  
+                  // Process the update result
+                  console.log('Update successful');
+                  res.redirect(`/${user}-pending-requests?id=${req.query.id}&user=${user}`)
+                } catch (error) {
+                  // Handle the error
+                  console.error('Error occurred during update:', error);
+                }
+              }else {
+                let updateQuery;
+                if (nextUserValue=== 'final') {
+                  updateQuery = `UPDATE requests SET ${user} = 'verified', ${nextUser} = 'final:pending' WHERE appid = ?`;
+                } else {
+                  updateQuery = `UPDATE requests SET ${user} = 'verified', ${nextUser} = 'pending' WHERE appid = ?`;
+                }
+
+                try {
+                  const updateResult = await query(updateQuery, [appid]);
+                  // Process the update result
+                  console.log('Update successful');
+                  res.redirect(`/${user}-pending-requests?id=${req.query.id}&user=${user}`);
+                } catch (error) {
+                  // Handle the error  
+                  console.error('Error occurred during update:', error);
+                }
+              }
+              
+          } catch (error) {
+            // Handle the error
+            console.error('Error occurred during flag check:', error);
+          }
+
+     })
+
+      //REJECT FORM BY ADMINISTRATORS
+     app.get('/reject-form',async(req,res)=>{ 
+        var appid=req.query.appid;
+        var user=req.query.user;
  
+        console.log('appid='+appid);
+          try {
+            const updateQuery = `UPDATE requests SET ${user} = 'rejected' WHERE appid = ?`;
+                try {
+                  const updateResult = await query(updateQuery, [appid]);  
+                  // Process the update result
+                  console.log('Update successful');
+                  res.redirect(`/${user}-pending-requests?id=${req.query.id}&user=${user}`)
+                } catch (error) {
+                  // Handle the error
+                  console.error('Error occurred during update:', error);
+                }        
+          } catch (error) {
+            // Handle the error
+            console.error('Error occurred during flag check:', error);
+          }
+
+     })
 /*----------- other control routes -------------*/
 
       // Set up a route for the login page
@@ -1205,7 +1405,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
               }
             }
           });
-
+        
         //REGISTER COLLEGE
         app.post('/register-college',(req,res)=>{
              
@@ -1327,9 +1527,95 @@ app.get('/hod/:name', isAuth, (req, res) => {
         });
       });    
        
-      
-      
+      //OTP VERIFICATION
+      app.get('/otpverify',isAuth,(req, res) => {
+        const jsonData = req.query.data;
+        const data = JSON.parse(jsonData); 
+        const formid = data[0].formid; // Accessing the 'formid' property
+        const stdid = data[0].id; 
+       
+        db.connection.query('SELECT name,email FROM student WHERE id = ?', [stdid], (err, results, fields) => {
+          if (err) {
+            throw err;
+          } else {
+            const email = results.length > 0 ? results[0].email : '';
+            const name=results.length>0?results[0].name:''; // Get the template content or set it as an empty string if not found
+            var genOtp=verify.generateOTP();        
+             // mail.sendOTPEmail(name,email,genOtp);
+              req.session.otp = genOtp; 
+              console.log(genOtp)
+              //const jsonData = JSON.stringify(data);
+              res.render('otpverify', {otp:genOtp,jsonData});
+          }
+        });;
+       });
 
+      //OTP VERIFICATION
+      app.post('/otpverify',isAuth,(req, res) => {
+        console.log(req.body)  
+        const jsonData = req.body.jsonData;
+        const submittedOTP = req.body.otp;
+        const storedOTP = req.session.otp;
+        console.log("in post otp=\t"+storedOTP);
+        if (submittedOTP === storedOTP) {
+          // OTP verification successful  
+          // Handle form submission here
+         
+          // Clear the OTP from the session after successful submission
+          delete req.session.otp;
+          res.redirect(`/submit?data=${encodeURIComponent(jsonData)}`);
+        } else {
+          // Invalid OTP, display an error or redirect to the OTP verification page
+          res.send('Invalid OTP. Please try again.');     
+        }   
+      
+       });
+      
+       //UPLOAD ATTCHMENT FILES FOR STUDENTS
+       app.post('/upload', async(req, res) => {
+       
+        const id = req.query.id;
+        console.log('here' + id);
+        console.log(req.body);
+        if (!req.files || !req.files.file) {
+
+          console.log('no file uploaded');
+          return res.status(400).json({ error: 'No file uploaded' });
+        
+        }
+        
+        // Retrieve file information from request
+        const file = req.files.file;
+        console.log(file);
+
+        // Insert file data into the MySQL database
+        const query1 = 'select * from student';
+        const values = [req.body.attaname, file.mimetype, file.size];
+        
+        try {
+          const result = await query(query1,values);
+
+          console.log(result);
+          // Retrieve the generated file ID
+         // const fileId = result.insertId;
+        
+          // Update the file ID in the file object
+         // file.fileId = fileId;
+        
+          // Continue with additional file processing or response handling
+          // For example, you can save the file to a specific location on the server
+          // or perform further operations based on the file ID
+        
+          res.status(200).json({ message: 'File uploaded successfully', fileId });
+        } catch (error) {
+          // Handle database errors
+          console.error(error);
+          res.status(500).json({ error: 'Database error' });
+        }
+        
+  
+      
+      });
        
 
       //render in edit in student requestes
@@ -1343,33 +1629,276 @@ app.get('/hod/:name', isAuth, (req, res) => {
             throw err; 
           } else {
             const templateContent = results.length > 0 ? results[0].formdata : ''; // Get the template content or set it as an empty string if not found
-            res.render('newform', { formid, templateContent: templateContent,id });
+            res.render('newform', { formid,id,templateContent: templateContent});
+      }
+    }); 
+  });
+      
+      //upload student attachment 
+      const otpGenerator = require('otp-generator');
+      
+      function generateUniqueID() {
+        return new Promise((resolve, reject) => {
+          const uniqueID = otpGenerator.generate(6, { digits: true, alphabets: false, upperCase: false, specialChars: false });
+          // Check if the generated ID is already present in the database
+          const sql = 'SELECT attaid FROM attachment WHERE attaid = ?';
+          db.connection.query(sql, [uniqueID], function (error, results) {
+            if (error) {
+              console.error('Error checking uniqueness of attaid');
+              reject(error);
+            }
+            if (results.length === 0) {
+              resolve(uniqueID); // Return the unique ID if it is not present in the database
+            } else {
+              resolve(generateUniqueID()); // Generate a new unique ID recursively if it is already present
+            }
+          });
+        });
+      }
+      
+      app.post('/upload/:name', (req, res) => {
+        const { attaname } = req.body;
+        const name = req.params.name;
+        let collegeid, regno;
+      
+        db.connection.query("SELECT * FROM student WHERE id = ?", [name], (err, results1, fields) => {
+          if (err) {
+            throw err;
+          } else {
+            collegeid = results1[0].collegeid;
+            regno = results1[0].id;
+    
+            generateUniqueID()
+            .then(attaid => {
+              const uploadedFile = req.files.file; // Assuming the file input field name is "file"
+              var filePath = path.join('./public/uploads/student', regno.toString(), uploadedFile.name);
+              console.log(filePath);
+              
+              uploadedFile.mv(filePath)
+                .then(() => {
+                  console.log('Upload successful');
+                  filePath = filePath.replace('public', '');
+                  return generateUniqueID();
+                })
+                .then(attaid => {
+                  console.log(attaid);
+                  console.log(regno);
+                  console.log(collegeid);
+              
+                  const sql = 'INSERT INTO attachment (stdid, collegeid, attaid, attaname, file) VALUES (?, ?, ?, ?, ?)';
+                  db.connection.query(sql, [regno, collegeid, attaid, attaname, filePath], function (error, results) {
+                    if (error) {
+                      console.error('Error saving attachment to the database');
+                      res.status(500).send('Internal Server Error'+error);
+                    } else {
+                      var name = results1[0].name;
+                      var admno = results1[0].admno;
+                      var regno = results1[0].id;
+                      var dept = results1[0].department;
+                      var phno = results1[0].phno;
+                      var addr = results1[0].address;
+                      var email = results1[0].email;
+                      var photo = results1[0].photo;
+              
+                      db.connection.query('SELECT * FROM attachment', function (error, results2) {
+                        if (error) {
+                          console.error('Error retrieving attachments from the database');
+                          res.status(500).send('Internal Server Error');
+                        } else {
+                          res.render('student', { name, admno, regno, dept, phno, addr, email, photo, attachments: results2 });
+                        }
+                      });
+                    }
+                  });
+                })
+                .catch(error => {
+                  console.error('Error uploading file or generating unique ID', error);
+                  res.status(500).send('Internal Server Error');
+                });
+              
+             })
+            .catch(error => {
+              console.error('Error generating unique ID', error);
+              res.status(500).send('Internal Server Error');
+            });
+           
           }
-        });;
+        }); 
+      });
+      app.post('/remove', function (req, res) {
+        const attachmentId = req.body.attachmentId;
+        const Id = req.query.regno;
+        console.log(attachmentId);
+        console.log(Id);
+        const sql = 'DELETE FROM attachment WHERE attaid = ?';
+        db.connection.query(sql, [attachmentId], function (error, results) {
+          if (error) {
+            console.error('Error removing attachment from the database',attachmentId);
+            console.error(error);
+          }
+          console.log(query);
+          res.redirect(`/student/${Id}`);
+        });
+      }); 
+      //delete template
+      app.get('/delete', (req, res) => {
+        const templateName = req.query.name;
+      
+        // Delete the corresponding records in the `requests` table first
+        const deleteRequestsQuery = 'DELETE FROM requests WHERE formid IN (SELECT formid FROM forms WHERE name = ?)';
+      
+        db.connection.query(deleteRequestsQuery, [templateName], (err, result) => {
+          if (err) {
+            console.error('Error deleting requests: ', err);
+            res.sendStatus(500);
+            return;
+          }
+      
+          // Delete the template from the `forms` table
+          const deleteFormQuery = 'DELETE FROM forms WHERE name = ?';
+      
+          db.connection.query(deleteFormQuery, [templateName], (err, result) => {
+            if (err) {
+              console.error('Error deleting template: ', err);
+              res.sendStatus(500);
+            } else {
+              console.log('Template deleted successfully');
+              
+              // Render the page with the `id` parameter
+              const id = req.query.id;
+              res.redirect(`/addtemplate?id=${id}`);
+            } 
+          });
+        });
       });
       
-      /* app.get('/verify',(req,res)=>{ 
-          
-      var token = verify.generateVerificationToken();
-           
-        db.connection.query("select email,token from verification where user=? and email=?",[user,email],(err,results,fields)=>{
-          if(err) {
-            res.send('server error');
-            throw err;
-                 
-          }
-          else{
-            var vertoken =results[0].token;
-            if(vertoken==token){
-                   res.render('email-verified');
-            }
-            else{
-               res.send('email not verified');
-            }
-          }
-         });
+      app.get('/psw-reset', (req, res) => {
+        res.render('forget');
       })
-    */
+     
+      app.post('/delete', (req, res) => {
+          const { user, username } = req.session.resetPasswordData;
+          const newPassword = req.body.newPassword;
+          
+          // Update the password based on the user type
+          switch (user) {
+            case 'college':
+              // Update the college password in the database
+              db.connection.query(
+                'UPDATE college SET password = ? WHERE collegeid = ?',
+                [newPassword, username],
+                (err, results) => {
+                  if (err) {
+                    console.error(err);
+                    return res.send('Server error');
+                  }
+                  
+                  // Password updated successfully
+                  res.send('Password reset successfully!');
+                }
+              );
+              break;
+              
+            case 'Student':
+              // Update the student password in the database
+              db.connection.query(
+                'UPDATE Student SET password = ? WHERE id = ?',
+                [newPassword, username],
+                (err, results) => {
+                  if (err) {
+                    console.error(err);
+                    return res.send('Server error');
+                  }
+                  
+                  // Password updated successfully
+                  res.send('Password reset successfully!');
+                }
+              );
+              break;
+              
+            case 'Tutor':
+              // Update the tutor password in the database
+              db.connection.query(
+                'UPDATE Tutor SET password = ? WHERE id = ?',
+                [newPassword, username],
+                (err, results) => {
+                  if (err) {
+                    console.error(err);
+                    return res.send('Server error');
+                  }
+                  
+                  // Password updated successfully
+                  res.send('Password reset successfully!');
+                }
+              );
+              break;
+              
+            case 'Hod':
+              // Update the HOD password in the database
+              db.connection.query(
+                'UPDATE Hod SET password = ? WHERE id = ?',
+                [newPassword, username],
+                (err, results) => {
+                  if (err) {
+                    console.error(err);
+                    return res.send('Server error');
+                  }
+                  
+                  // Password updated successfully
+                  res.send('Password reset successfully!');
+                }
+              );
+              break;
+              
+            case 'Principal':
+              // Update the principal password in the database
+              db.connection.query(
+                'UPDATE Principal SET password = ? WHERE id = ?',
+                [newPassword, username],
+                (err, results) => {
+                  if (err) {
+                    console.error(err);
+                    return res.send('Server error');
+                  }
+                  
+                  // Password updated successfully
+                  res.send('Password reset successfully!');
+                }
+              );
+              break;
+              
+            default:
+              res.send('Invalid user type');
+          }
+        });
+        
+
+
+        //downmload pdf
+        const path = require('path');
+
+        app.get('/download', (req, res) => {
+          const filePath = req.query.file; // Get the file path from the query parameter
+        
+          // Check if the file exists
+          if (!filePath) {
+            return res.status(404).send('File not found.');
+          }
+        
+          // Resolve the absolute file path
+          const absolutePath = path.join(__dirname, '..', 'public', filePath);
+        
+          // Set the appropriate headers
+          res.setHeader('Content-Type', 'application/pdf');
+          res.setHeader('Content-Disposition', 'inline'); // Open file in browser tab
+        
+          // Send the file as the response
+          res.sendFile(absolutePath);
+        });
+        
+         
+
+    
 }  
 
 module.exports = routes;

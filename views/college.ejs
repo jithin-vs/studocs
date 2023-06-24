@@ -94,8 +94,8 @@
         <% applications.forEach(function(application) { %>
             <tr>
               <td data-toggle="mod" data-target="#myMod"><%= application.appid %></td>
+              <td data-toggle="moda" data-target="#myModa"><%= application.formname %></td>
               <td data-toggle="moda" data-target="#myModa"><%= application.name %></td>
-              <td data-toggle="moda" data-target="#myModa"><%= application.student_name %></td>
               <% const dateFromDatabase = application.date %>
               <% const options = { day: '2-digit', month: '2-digit', year: 'numeric' };   %>
               <% const formattedDate = dateFromDatabase ? dateFromDatabase.toLocaleDateString(undefined, options) : null; %>
@@ -122,10 +122,10 @@
         
         <div Class="row">
           <div class="col-sm-12 col-md-4">
-            <input type="button" class="button1 btn-block"  onclick="window.location.href='/pending-requests?id=<%= collegeData.Id%>'" value="PENDING REQUESTS">&nbsp;&nbsp;
+            <input type="button" class="button1 btn-block"  onclick="window.location.href='/office-pending-requests?id=<%= collegeData.Id%>&user=office'" value="PENDING REQUESTS">&nbsp;&nbsp;
           </div>
           <div class="col-sm-12 col-md-4">
-            <input type="button" class="button1 btn-block"  onclick="window.location.href='/teacher_verified_requests'" value="VERIFIED REQUESTS">&nbsp;&nbsp;
+            <input type="button" class="button1 btn-block"  onclick="window.location.href='/office-verified-requests?id=<%= collegeData.Id%>'" value="VERIFIED REQUESTS">&nbsp;&nbsp;
           </div>
           <div class="col-sm-12 col-md-4">
             <input type="button" class="button1 btn-block"  onclick="window.location.href='/principaladd?id=<%= collegeData.Id %>'" value="PRINCIPAL">&nbsp;&nbsp;

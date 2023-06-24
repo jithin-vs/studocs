@@ -93,6 +93,27 @@ const sendOTPEmail=async(name,email,otp)=>{
   })
 
 }
+
+const sendpswOTPEmail=async(name,email,otp)=>{
+  console.log('sending mail....');
+  const mailOptions = {
+    from: 'studocs.geci@gmail.com',
+    to: email,
+    subject: 'Login details',
+    html: '<p>Hi, '+name+' ,Your Password reseting OTP is: '+otp+'</p>'   
+  };
+  transporter.sendMail(mailOptions, function(error,info){
+    if(error){
+       console.log(error);
+    }
+    else{
+
+       console.log("Email has been sent:- ",info.response);
+    }
+  })
+
+}
+
 /*const verifyEmail =async (req,res) =>{
    
   try{
@@ -102,4 +123,4 @@ const sendOTPEmail=async(name,email,otp)=>{
   }
 } */
 
- module.exports = {sendverifyEmail,sendcredEmail,sendregisterEmail,sendOTPEmail};
+ module.exports = {sendverifyEmail,sendcredEmail,sendregisterEmail,sendOTPEmail,sendpswOTPEmail};

@@ -11,7 +11,12 @@
   <link rel="stylesheet" href="/css/status.css">
   <link rel="stylesheet" href="/css/form.css">
 </head>
-
+<style>
+#progressbar li:not(.active):before,#progressbar li:not(.active)::after{
+      background: red;
+       
+  }
+</style>
 <body>
   <nav class="navbar navbar-expand-sm navbar-dark">
     <a class="navbar-brand logo" href="#">
@@ -62,7 +67,7 @@
 
       <div class="col-sm-6 side2">
         <div class="col-sm-6 panel">
-            <%- divContent%>
+            
         </div>
         <div class="container-fluid">
           <div class="card">
@@ -70,8 +75,8 @@
             <div class="row d-flex justify-content-center status">
                 <div class="col-12">
                 <ul id="progressbar" class="text-center">
-                    <li class="step0"></li>
-                    <li class="step0"></li>
+                    <li class="step0 "></li>
+                    <li class="step0 active"></li>
                     <li class="step0"></li>
                     <li class="step0"></li>
                 </ul>
