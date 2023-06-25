@@ -585,7 +585,21 @@ app.get('/hod/:name', isAuth, (req, res) => {
      
     
      //add new HOD   
- 
+     app.get('/hodadd',isAuth,(req,res)=>{
+            
+      db.connection.query("select * from hod",
+          [req.body.name],(err,results,fields)=>{
+           if(err) {
+             throw err;
+             
+           }
+           else{
+              res.render('addnewhod',{applications:results,id:req.query.id});
+           }
+         }); 
+         
+     });
+
      app.post('/hodadd',encoder,(req,res)=>{ 
         
         var principalid=req.query.id;
