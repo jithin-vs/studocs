@@ -778,9 +778,10 @@ app.get('/hod/:name', isAuth, (req, res) => {
     const formid = data[0].formid; // Accessing the 'formid' property
     const stdid = data[0].id; 
     const content=data[0].content;
+    const attachments=data[0].attachments;
 
       console.log(stdid);
-      console.log(content);
+      console.log(attachments);
       try {
          
         // Execute the first query with arguments
@@ -827,12 +828,12 @@ app.get('/hod/:name', isAuth, (req, res) => {
         var pending='pending';
         // Insert the values into the "requests" table
         const insertQuery = `INSERT INTO requests 
-                             (collegeId, stdid, formid, appid,date,dept,request_data,formname,${dest},tutor,dest)
-                             VALUES (?,?,?,?,NOW(),?,?,?,?,?,?)`;
-        const insertValues = query2Result.map(row => [row.collegeId, row.studentId, row.formId, uniqueId, row.dept, content, row.formname,final,pending,row.dest]);
+                             (collegeId, stdid, formid, appid,date,dept,request_data,formname,${dest},tutor,dest,attachment)
+                             VALUES (?,?,?,?,NOW(),?,?,?,?,?,?,?)`;
+        const insertValues = query2Result.map(row => [row.collegeId, row.studentId, row.formId, uniqueId, row.dept, content, row.formname,final,pending,row.dest,attachments]);
         const flattenedValues = insertValues.flat(); // Flatten the nested arrays
         await query(insertQuery, flattenedValues);
-
+        console.log(attachments);
         // Render the webpage and pass the query results
         res.redirect(`/requests?id=${stdid}&alertMessage=Successful!`);
 
@@ -1069,7 +1070,6 @@ app.get('/hod/:name', isAuth, (req, res) => {
       
       //STATUS table  DISPLAY
       app.get('/status/:name',isAuth,async(req,res)=>{
-        var active1=" ",active2=" ",active3=" ",active4=" ";
         try{
           const query1= `
           SELECT
@@ -1918,8 +1918,19 @@ app.get('/hod/:name', isAuth, (req, res) => {
               res.send('Invalid user type');
           }
         });
-        
-
+      //attachment_student loading and select
+      app.get('/attachment-options', (req, res) => {
+       const id=  req.query.id
+        const query = 'SELECT attaid, attaname FROM attachment where stdid=?';
+        db.connection.query(query,[id], (error, results) => {
+          if (error) {
+            console.error('Error executing query:', error);
+            res.status(500).send('Error fetching attachment options');
+          } else {
+            res.json(results);
+          }
+        });
+      });
 
         //downmload pdf
         const path = require('path');
