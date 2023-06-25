@@ -520,7 +520,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
     
     }); 
     
-  
+   
      /*-----add user pages-----*/
 
      //tutor
