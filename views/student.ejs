@@ -108,7 +108,7 @@
         <div class="container">
 
           <form action="/upload/<%= regno%>" method="POST" enctype="multipart/form-data" class="mt-4">
-            <div class=" form-row mb-3" style="font-weight:600; font-family: Georgia, 'Times New Roman', Times, serif;">
+            <div class=" form-row mb-3" style="font-weight:600;">
               <div class="form-group col-lg-6">
                 <label for="attaname" class="form-label">Attachment Name</label>
                 <input type="text" class="form-control" style="height: 42px;" id="attaname" name="attaname" required>
@@ -124,11 +124,11 @@
           </form>
       
           <% if (attachments && attachments.length > 0) { %>
-            <h2 class="mt-5 " style="font-weight:400; font-family: Georgia, 'Times New Roman', Times, serif;">Attachments</h2>
-            <div class="row mt-3">
+            <h2 class="mt-5 k" style="font-weight:400;">Attachments</h2>
+            <div class="row mt-3" >
               <% for (let i = 0; i < attachments.length; i++) { %>
-                <div class="col-md-4">
-                  <div class="card mb-3">
+                <div class="col-md-3" >
+                  <div class="card mb-3" style="width: 250px;">
                     <div class="card-body">
                       <h5 class="card-title" style="text-align: center; font-size: 25px; font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;"><%= attachments[i].attaname %></h5>
                        <form action="/remove?regno=<%= regno%>" method="POST"  class="mt-3">
