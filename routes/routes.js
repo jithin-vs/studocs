@@ -19,6 +19,7 @@ var routes =function(app,isAuth,encoder){
         });
       });
     };
+    
 
     
      
@@ -546,7 +547,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
      //tutor
       app.get('/tutoradd',isAuth,(req,res)=>{     
           
-        db.connection.query("select * from tutor where batch=? and deoartment=? AND collegeid=? ",
+        db.connection.query("select * from tutor where batch=? and department=? AND collegeid=? ",
         [req.body.name],(err,results,fields)=>{
         if(err) {
           throw err;
@@ -673,11 +674,12 @@ app.get('/hod/:name', isAuth, (req, res) => {
             
       const query1 = 'SELECT collegeid,batch,department FROM tutor WHERE  id = ?';
       const query1Result = await query(query1, [req.query.id]);
-      const collegeid=query1[0].collegeid;
-      const batch=query1[0].batch;
-      const department=query1[0].department;
+      console.log(query1Result);
+      const collegeid=query1Result[0].collegeid;
+      const batch=query1Result[0].batch;
+      const department=query1Result[0].department;
 
-      const query2 = 'SELECT * FROM student WHERE  collegeid=? AND batch=? AND department';
+      const query2 = 'SELECT * FROM student WHERE  collegeid=? AND batch=? AND department=?';
       const query2Result = await query(query2, [collegeid,batch,department]);
         
       res.render('addnewstudent',{applications:query2Result,id:req.query.id});
@@ -1486,17 +1488,22 @@ app.get('/hod/:name', isAuth, (req, res) => {
           }
         })
       });
+      
 
-
-      app.post('/staffadvisor/:name/search', (req, res) => { // Specify the URL for search with the name parameter
+      app.post('/staffadvisor/:name/search', async (req, res) => {
         const searchTerm = req.body.search;
       
-        // Perform search query
-        const query = `SELECT * FROM student WHERE
-          name LIKE '%${searchTerm}%' OR
-          id LIKE '%${searchTerm}%'`;
+        const query1 = 'SELECT collegeid, batch, department FROM tutor WHERE id = ?';
+        const query1Result = await query(query1, [req.params.name]);
+        const collegeid = query1Result[0].collegeid;
+        const batch = query1Result[0].batch;
+        const department = query1Result[0].department;
       
-        db.connection.query(query, (err, results) => {
+        // Perform search query
+        const query2 = 'SELECT * FROM student WHERE collegeid = ? AND batch = ? AND department = ? AND (name LIKE ? OR id LIKE ?)';
+        const params = [collegeid, batch, department, `%${searchTerm}%`, `%${searchTerm}%`];
+      
+        db.connection.query(query2, params, (err, results) => {
           if (err) {
             console.log(err);
             res.send('Server error: ' + err.message);
@@ -1506,16 +1513,22 @@ app.get('/hod/:name', isAuth, (req, res) => {
           }
         });
       });
+       
  
-      app.post('/hod/:name/search', (req, res) => { // Specify the URL for search with the name parameter
+      app.post('/hod/:name/search', async (req, res) => { // Specify the URL for search with the name parameter
         const searchTerm = req.body.search;
       
+        const query1 = 'SELECT collegeid, batch, department FROM hod WHERE id = ?';
+        const query1Result = await query(query1, [req.params.name]);
+        const collegeid = query1Result[0].collegeid;
+        const batch = query1Result[0].batch;
+        const department = query1Result[0].department;
         // Perform search query
-        const query = `SELECT * FROM tutor WHERE
-          name LIKE '%${searchTerm}%' OR
-          id LIKE '%${searchTerm}%'`;
+        const query2 = 'SELECT * FROM tutor WHERE collegeid = ? AND batch = ? AND department = ? AND (name LIKE ? OR id LIKE ?)';
+        const params = [collegeid, batch, department, `%${searchTerm}%`, `%${searchTerm}%`];
+        
       
-        db.connection.query(query, (err, results) => {
+        db.connection.query(query2, params, (err, results) =>  {
           if (err) {
             console.log(err);
             res.send('Server error: ' + err.message);
@@ -1527,15 +1540,19 @@ app.get('/hod/:name', isAuth, (req, res) => {
       });
 
 
-      app.post('/principal/:name/search', (req, res) => { // Specify the URL for search with the name parameter
+      app.post('/principal/:name/search', async (req, res) => { // Specify the URL for search with the name parameter
         const searchTerm = req.body.search;
       
+        const query1 = 'SELECT collegeid FROM principal WHERE id = ?';
+        const query1Result = await query(query1, [req.params.name]);
+        const collegeid = query1Result[0].collegeid;
+
         // Perform search query
-        const query = `SELECT * FROM hod WHERE
-          name LIKE '%${searchTerm}%' OR
-          id LIKE '%${searchTerm}%'`;
+        const query2 = 'SELECT * FROM hod WHERE collegeid = ? AND (name LIKE ? OR id LIKE ?)';
+        const params = [collegeid, batch, department, `%${searchTerm}%`, `%${searchTerm}%`];
+        
       
-        db.connection.query(query, (err, results) => {
+        db.connection.query(query2, params, (err, results) =>  {
           if (err) {
             console.log(err);
             res.send('Server error: ' + err.message);
@@ -1546,15 +1563,18 @@ app.get('/hod/:name', isAuth, (req, res) => {
         });
       });
          
-      app.post('/college/:name/search', (req, res) => { // Specify the URL for search with the name parameter
+      app.post('/college/:name/search', async(req, res) => { // Specify the URL for search with the name parameter
         const searchTerm = req.body.search;
-      
+        const query1 = 'SELECT collegeid FROM college WHERE id = ?';
+        const query1Result = await query(query1, [req.params.name]);
+        const collegeid = query1Result[0].collegeid;
+
         // Perform search query
-        const query = `SELECT * FROM principal WHERE
-          name LIKE '%${searchTerm}%' OR
-          id LIKE '%${searchTerm}%'`;
+        const query2 = 'SELECT * FROM hod WHERE collegeid = ? AND (name LIKE ? OR id LIKE ?)';
+        const params = [collegeid, batch, department, `%${searchTerm}%`, `%${searchTerm}%`];
+        // Perform search query
       
-        db.connection.query(query, (err, results) => {
+        db.connection.query(query2, params, (err, results) =>  {
           if (err) {
             console.log(err);
             res.send('Server error: ' + err.message);
