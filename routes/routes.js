@@ -534,8 +534,8 @@ app.get('/hod/:name', isAuth, (req, res) => {
            console.log(results);
            var id=req.query.id;
            if(id === null) 
-                    id='12345'
-           console.log(id);
+                    id='12345' 
+           console.log(id); 
             res.render('addnewtutor',{applications:results,id});
         } 
       });
