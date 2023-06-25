@@ -904,7 +904,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
         res.render('verified-requests',{id:req.query.id,applications:query2Result});
     });
 
-   app.get('/hod-verified-requests',isAuth,async(req,res)=>{ 
+   app.get('/hod-verified-requests',isAuth,async(req,res)=>{  
                 
         const query1 = 'SELECT collegeid,department FROM hod WHERE id = ?';
         const query1Result = await query(query1, [req.query.id]);

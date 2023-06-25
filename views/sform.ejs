@@ -62,7 +62,7 @@
             </div>
             <div class="form-group col-md-4">
               <label for="year">Year of Admission</label>
-              <input type="date" class="form-control" id="year"  name="yearofadmn" required value="<%= result.yearofadmission.toISOString().split('T')[0] %>">
+              <input type="date" class="form-control" id="year"  name="yearofadmn" required value="<%= result.yearofadmission %>">
 
             </div>
               <div class="form-group col-md-4">
@@ -71,7 +71,7 @@
               </div>
              <div class="form-group col-md-4">
                   <label for="reg" class="form-label">Admission Number</label>
-                  <input class="form-control form-control-sm" id="reg"  type="text" value="<%= result.admno %>" placeholder="Register No" name="admno"required> 
+                  <input class="form-control form-control-sm" id="reg"  type="text" value="<%= result.admno %>" placeholder="Admission No" name="admno"required> 
           </div>
           <div class="form-group col-md-4">
             <label for="id" class="form-label">College Id</label>
