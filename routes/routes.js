@@ -546,8 +546,8 @@ app.get('/hod/:name', isAuth, (req, res) => {
      //tutor
       app.get('/tutoradd',isAuth,(req,res)=>{     
           
-        db.connection.query("select * from tutor where batch=? and deoartment=? AND collegeid=? ",
-        [req.body.name],(err,results,fields)=>{
+        db.connection.query("select * from tutor where id=? ",
+        [req.query.id],(err,results,fields)=>{
         if(err) {
           throw err;
           
