@@ -465,11 +465,13 @@ app.get('/hod/:name', isAuth, (req, res) => {
       if(req.session.user){
         if (req.session.user) {
           try {
+            var pending1='pending';
+            var pending2='final:pending';  
             const query1 = `SELECT 
-                              student.name AS name, student.id AS studentId, requests.formname AS formname,
-                              requests.appid AS appid, student.batch AS batch, student.department AS dept, requests.date AS date 
-                              FROM student JOIN requests ON student.collegeid = requests.collegeid AND student.collegeid = ?`;
-            const query1Result = await query(query1, [username]);
+            student.name AS name, student.id AS studentId, requests.formname AS formname,
+            requests.appid AS appid, student.batch AS batch, student.department AS dept, requests.date AS date 
+            FROM student JOIN requests ON student.collegeid = requests.collegeid AND student.id=requests.stdid AND student.collegeid = ? AND requests.office IN(?,?)`;
+            const query1Result = await query(query1, [req.query.id,pending1,pending2]);
            console.log(query1Result);
             const selectQuery = "SELECT * FROM college WHERE collegeid = ?";
         
@@ -583,22 +585,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
      
     
      //add new HOD   
-  
-     app.get('/hodadd',isAuth,(req,res)=>{
-            
-      db.connection.query("select * from hod",
-          [req.body.name],(err,results,fields)=>{
-           if(err) {
-             throw err;
-             
-           }
-           else{
-              res.render('addnewhod',{applications:results,id:req.query.id});
-           }
-         }); 
-         
-     });
-     
+ 
      app.post('/hodadd',encoder,(req,res)=>{ 
         
         var principalid=req.query.id;
