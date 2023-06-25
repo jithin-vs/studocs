@@ -748,10 +748,10 @@ app.get('/hod/:name', isAuth, (req, res) => {
           }
          getData(); 
       });   
-   
+    
       /*-----------REQUEST HANDLING ROUTES ------*/
       
-  // SENDING REQUEST ROUTE FOR STUDENTS    
+  // SENDING REQUEST ROUTE FOR STUDENTS        
   app.get('/requests', isAuth,async(req, res) => {
     let id=req.query.id;
     const query1 = 'SELECT collegeid FROM student WHERE  id = ?';
@@ -778,9 +778,10 @@ app.get('/hod/:name', isAuth, (req, res) => {
     const formid = data[0].formid; // Accessing the 'formid' property
     const stdid = data[0].id; 
     const content=data[0].content;
+    const attachments=data[0].attachments;
 
       console.log(stdid);
-      console.log(content);
+      console.log(attachments);
       try {
          
         // Execute the first query with arguments
@@ -827,12 +828,12 @@ app.get('/hod/:name', isAuth, (req, res) => {
         var pending='pending';
         // Insert the values into the "requests" table
         const insertQuery = `INSERT INTO requests 
-                             (collegeId, stdid, formid, appid,date,dept,request_data,formname,${dest},tutor,dest,insert_time)
-                             VALUES (?,?,?,?,NOW(),?,?,?,?,?,?,NOW())`;
-        const insertValues = query2Result.map(row => [row.collegeId, row.studentId, row.formId, uniqueId, row.dept, content, row.formname,final,pending,row.dest]);
+                             (collegeId, stdid, formid, appid,date,dept,request_data,formname,${dest},tutor,dest,attachment,insert_time)
+                             VALUES (?,?,?,?,NOW(),?,?,?,?,?,?,?,NOW())`;
+        const insertValues = query2Result.map(row => [row.collegeId, row.studentId, row.formId, uniqueId, row.dept, content, row.formname,final,pending,row.dest,attachments]);
         const flattenedValues = insertValues.flat(); // Flatten the nested arrays
         await query(insertQuery, flattenedValues);
-
+        console.log(attachments);
         // Render the webpage and pass the query results
         res.redirect(`/requests?id=${stdid}&alertMessage=Successful!`);
 
@@ -1068,7 +1069,6 @@ app.get('/hod/:name', isAuth, (req, res) => {
       
       //STATUS table  DISPLAY
       app.get('/status/:name',isAuth,async(req,res)=>{
-        var active1=" ",active2=" ",active3=" ",active4=" ";
         try{
           const query1= `
           SELECT distinct
@@ -1120,7 +1120,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
         } else {
           const requestData = results[0].request_data;
           var active1 = ' ';
-  var active2 = ' ';
+  var active2 = ' '; 
   var active3 = ' ';
   var active4 = ' ';
 
@@ -1189,25 +1189,27 @@ app.get('/hod/:name', isAuth, (req, res) => {
       
 
      //SAVING TEMPLATEFORMS
-     app.post('/save-template',(req,res)=>{   
-      var name=req.query.name; 
+     app.post('/save-template', (req, res) => {
+      var name = req.query.name;
       const selectedOption = req.body.selectedOption;
+      const attachment = req.body.attachment;
       console.log(selectedOption);
-      //console.log(name);
-      var collegeid=req.query.id; 
+      // console.log(name);
+      var collegeid = req.query.id;
       console.log(name);
-      var divContent = req.body.content; 
-     //  console.log(divContent);
-       db.connection.query("insert into forms(name,collegeid,formdata,dest)values(?,?,?,?)",
-         [name,collegeid,divContent,selectedOption],(err,results,fields)=>{
-          if(err) {
-            throw err; 
-          } else{
-             res.redirect(`/addtemplate?id=${collegeid}`); 
-          }    
-       });
-       }); 
-     
+      var divContent = req.body.content;
+      // console.log(divContent);
+      db.connection.query("UPDATE forms SET formdata = ?, dest = ?, attachment = ? WHERE name = ? AND collegeid = ?",
+         [divContent, selectedOption, attachment, name, collegeid], (err, results, fields) => {
+            if (err) {
+               throw err;
+            } else {
+               res.render('addtemplate');
+               // res.redirect(`/addtemplate?id=${collegeid}`);
+            }
+         });
+   });
+   
      //ADD OR EDIT FORMS
      app.get('/addnewform',isAuth,(req, res) => {
       const id= req.query.id;
@@ -1917,8 +1919,19 @@ app.get('/hod/:name', isAuth, (req, res) => {
               res.send('Invalid user type');
           }
         });
-        
-
+      //attachment_student loading and select
+      app.get('/attachment-options', (req, res) => {
+       const id=  req.query.id
+        const query = 'SELECT attaid, attaname FROM attachment where stdid=?';
+        db.connection.query(query,[id], (error, results) => {
+          if (error) {
+            console.error('Error executing query:', error);
+            res.status(500).send('Error fetching attachment options');
+          } else {
+            res.json(results);
+          }
+        });
+      });
 
         //downmload pdf
         const path = require('path');
@@ -1942,8 +1955,26 @@ app.get('/hod/:name', isAuth, (req, res) => {
           res.sendFile(absolutePath);
         });
         
-         
+      // Route for inserting a new card
+app.post('/insert-card', (req, res) => {
+  const name = req.body.name;
+  const collegeId = req.query.id;
 
+  // Prepare the SQL query
+  const sql = 'INSERT INTO forms (name, collegeid) VALUES (?, ?)';
+  const values = [name, collegeId];
+
+  // Execute the SQL query
+  db.connection.query(sql, values, (error, results) => {
+    if (error) {
+      console.error('Error inserting the card into the database: ' + error.stack);
+      res.json({ success: false });
+    } else {
+      console.log('Card inserted successfully!');
+      res.json({ success: true });
+    }
+  });   
+});
     
 }  
 
