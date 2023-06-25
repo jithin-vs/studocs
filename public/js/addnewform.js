@@ -16,7 +16,7 @@ console.log(ending);
   var content = "<strong>From,</strong> <div class='from'>&nbsp&nbsp" + from + "</div><div class='date'>" +
     date + "</div>" + "<strong>To,</strong><br> <div class='to'>&nbsp&nbsp" + to + "</div><br>" +
     "<div class='sub'><strong>Sub:</strong>" + subject + "</div><br>sir/madam,<br><div class='para1'>&nbsp&nbsp&nbsp&nbsp " +
-    paragraph1 + "</div><div class='para2'>&nbsp&nbsp&nbsp&nbsp" + paragraph2 + "</div><br><div class='end'>" + ending +"</div>";
+    paragraph1 + "</div><div class='para2'>&nbsp&nbsp&nbsp&nbsp" + paragraph2 + "</div><br><div class='end'>" + ending +"</div><br><div class=remarks><\div>";
 
   var regex = /#\w+/g;
   var highlightedContent = content.replace(regex, '<span style="color: red;">$&</span>');
