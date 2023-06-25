@@ -316,7 +316,7 @@ var routes =function(app,isAuth,encoder){
               requests.appid AS appid, student.batch AS batch, student.department AS dept, requests.date AS date 
               FROM student JOIN requests ON student.collegeid = requests.collegeid AND  student.id=requests.stdid AND student.collegeid = ? AND student.department=? AND student.batch=? AND requests.tutor=?`;
         const query2Result = await query(query2, [collegeid,dept,batch,pending]);
-
+        console.log(query2Result);
         const query3=`SELECT name, id, phno, department, address, email, photo FROM tutor WHERE id = ?`
         const query3Result = await query(query3, [username]);
         const tutorData=query3Result[0];
@@ -330,48 +330,31 @@ var routes =function(app,isAuth,encoder){
     });
 //hod
 
-app.get('/hod/:name', isAuth, (req, res) => {
+   app.get('/hod/:name', isAuth, async(req, res) => {
   if (req.session.user) {
     try {
       const username = req.params.name;
-      
-      const query1 = new Promise((resolve, reject) => {
-        db.connection.query("SELECT * FROM requests", (err, results, fields) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(results);
-          }
-        });
-      });
-
-      const query2 = new Promise((resolve, reject) => {
-        db.connection.query("SELECT name, id, phno, department, address, email, photo FROM hod WHERE id = ?", [username], (err, results, fields) => {
-          if (err) {
-            reject(err);
-          } else {
-            if (results.length === 0) {
-              reject(new Error('No data found for the specified username.'));
-            } else {
-              resolve(results[0]);
-            }
-          }
-        });
-      });
-
-      Promise.all([query1, query2])
-        .then(([requests, tutorData]) => {
-          const imagePath = tutorData.photo ? path.relative('public', tutorData.photo) : 'default/path/to/image.jpg';
-          const Photo = imagePath.replace(/\\/g, '/'); // Convert backslashes to forward slashes for URL compatibility
-
-          const applications = [];
-          const user='hod';
-          res.render('hod', {Photo, tutorData, applications,user });
-        })
-        .catch((err) => {
-          console.log(err);
-          res.send('Server error: ' + err.message);
-        });
+      const query1 = 'SELECT collegeid,department FROM hod WHERE  id = ?';
+      const query1Result = await query(query1, [username]);
+      console.log(query1Result)
+      var collegeid=query1Result[0].collegeid;
+      var dept=query1Result[0].department;
+      var pending1='pending';
+      var pending2='final:pending';  
+      //console.log('cid='+collegeid+',dept='+dept+',batch='+batch+',status='+pending)
+      const query2 = `SELECT 
+            student.name AS name, student.id AS studentId, requests.formname AS formname,
+            requests.appid AS appid, student.batch AS batch, student.department AS dept, requests.date AS date 
+            FROM student JOIN requests ON student.collegeid = requests.collegeid AND  student.id=requests.stdid AND student.collegeid = ? AND student.department=?  AND requests.hod IN(?,?)`;
+      const query2Result = await query(query2, [collegeid,dept,pending1,pending2]);
+      console.log(query2Result);
+      const query3=`SELECT name, id, phno, department, address, email, photo FROM hod WHERE id = `
+      const query3Result = await query(query3, [username]);
+      const tutorData=query3Result[0];
+      const imagePath = tutorData.photo ? path.relative('public', tutorData.photo) : 'default/path/to/image.jpg';
+      const Photo = imagePath.replace(/\\/g, '/'); // Convert backslashes to forward slashes for URL compatibility
+      const user='hod';
+      res.render('hod', { Photo, tutorData, applications:query2Result,user });
     } catch (err) {
       console.log(err);
       res.send('Server error: ' + err.message);
@@ -379,34 +362,36 @@ app.get('/hod/:name', isAuth, (req, res) => {
   } else {
     res.send('Unauthorized user');
   }
-});
+    });
 
     //hod
  
     //Principal
-    app.get('/Principal/:name',isAuth,(req, res) => {
+    app.get('/Principal/:name',isAuth,async(req, res) => {
       console.log(req.params.name);
       if(req.session.user){  
         try{
-          db.connection.query("select * from principal where id=?",
-          [req.params.name],(err,results,fields)=>{
-           if(err) {
-             throw err;
-             
-           } 
-           else{ 
-              console.log(results);
-              var Name=results[0].name; 
-              var Id=results[0].id;
-              var Mobile=results[0].phno;  
-              var Address=results[0].address
-              var Email=results[0].email;
-              var imagePath=results[0].photo;
-              const Photo = path.relative('public',imagePath);
-              applications=[];
-              res.render('Principal',{Name,Id,Mobile,Address,Email,Photo,applications})
-           }
-         }); 
+          const username = req.params.name;
+          const query1 = 'SELECT collegeid FROM principal WHERE  id = ?';
+          const query1Result = await query(query1, [username]);
+          console.log(query1Result)
+          var collegeid=query1Result[0].collegeid;
+          var pending1='pending';
+          var pending2='final:pending';  
+          //console.log('cid='+collegeid+',dept='+dept+',batch='+batch+',status='+pending)
+          const query2 = `SELECT 
+                student.name AS name, student.id AS studentId, requests.formname AS formname,
+                requests.appid AS appid, student.batch AS batch, student.department AS dept, requests.date AS date 
+                FROM student JOIN requests ON student.collegeid = requests.collegeid AND  student.id=requests.stdid AND student.collegeid = ?  AND requests.principal IN(?,?)`;
+          const query2Result = await query(query2, [collegeid,pending1,pending2]);
+          console.log(query2Result);
+          const query3=`SELECT name, id, phno, department, address, email, photo FROM hod WHERE id = `
+          const query3Result = await query(query3, [username]);
+          const tutorData=query3Result[0];
+          const imagePath = tutorData.photo ? path.relative('public', tutorData.photo) : 'default/path/to/image.jpg';
+          const Photo = imagePath.replace(/\\/g, '/'); // Convert backslashes to forward slashes for URL compatibility
+          const user='principal';
+          res.render('principal', { Photo, tutorData, applications:query2Result,user });
         }catch(err)
         {
             console.log(err);
@@ -585,19 +570,16 @@ app.get('/hod/:name', isAuth, (req, res) => {
      
     
      //add new HOD   
-     app.get('/hodadd',isAuth,(req,res)=>{
+     app.get('/hodadd',isAuth,async(req,res)=>{  
             
-      db.connection.query("select * from hod",
-          [req.body.name],(err,results,fields)=>{
-           if(err) {
-             throw err;
-             
-           }
-           else{
-              res.render('addnewhod',{applications:results,id:req.query.id});
-           }
-         }); 
-         
+      const query1 = 'SELECT collegeid FROM principal WHERE  id = ?';
+      const query1Result = await query(query1, [req.query.id]);
+      const collegeid = query1Result[0].collegeid;
+
+      const query2 = 'SELECT * from hod WHERE  collegeid = ?';
+      const query2Result = await query(query2, [collegeid]); 
+
+      res.render('addnewhod',{applications:query2Result,id:req.query.id});
     });
 
      app.post('/hodadd',encoder,(req,res)=>{ 
