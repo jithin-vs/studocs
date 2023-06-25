@@ -551,7 +551,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
         const query1Result = await query(query1, [req.query.id]);
 
         const collegeid=query1Result[0].collegeid;
-        const department=query2Result[0].department;
+        const department=query1Result[0].department;
 
         const query2 = 'SELECT * FROM tutor WHERE  collegeid = ? AND department=?';
         const query2Result = await query(query2, [collegeid,department]);
@@ -727,8 +727,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
      app.get('/principaladd',isAuth,async(req,res)=>{
            
 
-      const collegeid=query1Result[0].collegeid;
-
+    
       const query2 = 'SELECT * FROM principal WHERE  collegeid = ?';
       const query2Result = await query(query2, [req.query.id]);
 
@@ -912,7 +911,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
         var checkVal1='verified';
         var checkVal2='completed';
         var checkVal3='rejected';
-        console.log('cid='+collegeid+',dept='+dept+'status='+pending)
+        console.log('cid='+collegeid+',dept='+dept)
         const query2 = `SELECT
               student.collegeid AS collegeId, student.id AS studentId,requests.formname AS formname,
               requests.appid AS appid, student.batch AS batch, student.department AS dept ,requests.date AS date 
@@ -1529,14 +1528,13 @@ app.get('/hod/:name', isAuth, (req, res) => {
       app.post('/hod/:name/search', async (req, res) => { // Specify the URL for search with the name parameter
         const searchTerm = req.body.search;
       
-        const query1 = 'SELECT collegeid, batch, department FROM hod WHERE id = ?';
+        const query1 = 'SELECT collegeid, department FROM hod WHERE id = ?';
         const query1Result = await query(query1, [req.params.name]);
         const collegeid = query1Result[0].collegeid;
-        const batch = query1Result[0].batch;
         const department = query1Result[0].department;
         // Perform search query
-        const query2 = 'SELECT * FROM tutor WHERE collegeid = ? AND batch = ? AND department = ? AND (name LIKE ? OR id LIKE ?)';
-        const params = [collegeid, batch, department, `%${searchTerm}%`, `%${searchTerm}%`];
+        const query2 = 'SELECT * FROM tutor WHERE collegeid = ? AND department = ? AND (name LIKE ? OR id LIKE ?)';
+        const params = [collegeid, department, `%${searchTerm}%`, `%${searchTerm}%`];
         
       
         db.connection.query(query2, params, (err, results) =>  {
@@ -1560,7 +1558,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
 
         // Perform search query
         const query2 = 'SELECT * FROM hod WHERE collegeid = ? AND (name LIKE ? OR id LIKE ?)';
-        const params = [collegeid, batch, department, `%${searchTerm}%`, `%${searchTerm}%`];
+        const params = [collegeid, `%${searchTerm}%`, `%${searchTerm}%`];
         
       
         db.connection.query(query2, params, (err, results) =>  {
@@ -1576,13 +1574,11 @@ app.get('/hod/:name', isAuth, (req, res) => {
          
       app.post('/college/:name/search', async(req, res) => { // Specify the URL for search with the name parameter
         const searchTerm = req.body.search;
-        const query1 = 'SELECT collegeid FROM college WHERE id = ?';
-        const query1Result = await query(query1, [req.params.name]);
-        const collegeid = query1Result[0].collegeid;
+        
 
         // Perform search query
         const query2 = 'SELECT * FROM hod WHERE collegeid = ? AND (name LIKE ? OR id LIKE ?)';
-        const params = [collegeid, batch, department, `%${searchTerm}%`, `%${searchTerm}%`];
+        const params = [req.params.name,`%${searchTerm}%`, `%${searchTerm}%`];
         // Perform search query
       
         db.connection.query(query2, params, (err, results) =>  {
