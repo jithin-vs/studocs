@@ -443,10 +443,12 @@ app.get('/hod/:name', isAuth, (req, res) => {
     }); 
 
    //Student
-    app.get('/student/:name',isAuth,(req, res) => {
+    app.get('/student/:name',isAuth,async(req, res) => {
       console.log(req.params.name);
       if(req.session.user){
         try{
+          const query1 = 'SELECT * FROM attachment where stdid=?';
+          const query1Result = await query(query1, [req.params.name]);
           db.connection.query("select * from student where id=?",
           [req.params.name],(err,results,fields)=>{
            if(err) {
@@ -463,15 +465,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
               var addr=results[0].address
               var email=results[0].email;
               var photo=results[0].photo;
-              db.connection.query('SELECT * FROM attachment', function (error, results1) {
-                if (error) {
-                  console.error('Error retrieving attachments from the database');
-                }
-               else{
-               console.log(results1);
-              res.render('student',{name,admno,regno,dept,phno,addr,email,photo,attachments: results1})}
-            });
-           }
+              res.render('student',{name,admno,regno,dept,phno,addr,email,photo,attachments:query1Result})}
          }); 
         }catch(err)
         {
@@ -552,7 +546,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
      //tutor
       app.get('/tutoradd',isAuth,(req,res)=>{     
           
-        db.connection.query("select * from tutor ",
+        db.connection.query("select * from tutor where batch=? and deoartment=? AND collegeid=? ",
         [req.body.name],(err,results,fields)=>{
         if(err) {
           throw err;
@@ -675,25 +669,20 @@ app.get('/hod/:name', isAuth, (req, res) => {
 
  
       //student add  
-     app.get('/studentadd',isAuth,(req,res)=>{
-                  
-            db.connection.query("select * from Student",
-                [req.body.name],(err,results,fields)=>{
-                if(err) {
-                  throw err;
-                  
-                }
-                else{
-                   console.log(results);
-                   var id=req.query.id;
-                   if(id === null)
-                            id='12345'
-                   console.log(id);
-                    res.render('addnewstudent',{applications:results,id});
-                } 
-              }); 
+     app.get('/studentadd',isAuth,async(req,res)=>{
+            
+      const query1 = 'SELECT collegeid,batch,department FROM tutor WHERE  id = ?';
+      const query1Result = await query(query1, [req.query.id]);
+      const collegeid=query1[0].collegeid;
+      const batch=query1[0].batch;
+      const department=query1[0].department;
+
+      const query2 = 'SELECT * FROM student WHERE  collegeid=? AND batch=? AND department';
+      const query2Result = await query(query2, [collegeid,batch,department]);
+        
+      res.render('addnewstudent',{applications:query2Result,id:req.query.id});
               
-          });
+      });
    
      app.post('/studentadd',encoder,(req,res)=>{
         var tutorid=req.query.id;
@@ -1051,20 +1040,15 @@ app.get('/hod/:name', isAuth, (req, res) => {
 /*----------- FORM CONTROL AND MAANGEMENT -------------*/
 
       // ADDING TEMPLATE 
-      app.get('/addtemplate',isAuth,(req,res)=>{         
+      app.get('/addtemplate',isAuth,async(req,res)=>{         
         try{
-          var id=req.query.id;
-          db.connection.query("select * from forms",
-        [req.params.name],(err,results,fields)=>{
-        if(err) {
-          throw err; 
-        } 
-        else{
+          const id=req.query.id;
+          const query1 = 'SELECT name FROM forms WHERE  collegeid = ?';
+          const query1Result = await query(query1, [req.query.id]);
+          var results=query1Result;
           const divContent = results.length>0?results[0].name:null;
           const applications = results.length>0?results[0].name:null;// Empty array, can be populated later if needed
           res.render('addtemplate',{applications:results,id});
-        }
-        });
         }catch(err){
           console.log(err); 
         }  
@@ -1714,7 +1698,11 @@ app.get('/hod/:name', isAuth, (req, res) => {
         const { attaname } = req.body;
         const name = req.params.name;
         let collegeid, regno;
-      
+
+        if (!req.files || !req.files.file) {
+          // Display error notification using SweetAlert
+          return res.status(400).send('<script>Swal.fire("Error", "No file selected", "error");</script>');
+        }
         db.connection.query("SELECT * FROM student WHERE id = ?", [name], (err, results1, fields) => {
           if (err) {
             throw err;
@@ -1745,23 +1733,9 @@ app.get('/hod/:name', isAuth, (req, res) => {
                       console.error('Error saving attachment to the database');
                       res.status(500).send('Internal Server Error'+error);
                     } else {
-                      var name = results1[0].name;
-                      var admno = results1[0].admno;
-                      var regno = results1[0].id;
-                      var dept = results1[0].department;
-                      var phno = results1[0].phno;
-                      var addr = results1[0].address;
-                      var email = results1[0].email;
-                      var photo = results1[0].photo;
               
-                      db.connection.query('SELECT * FROM attachment', function (error, results2) {
-                        if (error) {
-                          console.error('Error retrieving attachments from the database');
-                          res.status(500).send('Internal Server Error');
-                        } else {
-                          res.render('student', { name, admno, regno, dept, phno, addr, email, photo, attachments: results2 });
-                        }
-                      });
+                          res.redirect(`/student/${regno}`);
+
                     }
                   });
                 })
