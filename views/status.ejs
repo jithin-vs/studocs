@@ -49,6 +49,7 @@
                 <tr>
                   <th>Form ID</th>
                   <th>Application ID</th>
+                  <th>Application NAME</th>
                   <th>Submit date</th>
                   <th hidden>formid</th>
                 </tr>
@@ -58,6 +59,7 @@
                 <tr class="status-row">
                   <td ><%= application.formid %></td>
                   <td ><%= application.appid %></td>
+                  <td ><%= application.formname %></td> 
                   <% const dateFromDatabase = application.date %>
                   <% const options = { day: '2-digit', month: '2-digit', year: 'numeric' }; %>
                   <% const formattedDate = dateFromDatabase ? dateFromDatabase.toLocaleDateString(undefined, options) : null; %>

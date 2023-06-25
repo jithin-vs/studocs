@@ -81,9 +81,10 @@
         <tbody>
         <% applications.forEach(function(application) { %>
             <tr>
-              <td data-toggle="mod" data-target="#myMod"><%= application.id %></td>
+              <td data-toggle="mod" data-target="#myMod"><%= application.formid %></td>
+              <td data-toggle="moda" data-target="#myModa"><%= application.formname %></td>
               <td data-toggle="moda" data-target="#myModa"><%= application.name %></td>
-              <td data-toggle="moda" data-target="#myModa"><%= applicant.name %></td>
+              
               <td data-toggle="mo" data-target="#myMo"><%= application.date %></td>
               <td>
                 <button type="button" class="btn btn-success" data-toggle="dwd" data-target="#dwd">view</button>
