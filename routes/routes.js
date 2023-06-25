@@ -598,7 +598,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
            }
          }); 
          
-     });
+    });
 
      app.post('/hodadd',encoder,(req,res)=>{ 
         
