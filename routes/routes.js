@@ -443,10 +443,12 @@ app.get('/hod/:name', isAuth, (req, res) => {
     }); 
 
    //Student
-    app.get('/student/:name',isAuth,(req, res) => {
+    app.get('/student/:name',isAuth,async(req, res) => {
       console.log(req.params.name);
       if(req.session.user){
         try{
+          const query1 = 'SELECT * FROM attachment where stdid=?';
+          const query1Result = await query(query1, [req.params.name]);
           db.connection.query("select * from student where id=?",
           [req.params.name],(err,results,fields)=>{
            if(err) {
@@ -463,15 +465,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
               var addr=results[0].address
               var email=results[0].email;
               var photo=results[0].photo;
-              db.connection.query('SELECT * FROM attachment', function (error, results1) {
-                if (error) {
-                  console.error('Error retrieving attachments from the database');
-                }
-               else{
-               console.log(results1);
-              res.render('student',{name,admno,regno,dept,phno,addr,email,photo,attachments: results1})}
-            });
-           }
+              res.render('student',{name,admno,regno,dept,phno,addr,email,photo,attachments:query1Result})}
          }); 
         }catch(err)
         {
@@ -1051,20 +1045,10 @@ app.get('/hod/:name', isAuth, (req, res) => {
 /*----------- FORM CONTROL AND MAANGEMENT -------------*/
 
       // ADDING TEMPLATE 
-      app.get('/addtemplate',isAuth,(req,res)=>{         
+      app.get('/addtemplate',isAuth,async(req,res)=>{         
         try{
-          var id=req.query.id;
-          db.connection.query("select * from forms",
-        [req.params.name],(err,results,fields)=>{
-        if(err) {
-          throw err; 
-        } 
-        else{
-          const divContent = results.length>0?results[0].name:null;
-          const applications = results.length>0?results[0].name:null;// Empty array, can be populated later if needed
-          res.render('addtemplate',{applications:results,id});
-        }
-        });
+          const query1 = 'SELECT * FROM forms WHERE  stdid = ?';
+          const query1Result = await query(query1, [req.query.id]);
         }catch(err){
           console.log(err); 
         }  
@@ -1212,7 +1196,8 @@ app.get('/hod/:name', isAuth, (req, res) => {
           if(err) {
             throw err; 
           } else{
-             res.redirect(`/addtemplate?id=${collegeid}`);
+              res.render('addtemplate');
+             //res.redirect(`/addtemplate?id=${collegeid}`);
           }    
        });
        });
@@ -1712,7 +1697,11 @@ app.get('/hod/:name', isAuth, (req, res) => {
         const { attaname } = req.body;
         const name = req.params.name;
         let collegeid, regno;
-      
+
+        if (!req.files || !req.files.file) {
+          // Display error notification using SweetAlert
+          return res.status(400).send('<script>Swal.fire("Error", "No file selected", "error");</script>');
+        }
         db.connection.query("SELECT * FROM student WHERE id = ?", [name], (err, results1, fields) => {
           if (err) {
             throw err;
@@ -1752,7 +1741,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
                       var email = results1[0].email;
                       var photo = results1[0].photo;
               
-                      db.connection.query('SELECT * FROM attachment', function (error, results2) {
+                      db.connection.query('SELECT * FROM attachment where stdid=?',[req.params], function (error, results2) {
                         if (error) {
                           console.error('Error retrieving attachments from the database');
                           res.status(500).send('Internal Server Error');
