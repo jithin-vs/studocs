@@ -1243,7 +1243,9 @@ app.get('/hod/:name', isAuth, (req, res) => {
           case 'tutor'    : nextUser = 'hod' ;       break;
           case 'hod'      : nextUser = 'principal' ; break;
           case 'principal': nextUser = 'office' ;    break;
-        }    
+        }   
+        if(user ==='office')
+           nextUser=user; 
         console.log(nextUser+','+appid);
        // Check the flag column value before executing the update query
           const checkQuery = `SELECT ${user},${nextUser} FROM requests WHERE appid =?`;  
