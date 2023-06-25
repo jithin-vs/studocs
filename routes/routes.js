@@ -896,7 +896,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
         var checkVal1='verified';
         var checkVal2='completed';
         var checkVal3='rejected';
-        console.log('cid='+collegeid+',dept='+dept+'status='+pending)
+        console.log('cid='+collegeid+',dept='+dept+'status=')
         const query2 = `SELECT
               student.collegeid AS collegeId, student.id AS studentId,requests.formname AS formname,
               requests.appid AS appid, student.batch AS batch, student.department AS dept ,requests.date AS date 
