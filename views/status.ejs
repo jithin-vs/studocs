@@ -149,7 +149,10 @@
     $(document).ready(function() {
       $('.status-row').click(function() {
         var appId = $(this).find('input#appid').val();
-  
+var active1=" ";
+var active2=" ";
+var active3=" ";
+var active4=" ";
         $.ajax({
           url: '/fetch-request-data',
           method: 'POST',
@@ -160,14 +163,16 @@
             var requestData = response.requestData;
             var responseData = response.responseData;
 
-            $('#requestContent').html(requestData);
-            $('#requestContent').show();
-
-            // Update the progress bar based on the verification status
-            $('.a1').addClass(responseData.active1);
+             // Update the progress bar based on the verification status
+             $('.a1').addClass(responseData.active1);
             $('.a2').addClass(responseData.active2);
             $('.a3').addClass(responseData.active3);
             $('.a4').addClass(responseData.active4);
+
+            $('#requestContent').html(requestData);
+            $('#requestContent').show();
+
+           
           },
           error: function() {
             alert('Error occurred while fetching request data.');

@@ -36,7 +36,7 @@
 
     <div class="container-fluid">
         <div class="row">
-          <div class="col-sm-6 side1">
+          <div class="col-sm-6 side1" >
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <h4 style="margin-left: 20px;"><u>Verified Requests</u></h4>
             <div style="display: flex; align-items: center; " >
@@ -69,10 +69,10 @@
             </div>
           </div>
             </div>
-            <div class="col-lg-12 panel2" style="overflow-x: auto;">
-              <table class="table" style="overflow-x: auto;">
+            <div class="col-lg-12 panel2" >
+              <table class="table" >
                 <thead>
-                  <tr>
+                  <tr >
                     <th>ID</th>
                     <th>Application Name</th>
                     <th>Name</th>
@@ -84,8 +84,9 @@
                 </thead>
               <tbody>
               <% applications.forEach(function(application) { %>
-                  <tr>
+                  <tr class="status-row">
                     <td data-toggle="mod" data-target="#myMod"><%= application.appid %></td>
+                    <td hidden><input type="text" id="appid" value="<%= application.appid %>"></td>
                     <td data-toggle="moda" data-target="#myModa"><%= application.formname %></td>
                     <td data-toggle="moda" data-target="#myM"><%= application.name %></td>
                     <td data-toggle="moda" data-target="#myModa"><%= application.batch %></td>
@@ -108,7 +109,7 @@
             <div class="arrow-left">
               <i class="fa fa-arrow-circle-left fa-3x" ></i>
             </div>
-            <div class="col-sm-6 panel">
+            <div id="requestContent" class="col-sm-6 panel">
               <!-- Existing code for the panel -->
             </div>
             <div class="arrow-right">
@@ -138,5 +139,29 @@
         </div>
       </div>
     </div>
+    <script>
+      $(document).ready(function() {
+        $('.status-row').click(function() {
+          var appId = $(this).find('input#appid').val();
+    
+          $.ajax({
+            url: '/fetch-request-data',
+            method: 'POST',
+            data: {
+              appid: appId
+            },
+            success: function(response) {
+              var requestData = response.requestData;
+  
+              $('#requestContent').html(requestData);
+              $('#requestContent').show();
+            },
+            error: function() {
+              alert('Error occurred while fetching request data.');
+            }
+          });
+        });
+      });
+    </script>
   </body>
 </html>
