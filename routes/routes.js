@@ -1047,8 +1047,13 @@ app.get('/hod/:name', isAuth, (req, res) => {
       // ADDING TEMPLATE 
       app.get('/addtemplate',isAuth,async(req,res)=>{         
         try{
-          const query1 = 'SELECT * FROM forms WHERE  stdid = ?';
+          const id=req.query.id;
+          const query1 = 'SELECT name FROM forms WHERE  collegeid = ?';
           const query1Result = await query(query1, [req.query.id]);
+          var results=query1Result;
+          const divContent = results.length>0?results[0].name:null;
+          const applications = results.length>0?results[0].name:null;// Empty array, can be populated later if needed
+          res.render('addtemplate',{applications:results,id});
         }catch(err){
           console.log(err); 
         }  
