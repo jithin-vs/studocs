@@ -14,8 +14,8 @@
   <link rel="stylesheet" href="./css/addtemp.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
   <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'>
-  <link rel="stylesheet" href="path/to/sweetalert2.min.css">
-  <script src="path/to/sweetalert2.min.js"></script>
+  <link rel="stylesheet" href="/css/sweetalert2.min.css">
+  <script src="/js/sweetalert2.min.js"></script>
 
   <style>
     .card {
@@ -125,12 +125,8 @@
                   console.log("name="+name+"applicatons="+applications)
                   const result = checkNameExists(applications, name);
                   if (result === 'Name already exists!') {
-                    // Display a popup notification using SweetAlert
-                    Swal.fire({
-                      title: 'Name Exists',
-                      text: 'Name already exists!',
-                      icon: 'error'
-                    });
+                      // Display a popup notification using the alert() function
+                      alert('Name already exists!');
                   } else {
                     // Proceed with creating the card
                     createCard(name);
@@ -140,12 +136,22 @@
             }
 
             function checkNameExists(applicationsArray, name) {
-              const existingName = applicationsArray.find((app) => app.name === name);
-              if (existingName) {
-                return "Name already exists!";
-              } else {
-                return "Name does not exist.";
-              }
+              console.log("inside checkname,");
+              console.log("application="+applicationsArray);
+              console.log("name="+name);
+              for (let i = 0; i < applicationsArray.length; i++) {
+                  if (applicationsArray[i] === name) {
+                    return "Name already exists!"; // Name found
+                  }
+                }
+                return  "Name does not exist."; 
+              // const existingName = applicationsArray.find((app) => app.name === name);
+              // console.log("exist flag="+existingName);
+              // if (existingName) {
+              //   return "Name already exists!";
+              // } else {
+              //   return "Name does not exist.";
+              // }
             }
                   
             function deleteCard(template) {
