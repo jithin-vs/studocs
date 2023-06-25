@@ -22,17 +22,15 @@
     margin: 0PX; 
     padding: 0PX;
     overflow-y:auto;
+    position: relative;
     height: 652px;
    }
    .panel2{
-    width: 100%;
     margin-top: 20px;
     margin-left: 20px;
     background-color:rgb(255, 255, 255); 
     overflow-y:auto;
     height: auto;
-    overflow-x: auto;
-    width: auto;
    }
    
    .side2{

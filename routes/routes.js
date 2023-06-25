@@ -807,6 +807,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
           // Render a template not found message to the client
           return res.render('template-not-found');
         }
+        console.log(query2Result)
             // Generate a unique ID
               let uniqueId;
               let idExists = true;
@@ -904,14 +905,14 @@ app.get('/hod/:name', isAuth, (req, res) => {
         const query1 = 'SELECT collegeid,department FROM hod WHERE id = ?';
         const query1Result = await query(query1, [req.query.id]);
         
-        var collegeid=query1Result[0].collegeid;  
+        var collegeid=query1Result[0].collegeid;   
         var dept=query1Result[0].department;   
         var checkVal1='verified';
         var checkVal2='completed';
         var checkVal3='rejected';
         console.log('cid='+collegeid+',dept='+dept)
         const query2 = `SELECT
-              student.collegeid AS collegeId, student.id AS studentId,requests.formname AS formname,
+              student.name AS name,student.collegeid AS collegeId, student.id AS studentId,requests.formname AS formname,
               requests.appid AS appid, student.batch AS batch, student.department AS dept ,requests.date AS date 
               FROM student JOIN requests ON student.collegeid = requests.collegeid  AND 
               student.id=requests.stdid AND student.collegeid =?  AND student.id=requests.stdid  AND student.department=? AND requests.hod IN(?,?,?)`;
@@ -1117,21 +1118,21 @@ app.get('/hod/:name', isAuth, (req, res) => {
           return res.status(500).send('Error occurred while fetching request data.');
         } else {
           const requestData = results[0].request_data;
-          let active1 = '';
-  let active2 = '';
-  let active3 = '';
-  let active4 = '';
+          var active1 = ' ';
+  var active2 = ' ';
+  var active3 = ' ';
+  var active4 = ' ';
 
-  if (results[0].tutor === 'verified') {
+  if (results[0].tutor === 'verified' || results[0].tutor === 'completed') {
     active1 = 'active';
   } 
-   if (results[0].hod === 'verified') {
+   if (results[0].hod === 'verified'|| results[0].hod === 'completed') {
     active2 = 'active';
   } 
-   if (results[0].principal === 'verified') {
+   if (results[0].principal === 'verified' || results[0].principal === 'completed') {
     active3 = 'active';
   } 
-   if (results[0].office === 'verified') {
+   if (results[0].office === 'verified' || results[0].office === 'completed') {
     active4 = 'active';
   }
     const responseData = {
@@ -1144,7 +1145,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
           console.log(responseData);
         
           res.send({ requestData: requestData, responseData: responseData });
-        }
+        } 
       });
     });
     
