@@ -527,7 +527,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
         const query1 = 'SELECT collegeid,department FROM hod WHERE  id = ?';
         const query1Result = await query(query1, [req.query.id]);
 
-        const collegeid=query1Result[0].collegeid;
+        const collegeid=query1Result[0].collegeid;  
         const department=query1Result[0].department;
 
         const query2 = 'SELECT * FROM tutor WHERE  collegeid = ? AND department=?';
