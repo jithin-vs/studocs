@@ -1189,25 +1189,27 @@ app.get('/hod/:name', isAuth, (req, res) => {
       
 
      //SAVING TEMPLATEFORMS
-     app.post('/save-template',(req,res)=>{   
-      var name=req.query.name; 
+     app.post('/save-template', (req, res) => {
+      var name = req.query.name;
       const selectedOption = req.body.selectedOption;
+      const attachment = req.body.attachment;
       console.log(selectedOption);
-      //console.log(name);
-      var collegeid=req.query.id; 
+      // console.log(name);
+      var collegeid = req.query.id;
       console.log(name);
-      var divContent = req.body.content; 
-     //  console.log(divContent);
-       db.connection.query("insert into forms(name,collegeid,formdata,dest)values(?,?,?,?)",
-         [name,collegeid,divContent,selectedOption],(err,results,fields)=>{
-          if(err) {
-            throw err; 
-          } else{
-             res.redirect(`/addtemplate?id=${collegeid}`); 
-          }    
-       });
-       });
-     
+      var divContent = req.body.content;
+      // console.log(divContent);
+      db.connection.query("UPDATE forms SET formdata = ?, dest = ?, attachment = ? WHERE name = ? AND collegeid = ?",
+         [divContent, selectedOption, attachment, name, collegeid], (err, results, fields) => {
+            if (err) {
+               throw err;
+            } else {
+               res.render('addtemplate');
+               // res.redirect(`/addtemplate?id=${collegeid}`);
+            }
+         });
+   });
+   
      //ADD OR EDIT FORMS
      app.get('/addnewform',isAuth,(req, res) => {
       const id= req.query.id;
@@ -1953,8 +1955,26 @@ app.get('/hod/:name', isAuth, (req, res) => {
           res.sendFile(absolutePath);
         });
         
-         
+      // Route for inserting a new card
+app.post('/insert-card', (req, res) => {
+  const name = req.body.name;
+  const collegeId = req.query.id;
 
+  // Prepare the SQL query
+  const sql = 'INSERT INTO forms (name, collegeid) VALUES (?, ?)';
+  const values = [name, collegeId];
+
+  // Execute the SQL query
+  db.connection.query(sql, values, (error, results) => {
+    if (error) {
+      console.error('Error inserting the card into the database: ' + error.stack);
+      res.json({ success: false });
+    } else {
+      console.log('Card inserted successfully!');
+      res.json({ success: true });
+    }
+  });   
+});
     
 }  
 
