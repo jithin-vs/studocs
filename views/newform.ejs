@@ -90,7 +90,14 @@
           <%- templateContent %>
         </div>
         <div class="subm">
-          <button class="btn btn-secondary scc dropdown-toggle" style="background-color: blue;">Add Attachment</button>
+          <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="attachment-dropdown-button" data-toggle="dropdown">
+              Add Attachment
+            </button>
+            <ul class="dropdown-menu" id="attachment-dropdown">
+              <!-- Attachment options will be dynamically added here -->
+            </ul>
+          </div>
           <button class="btn btn-secondary scc" style="background-color:green;" data-target="#confirmationModal" data-toggle="modal">Submit</button>
           <br>
         </div>
@@ -148,6 +155,39 @@
   
 </script>
  <script src="/js/newform.js"></script>
+ <!-- Add this line within the <head> section -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Add this script after the other scripts -->
+<script>
+$(document).ready(function() {
+  $.ajax({
+    url: '/attachment-options?id=<%= id%>',
+    type: 'GET',
+    success: function(data) {
+      data.forEach(function(option) {
+        var checkbox = $('<input>')
+          .attr('type', 'checkbox')
+          .attr('name', 'attachments')
+          .attr('value', option.attaid);
+        var label = $('<label>').text(option.attaname);
+
+        $('#attachment-dropdown').append(
+          $('<li>').append(
+            $('<div>')
+              .addClass('dropdown-item')
+              .append(checkbox)
+              .append(label)
+          )
+        );
+      });
+    },
+    error: function() {
+      console.error('Error fetching attachment options');
+    }
+  });
+});
+</script>
  <script>
   
   function submitForm() {
@@ -163,10 +203,17 @@
     }
 
     var divContent = document.getElementById("letter-preview").innerHTML;
+    var selectedAttachments = [];
+  $("input[name='attachments']:checked").each(function() {
+    selectedAttachments.push($(this).val());
+  });
+  var attachmentsString = selectedAttachments.join(','); 
+  console.log(selectedAttachments);
     var data = [{
       formid: '<%=formid%>',
       id: '<%=id%>',
-      content: divContent
+      content: divContent,
+      attachments: attachmentsString 
     }];
     console.log(divContent);
     var jsonData = encodeURIComponent(JSON.stringify(data));

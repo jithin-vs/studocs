@@ -14,6 +14,38 @@
     letter-spacing: 2px;
     font-size: 30px;
   }
+
+  .navbar .btn,
+.navbar .btn:focus {
+  padding: 8px 20px;
+  margin-left: 10px;
+  border-radius: 5px;
+  background-color: #4314B6;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+}
+.navbar .btn1{
+  padding: 8px 20px;
+  margin-left: 10px;
+  border-radius: 5px;
+  color: white;
+  background-color: rgba(29, 29, 32, 1);
+  border:1px solid  rgba(82, 82, 90, 1);;
+  font-size: 14px;
+  font-weight: 600;
+}
+.navbar .btn2,
+.navbar .btn2:focus{
+  padding: 8px 20px;
+  margin-left: 10px;
+  border-radius: 5px;
+  color: white;
+  background-color: rgb(237, 47, 47);
+  font-size: 14px;
+  font-weight: 600;
+}
   .form {
     padding: 20px;;
   }
@@ -22,17 +54,15 @@
     margin: 0PX; 
     padding: 0PX;
     overflow-y:auto;
+    position: relative;
     height: 652px;
    }
    .panel2{
-    width: 100%;
     margin-top: 20px;
     margin-left: 20px;
     background-color:rgb(255, 255, 255); 
     overflow-y:auto;
     height: auto;
-    overflow-x: auto;
-    width: auto;
    }
    
    .side2{

@@ -11,6 +11,10 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.debug.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.0/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/latest/html2pdf.bundle.js"></script>
   <link rel="stylesheet" href="/css/verified_req.css">
 </head>
 <body>
@@ -27,6 +31,9 @@
           <li class="nav-item">
             <a class="nav-link active" onclick="history.back()">Home</a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link active btn" onclick="generatePDF()">Download <i class="fa fa-download"></i></a>
+        </li>
           <li class="nav-item">
             <a class="nav-link active" href="#" data-target="#myModal" data-toggle="modal">Sign Out <i class="fa fa-sign-out"></i></a>
           </li>
@@ -53,21 +60,24 @@
                     <th>ID</th>
                     <th>Application Name</th>
                     <th>Submit date</th>
-                    <th>Action</th>
+                    <!-- <th>Action</th> -->
                   </tr>
                 </thead>
               <tbody>
+
               <% applications.forEach(function(application) { %>
-                  <tr>
-                    <td data-toggle="mod" data-target="#myMod"><%= application.appid %></td>
-                    <td data-toggle="moda" data-target="#myModa"><%= application.name %></td>
+                  <tr class="status-row">
+                    <td><%= application.appid %></td>
+                    <td hidden><input type="text" id="appid" value="<%= application.appid %>"></td>
+                    <td hidden><input type="text" id="appid" value="<%= application.appid %>"></td>
+                    <td><%= application.formname %></td>
                     <% const dateFromDatabase = application.date %>
                     <% const options = { day: '2-digit', month: '2-digit', year: 'numeric' }; %>
                     <% const formattedDate = dateFromDatabase ? dateFromDatabase.toLocaleDateString(undefined, options) : null; %>
-                    <td data-toggle="mo" data-target="#myMo"><%= formattedDate %></td>
-                    <td>
+                    <td ><%= formattedDate %></td>
+                    <!-- <td>
                       <button type="button" class="btn btn-success" data-toggle="dwd" data-target="#dwd">download</button>
-                    </td>
+                    </td> -->
                   </tr>
               <% }); %>
               </tbody>
@@ -79,7 +89,7 @@
             <div class="arrow-left">
               <i class="fa fa-arrow-circle-left fa-3x" ></i>
             </div>
-            <div class="col-sm-6 panel">
+            <div id="requestContent" class="col-sm-6 panel">
               <!-- Existing code for the panel -->
             </div>
             <div class="arrow-right">
@@ -109,5 +119,85 @@
         </div>
       </div>
     </div>
+    <script>
+      var dw=0;
+      $(document).ready(function() {
+        $('.status-row').click(function() {
+          var appId = $(this).find('input#appid').val();
+          dw=1;
+          console.log(appId)
+          $.ajax({
+            url: '/fetch-request-data',
+            method: 'POST',
+            data: {
+              appid: appId
+            },
+            success: function(response) {
+              var requestData = response.requestData;
+  
+              $('#requestContent').html(requestData);
+              $('#requestContent').show();
+            },
+            error: function() {
+              alert('Error occurred while fetching request data.');
+            }
+          });
+        });
+      });
+      function generatePDF() { 
+        if(dw==0){
+          alert("please select any form");
+        } 
+        else{
+
+       
+  var panelElement = document.getElementById('requestContent');
+  
+  // Calculate the total height of the scrollable panel
+  var totalHeight = panelElement.scrollHeight;
+  
+  // Set the height of the panel to its full content height
+  panelElement.style.height = totalHeight + 'px';
+
+  // Create a new jsPDF instance
+  var pdf = new jsPDF({
+    orientation: 'portrait',
+    unit: 'pt',
+    format: 'a4'
+  
+  })};
+
+  // Function to capture the scrollable panel as an image
+  function capturePanelImage() {
+    panelElement.style.border = 'none';
+    html2canvas(panelElement).then(canvas => {
+      var imageData = canvas.toDataURL('image/png',1.0);
+      var imgWidth = pdf.internal.pageSize.getWidth();
+    var imgHeight = pdf.internal.pageSize.getHeight();
+      
+      // Add the captured image to the PDF
+      pdf.addImage(imageData, 'PNG', 0, 0, imgWidth, imgHeight, '', 'FAST');
+
+      // Check if there's more content to capture
+      if (panelElement.scrollTop + panelElement.offsetHeight < totalHeight) {
+        // Scroll down to the next position
+        panelElement.scrollTop += panelElement.offsetHeight;
+        console.log('hi')
+        // Call the capturePanelImage function recursively after a delay
+        setTimeout(capturePanelImage, 500); // Adjust the delay if needed
+      } else {
+        // Save the PDF file
+        pdf.save('download.pdf');
+
+        // Reset the panel height to its original value
+        panelElement.style.height = '';
+      }
+    });
+  }
+
+  // Call the capturePanelImage function to start capturing the panel content
+  capturePanelImage();
+}
+</script>
   </body>
 </html>
