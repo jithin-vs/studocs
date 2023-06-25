@@ -1120,7 +1120,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
         } else {
           const requestData = results[0].request_data;
           var active1 = ' ';
-  var active2 = ' ';
+  var active2 = ' '; 
   var active3 = ' ';
   var active4 = ' ';
 
