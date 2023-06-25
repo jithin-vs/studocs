@@ -14,8 +14,8 @@
   <link rel="stylesheet" href="./css/addtemp.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
   <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'>
-  <link rel="stylesheet" href="path/to/sweetalert2.min.css">
-  <script src="path/to/sweetalert2.min.js"></script>
+  <link rel="stylesheet" href="/css/sweetalert2.min.css">
+  <script src="/js/sweetalert2.min.js"></script>
 
   <style>
     .card {
@@ -71,81 +71,108 @@
       </div>
       <script>
         document.addEventListener('DOMContentLoaded', function() {
-          const cardContainer = document.getElementById('cardContainer');
-      
-            // Fetch the existing template names from the server
-            fetch('/get-templates')
-              .then(response => response.json())
-              .then(data => {
-                // Loop through the template names and create the card elements
-                data.templates.forEach(template => {
-                  createCard(template);
-                });
+  const cardContainer = document.getElementById('cardContainer');
 
-                // Add the "New Card" option at the end
-                createNewCardOption(data.templates);
-              })
-              .catch(error => console.error(error));
+  // Fetch the existing template names from the server
+  fetch('/get-templates')
+    .then(response => response.json())
+    .then(data => {
+      // Loop through the template names and create the card elements
+      data.templates.forEach(template => {
+        createCard(template);
+      });
 
-      
-          function createCard(template) {
-            const card = document.createElement('div');
-            card.classList.add('card');
-            card.addEventListener('dblclick', function() {
-              // Redirect to the "template-display" page with the template name as a query parameter
-              window.location.href = '/addnewform?name=' + encodeURIComponent(template) + '&id=<%=id%>';
-            });
-      
-            const nameSpan = document.createElement('span');
-            nameSpan.classList.add('name');
-            nameSpan.textContent = template;
-      
-            card.appendChild(nameSpan);
-      
-            if (!card.classList.contains('new-card')) {
-              const deleteIcon = document.createElement('span');
-              deleteIcon.classList.add('delete-icon');
-              deleteIcon.innerHTML = '<i class="fas fa-trash"></i>';
-              deleteIcon.addEventListener('click', function(event) {
-                event.stopPropagation();
-                deleteCard(template);
-              });
-              card.appendChild(deleteIcon);
+      // Add the "New Card" option at the end
+      createNewCardOption(data.templates);
+    })
+    .catch(error => console.error(error));
+
+  function createCard(template) {
+    const card = document.createElement('div');
+    card.classList.add('card');
+    card.addEventListener('dblclick', function() {
+      // Redirect to the "template-display" page with the template name as a query parameter
+      window.location.href = '/addnewform?name=' + encodeURIComponent(template) + '&id=<%=id%>';
+    });
+
+    const nameSpan = document.createElement('span');
+    nameSpan.classList.add('name');
+    nameSpan.textContent = template;
+
+    card.appendChild(nameSpan);
+
+    if (!card.classList.contains('new-card')) {
+      const deleteIcon = document.createElement('span');
+      deleteIcon.classList.add('delete-icon');
+      deleteIcon.innerHTML = '<i class="fas fa-trash"></i>';
+      deleteIcon.addEventListener('click', function(event) {
+        event.stopPropagation();
+        deleteCard(template);
+      });
+      card.appendChild(deleteIcon);
+    }
+
+    cardContainer.insertBefore(card, document.getElementById('newCard'));
+  }
+
+  function createNewCardOption(applications) {
+    const newCard = document.getElementById('newCard');
+    newCard.onclick = function() {
+      const name = prompt('Enter the name of the new card:');
+      if (name !== null && name !== '') {
+        const result = checkNameExists(applications, name);
+        if (result === 'Name already exists!') {
+          // Display a popup notification using SweetAlert
+          Swal.fire({
+            title: 'Name Exists',
+            text: 'Name already exists!',
+            icon: 'error'
+          });
+        } else {
+          // Proceed with creating the card
+          createCard(name);
+
+          // Insert the new card into the database
+          const formData = new FormData();
+          formData.append('name', name);
+
+          fetch('/insert-card?id=<%=id%>', {
+            method: 'POST',
+            body: formData
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              // Insertion successful
+              console.log('Card inserted successfully!');
+            } else {
+              // Insertion failed
+              console.error('Failed to insert the card into the database.');
             }
-      
-            cardContainer.insertBefore(card, document.getElementById('newCard'));
-          }
-          
-          function createNewCardOption(applications) {
-             console.log("applications="+applications)
-              const newCard = document.getElementById('newCard');
-              newCard.onclick = function() {
-                const name = prompt('Enter the name of the new card:');
-                if (name !== null && name !== '') {
-                  console.log("name="+name+"applicatons="+applications)
-                  const result = checkNameExists(applications, name);
-                  if (result === 'Name already exists!') {
-                    // Display a popup notification using SweetAlert
-                    Swal.fire({
-                      title: 'Name Exists',
-                      text: 'Name already exists!',
-                      icon: 'error'
-                    });
-                  } else {
-                    // Proceed with creating the card
-                    createCard(name);
-                  }
-                }
-              };
-            }
+          })
+          .catch(error => console.error(error));
+        }
+      }
+    };
+  }
 
             function checkNameExists(applicationsArray, name) {
-              const existingName = applicationsArray.find((app) => app.name === name);
-              if (existingName) {
-                return "Name already exists!";
-              } else {
-                return "Name does not exist.";
-              }
+              console.log("inside checkname,");
+              console.log("application="+applicationsArray);
+              console.log("name="+name);
+              for (let i = 0; i < applicationsArray.length; i++) {
+                  if (applicationsArray[i] === name) {
+                    return "Name already exists!"; // Name found
+                  }
+                }
+                return  "Name does not exist."; 
+              // const existingName = applicationsArray.find((app) => app.name === name);
+              // console.log("exist flag="+existingName);
+              // if (existingName) {
+              //   return "Name already exists!";
+              // } else {
+              //   return "Name does not exist.";
+              // }
             }
                   
             function deleteCard(template) {
