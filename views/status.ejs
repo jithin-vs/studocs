@@ -11,7 +11,12 @@
   <link rel="stylesheet" href="/css/status.css">
   <link rel="stylesheet" href="/css/form.css">
 </head>
-
+<style>
+#progressbar li:not(.active):before,#progressbar li:not(.active)::after{
+      background: red;
+       
+  }
+</style>
 <body>
   <nav class="navbar navbar-expand-sm navbar-dark">
     <a class="navbar-brand logo" href="#">
@@ -42,17 +47,19 @@
             <table class="table">
               <thead>
                 <tr>
-                  <th>ID</th>
-                  <th>Application Name</th>
+                  <th>Form ID</th>
+                  <th>Application ID</th>
                   <th>Submit date</th>
+                  <th hidden>formid</th>
                 </tr>
               </thead>
             <tbody>
             <% applications.forEach(function(application) { %>
-                <tr>
-                  <td data-toggle="mod" data-target="#myMod"><%= application.formid %></td>
-                  <td data-toggle="moda" data-target="#myModa"><%= application.name %></td>
-                  <td data-toggle="mo" data-target="#myMo"><%= application.date %></td>
+                <tr class="status-row">
+                  <td ><%= application.formid %></td>
+                  <td ><%= application.appid %></td>
+                  <td><%= application.date %></td>
+                  <td hidden><input type="text" id="appid" value="<%= application.appid %>"></td>
                 </tr>
             <% }); %>
             </tbody>
@@ -62,7 +69,9 @@
 
       <div class="col-sm-6 side2">
         <div class="col-sm-6 panel">
-            
+          <div id="requestContent" style="display: none;">
+            <!-- Content will be displayed here -->
+          </div>
         </div>
         <div class="container-fluid">
           <div class="card">
@@ -70,10 +79,10 @@
             <div class="row d-flex justify-content-center status">
                 <div class="col-12">
                 <ul id="progressbar" class="text-center">
-                    <li class="step0 "></li>
-                    <li class="step0 active"></li>
-                    <li class="step0"></li>
-                    <li class="step0"></li>
+                    <li class="a1 step0 "></li>
+                    <li class="a2 step0 "></li>
+                    <li class="a3 step0"></li>
+                    <li class="a4 step0"></li>
                 </ul>
                 </div>
             </div>
@@ -132,6 +141,41 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      $('.status-row').click(function() {
+        var appId = $(this).find('input#appid').val();
+  
+        $.ajax({
+          url: '/fetch-request-data',
+          method: 'POST',
+          data: {
+            appid: appId
+          },
+          success: function(response) {
+            var requestData = response.requestData;
+            var responseData = response.responseData;
+
+            $('#requestContent').html(requestData);
+            $('#requestContent').show();
+
+            // Update the progress bar based on the verification status
+            $('.a1').addClass(responseData.active1);
+            $('.a2').addClass(responseData.active2);
+            $('.a3').addClass(responseData.active3);
+            $('.a4').addClass(responseData.active4);
+          },
+          error: function() {
+            alert('Error occurred while fetching request data.');
+          }
+        });
+      });
+    });
+  </script>
+  
+  
+
 </body>
 
 </html>

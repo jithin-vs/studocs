@@ -1001,7 +1001,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
       console.log(query1Result)
       var collegeid=query1Result[0].collegeid;
       var dept=query1Result[0].department;
-      var batch=query1Result[0].batch;
+      var batch=query1Result[0].batch;  
       const pending='pending';
       //console.log('cid='+collegeid+',dept='+dept+',batch='+batch+',status='+pending)
       const query2 = `SELECT 
@@ -1090,25 +1090,74 @@ app.get('/hod/:name', isAuth, (req, res) => {
         
       });
       
-      //STATUS DISPLAY
+      //STATUS table  DISPLAY
       app.get('/status/:name',isAuth,async(req,res)=>{
+        var active1=" ",active2=" ",active3=" ",active4=" ";
         try{
           db.connection.query("select * from requests  join student on requests.stdid=student.id and student.id=? ",
         [req.params.name],(err,results,fields)=>{
-        if(err) {
-          throw err; 
+        if(err) { 
+          throw err;  
         } 
         else{
           
-          const applications =results; // Empty array, can be populated later if needed
-          res.render('status',{ applications });
+          const applications =results;
+          active1 = "";
+         active2 = "";
+          active3 = "";
+          active4 = "";
+          
+          // Empty array, can be populated later if needed
+          res.render('status',{ applications,active1,active2,active3,active4 });
         }
         }); 
         }catch(err){
           console.log(err); 
         }
 
-    })
+    });
+    //ststus
+    app.post('/fetch-request-data', (req, res) => {
+      const { appid } = req.body;
+   
+          db.connection.query("SELECT * FROM requests WHERE appid = ?", [appid], (err, results, fields) => {
+        if (err) {
+          console.error(err);
+          return res.status(500).send('Error occurred while fetching request data.');
+        } else {
+          const requestData = results[0].request_data;
+          let active1 = '';
+  let active2 = '';
+  let active3 = '';
+  let active4 = '';
+
+  if (results[0].tutor === 'verified') {
+    active1 = 'active';
+  } 
+   if (results[0].hod === 'verified') {
+    active2 = 'active';
+  } 
+   if (results[0].principal === 'verified') {
+    active3 = 'active';
+  } 
+   if (results[0].office === 'verified') {
+    active4 = 'active';
+  }
+    const responseData = {
+      active1: active1, 
+      active2: active2,
+      active3: active3,
+      active4: active4
+    };
+  
+          console.log(responseData);
+        
+          res.send({ requestData: requestData, responseData: responseData });
+        }
+      });
+    });
+    
+    
 
     //REQUEST DISPLAY
     app.get('/form/:selectedFormId',isAuth, (req, res) => {
@@ -1420,10 +1469,12 @@ app.get('/hod/:name', isAuth, (req, res) => {
       app.post('/deleteuser', encoder, (req, res) => { 
         var id = req.query.id; 
         var user = req.query.user;
-        var returnid=req.query.returnid;;
+        var returnid=req.query.returnid;
+        console.log('user'+user);
+        console.log('hererdfxf'); 
         db.connection.query("DELETE FROM ?? WHERE id = ?", [req.query.user, req.query.id], (err, results, fields) => {
           if (err) {
-            res.send('server error');  
+            res.send('server error');    
             throw err;
           } else {
             if (user === 'student')
@@ -1738,7 +1789,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
             console.error(error);
           }
           console.log(query);
-          res.redirect(`/student/${Id}`);
+          res.redirect(`/student/${Id}#docs`);
         });
       }); 
       //delete template
