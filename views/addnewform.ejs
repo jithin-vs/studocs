@@ -91,6 +91,12 @@
               <textarea cols="50" rows="3" name="text" id="text8" class="form-control" style="resize:vertical;display:none" placeholder='[Yours sincerely,]&#10;[Name]' oninput="displayText()"></textarea>
             </p>
             <hr>
+            <hr>
+            <p class="p1">attachment required
+              <span class="box1" onclick="showtextarea(9)"><i class="fa fa-plus fa-big"></i></span>
+              <textarea cols="50" rows="3" name="text" id="text9" class="form-control" style="resize:vertical;display:none" placeholder='enthr name of attachment needed' oninput="displayText()" required></textarea>
+            </p>
+            <hr>
 					
           <br>
           <br>
@@ -165,6 +171,7 @@ function sendDivContent() {
   const parameters = getURLParameters();
   const name = parameters.name;
   const selectedOption = document.getElementById("selectOption").value;
+  const attachment = document.getElementById('text9').value;
 
   if (selectedOption === "Forward To" || selectedOption === "") {
     alert("Please select a valid option");
@@ -179,7 +186,7 @@ function sendDivContent() {
   xhr.setRequestHeader("Content-Type", "application/json");
 
   // Send the data to the server
-  xhr.send(JSON.stringify({ content: divContent, selectedOption: selectedOption }));
+  xhr.send(JSON.stringify({ content: divContent, selectedOption: selectedOption,attachment:attachment }));
 
   // Handle the response from the server
   xhr.onreadystatechange = function() {
