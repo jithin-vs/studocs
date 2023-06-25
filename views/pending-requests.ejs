@@ -63,6 +63,7 @@
           <% applications.forEach(function(application) { %>
               <tr>
                 <td data-toggle="mod" data-target="#myMod"><%= application.appid %></td>
+                <td hidden><input type="text" id="appid" value="<%= application.appid %>"></td>
                 <td data-toggle="moda" data-target="#myModa"><%= application.formname %></td>
                 <td data-toggle="moda" data-target="#myM"><%= application.name %></td>
                 <td data-toggle="moda" data-target="#myModa"><%= application.batch %></td>
@@ -184,25 +185,45 @@
                 selectedFormId = event.target.dataset.formId;
                 console.log('Selected Form ID:', selectedFormId);
               }    
-
               document.addEventListener('DOMContentLoaded', function() {
-                const viewButtons = document.querySelectorAll('.view-button');
-                const displayContainer = document.getElementById('displayContainer');
-                viewButtons.forEach(function(button) {
-                  button.addEventListener('click', function(event) {
-                    fetchid(); // Call the fetchid() function to save the form ID
-                    console.log(selectedFormId)
-                    // Make a request to fetch the HTML content from the server
-                    fetch(`/requ/${selectedFormId}`)
-                      .then(response => response.text())
-                      .then(html => {
-                        // Update the HTML content of the display container
-                        displayContainer.innerHTML = html;
-                      })
-                      .catch(error => console.error(error));
-                  });
-                });
-              });
+  const viewButtons = document.querySelectorAll('.view-button');
+  const displayContainer = document.getElementById('displayContainer');
+
+  viewButtons.forEach(function(button) {
+    button.addEventListener('click', function(event) {
+      fetchid(); // Call the fetchid() function to save the form ID
+      console.log(selectedFormId);
+
+      // Make a request to fetch the HTML content from the server
+      fetch(`/requ/${selectedFormId}`)
+        .then(response => response.text())
+        .then(html => {
+          // Update the HTML content of the display container
+          displayContainer.innerHTML = html;
+        })
+        .catch(error => console.error(error));
+        fetch(`/add_attach?id=101`)
+    .then(response => response.json())
+    .then(data => {
+      attachment.innerHTML = generateAttachmentLinks(data);
+    })
+    .catch(error => console.error(error));
+
+  function generateAttachmentLinks(data) {
+    let links = '';
+    data.forEach(attachment => {
+      const link = `<a href="${attachment.file}">${attachment.attaname}</a><br>`;
+      links += link;
+    });
+    return links;
+  }
+});
+});
+});
+
+
+
+   
                         
         const button1 = document.getElementById('button1');
         const button2 = document.getElementById('button2');
@@ -283,25 +304,83 @@
 
               return params;
             }
+            function updateDivContent(add) {
+                // Create a <span> element with the added content in red color
+                const redContent = '<span style="color: red;">' + add + '</span>';
+                var userurl= getURLParameters();
+                // Get the existing content of the div
+                const tutorDiv = document.getElementById(userurl.user);
+                const existingContent = tutorDiv.innerHTML;
+
+                // Append the red content
+                const modifiedContent = existingContent + redContent;
+
+                // Update the content of the div
+                tutorDiv.innerHTML = modifiedContent;
+               
+                return;
+            }
+            
+
+
+
+               function updateRequestData() {
+              // Get the content of the div with id 'displayContainer'
+              var appId = selectedFormId;
+              console.log(appId)
+              const requestData = document.getElementById('displayContainer').innerHTML;
+
+              // Create an object to hold the data
+              const data = {
+                request_data: requestData,
+                appid: appId
+              };
+
+              // Send an AJAX request to update the request_data field
+              const xhr = new XMLHttpRequest();
+              xhr.open('POST', '/update-request-data');
+              xhr.setRequestHeader('Content-Type', 'application/json');
+              xhr.onreadystatechange = function () {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                  if (xhr.status === 200) {
+                    console.log('request_data updated successfully');
+                  } else {
+                    console.error('Error updating request_data:', xhr.status);
+                  }
+                }
+              };
+              xhr.send(JSON.stringify(data));
+              return;
+            }
+
+
+
+
+
+
+
 
         function redirectToVerifyForm() {
            const textareaValue = document.getElementById('myTextArea').value;
             // Append the desired string
-            const modifiedText = 'Verified by tutor: ' + textareaValue;
-            console.log(modifiedText);
-
             var userurl= getURLParameters();
-            console.log("user="+userurl.user)
-           // const url = `/verify-form?appid=${selectedFormId}&id=${userurl.id}&user=${userurl.user}`;
+            const modifiedText = 'Verified by '+userurl.user+': ' + textareaValue;
+            console.log(modifiedText); 
+            updateDivContent(modifiedText);
+            console.log("user="+userurl.user);
+            updateRequestData();
+           const url = `/verify-form?appid=${selectedFormId}&id=${userurl.id}&user=${userurl.user}`;
             window.location.href = url;
           }
        function redirectToRejectForm() {
               var userurl= getURLParameters();
               const textareaValue = document.getElementById('myTextArea').value;
               // Append the desired string
-              const modifiedText = 'Rejected by tutor: ' + textareaValue;
+              const modifiedText = 'Rejected by '+userurl.user+': ' + textareaValue;
               console.log(modifiedText);  
               console.log("user="+userurl.user)
+              updateDivContent(modifiedText);
+              updateRequestData();
             const url = `/reject-form?appid=${selectedFormId}&id=${userurl.id}&user=${userurl.user}`;
             window.location.href = url;
           }

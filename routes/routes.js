@@ -1976,6 +1976,55 @@ app.post('/insert-card', (req, res) => {
   });   
 });
     
+// Define a route to update the request_data field
+app.post('/update-request-data', (req, res) => {
+  // Get the request body
+  const { request_data,appid } = req.body;
+console.log(appid)
+  // Update the MySQL table with the new request_data value
+  const query = 'UPDATE requests SET request_data = ? WHERE appid = ?';
+  db.connection.query(query, [request_data, appid], (error, results) => {
+    if (error) {
+      console.error('Error updating request_data:', error);
+      res.status(500).send('Error updating request_data');
+    } else {
+      console.log('request_data updated successfully1');
+      res.send('request_data updated successfully');
+    }
+  });
+});
+
+//attachment add in request
+
+app.get('/add_attach', (req, res) => {
+  const id = req.query.id; // Get the 'id' parameter from the query string
+console.log(id)
+  // Perform the database query to fetch attachments based on the 'id'
+  // Replace the database query with your actual implementation
+  db.connection.query('SELECT attachment.attaname, attachment.file FROM requests INNER JOIN attachment ON FIND_IN_SET(attachment.attaid, requests.attachment) WHERE requests.appid = ?;', [id], (error, results) => {
+    if (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Internal server error' });
+    } else {
+      console.log(results);
+      res.json(results);
+    }
+  }); 
+});
+
+// Function to process the retrieved data and generate HTML content
+function generateAttachmentHTML(results) {
+  const attachmentHTMLArray = [];
+
+  results.forEach((row) => {
+    const linkHTML = `<a href="${row.file}">${row.attaname}</a>`;
+    attachmentHTMLArray.push(linkHTML);
+  });
+
+  return attachmentHTMLArray.join('');
+}
+
+
 }  
 
 module.exports = routes;
