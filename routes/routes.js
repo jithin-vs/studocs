@@ -880,7 +880,7 @@ var routes =function(app,isAuth,encoder){
         const query2Result = await query(query2, [collegeid,dept,batch,checkVal1,checkVal2,checkVal3]);
         //console.log(query2Result);
         res.render('teacher_verified_requests',{id:req.query.id,applications:query2Result});
-    });
+    }); 
 
    app.get('/hod-verified-requests',isAuth,async(req,res)=>{ 
                 
@@ -1070,7 +1070,7 @@ var routes =function(app,isAuth,encoder){
           var pending1='pending';
           var pending2='final:pending'; 
           const query2 = `SELECT 
-          student.name AS name, student.id AS studentId, requests.formname AS formname,requests.formid AS formid,
+          student.name AS name, student.id AS studentId, requests.formname AS formname,requests.formid AS formid, 
           requests.appid AS appid, student.batch AS batch, student.department AS dept, requests.date AS date 
           FROM student JOIN requests ON student.collegeid = requests.collegeid AND student.collegeid = ?  
           AND student.id=requests.stdid AND student.department=? AND student.batch=? AND student.id=? AND (requests.${dest} IN(?,?) OR requests.tutor=? OR requests.hod=? OR requests.principal=? OR requests.office=?)`;
@@ -1171,25 +1171,27 @@ var routes =function(app,isAuth,encoder){
       
 
      //SAVING TEMPLATEFORMS
-     app.post('/save-template',(req,res)=>{   
-      var name=req.query.name; 
+     app.post('/save-template', (req, res) => {
+      var name = req.query.name;
       const selectedOption = req.body.selectedOption;
+      const attachment = req.body.attachment;
       console.log(selectedOption);
-      //console.log(name);
-      var collegeid=req.query.id; 
+      // console.log(name);
+      var collegeid = req.query.id;
       console.log(name);
-      var divContent = req.body.content; 
-     //  console.log(divContent);
-       db.connection.query("insert into forms(name,collegeid,formdata,dest)values(?,?,?,?)",
-         [name,collegeid,divContent,selectedOption],(err,results,fields)=>{
-          if(err) {
-            throw err; 
-          } else{
-             res.redirect(`/addtemplate?id=${collegeid}`); 
-          }    
-       });
-       });
-     
+      var divContent = req.body.content;
+      // console.log(divContent);
+      db.connection.query("UPDATE forms SET formdata = ?, dest = ?, attachment = ? WHERE name = ? AND collegeid = ?",
+         [divContent, selectedOption, attachment, name, collegeid], (err, results, fields) => {
+            if (err) {
+               throw err;
+            } else {
+               res.render('addtemplate');
+               // res.redirect(`/addtemplate?id=${collegeid}`);
+            }
+         });
+   });
+   
      //ADD OR EDIT FORMS
      app.get('/addnewform',isAuth,(req, res) => {
       const id= req.query.id;
@@ -1935,8 +1937,26 @@ var routes =function(app,isAuth,encoder){
           res.sendFile(absolutePath);
         });
         
-         
+      // Route for inserting a new card
+app.post('/insert-card', (req, res) => {
+  const name = req.body.name;
+  const collegeId = req.query.id;
 
+  // Prepare the SQL query
+  const sql = 'INSERT INTO forms (name, collegeid) VALUES (?, ?)';
+  const values = [name, collegeId];
+
+  // Execute the SQL query
+  db.connection.query(sql, values, (error, results) => {
+    if (error) {
+      console.error('Error inserting the card into the database: ' + error.stack);
+      res.json({ success: false });
+    } else {
+      console.log('Card inserted successfully!');
+      res.json({ success: true });
+    }
+  });   
+});
     
 }  
 

@@ -40,31 +40,8 @@
         <div style="display: flex; justify-content: space-between; align-items: center;">
           <h4 style="margin-left: 20px;"><u>Pending Requests</u></h4>
         <div style="display: flex; align-items: center; " >
-        <p id="dropdown" style="margin-left: 10px; margin-top: 10px;" >
-          <select class="form-control form-control-sm" >
-            <option>CSE</option>
-            <option>ECE</option>
-            <option>EEE</option>
-            <option>IT</option>
-            <option>MECH</option>
-  
-          </select>
-        </p> 
-        <p id="dropdown" style="margin-left: 10px; margin-top: 10px;">
-          <select class="form-control form-control-sm" >
-            <option>S1</option>
-            <option>S2</option>
-            <option>S3</option>
-            <option>S4</option>
-            <option>S5</option>
-            <option>S6</option>
-            <option>S7</option>
-            <option>S8</option>
-  
-          </select>
-        </p>
-        <div class="search-bar" style="margin-left: 10px; margin-top: -8px;">
-          <input type="text" placeholder="Search..." class="form-control form-control-sm">
+        <div class="search-bar" style="margin-left: 10px; margin-top: 10px; margin-right: 8px;">
+          <input type="text" id="searchInput" placeholder="Search..." class="form-control form-control-sm">
           <i class="fa fa-search" aria-hidden="true"></i>
         </div>
       </div>
@@ -328,6 +305,17 @@
             const url = `/reject-form?appid=${selectedFormId}&id=${userurl.id}&user=${userurl.user}`;
             window.location.href = url;
           }
+          $(document).ready(function() {
+    // Add an event listener to the search input
+    $('#searchInput').on('keyup', function() {
+      var value = $(this).val().toLowerCase();
+
+      // Filter the table rows based on the search value
+      $('table tbody tr').filter(function() {
+        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+      });
+    });
+  });
     </script>
    </body>
 </html>

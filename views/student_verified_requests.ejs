@@ -48,7 +48,7 @@
             <h4 style="margin-left: 20px;"><u>Verified Requests</u></h4>
             <div style="display: flex; align-items: center; " >
               <div class="search-bar" style="margin-left: 10px; margin-top: 10px;">
-                <input type="text" placeholder="Search..." class="form-control form-control-sm">
+                <input type="text" id="searchInput" placeholder="Search..." class="form-control form-control-sm">
                 <i class="fa fa-search" aria-hidden="true"></i>
               </div>
             </div>
@@ -86,14 +86,8 @@
         </div>
         <div class="col-sm-6 side2">
           <div class="d-flex justify-content-center align-items-center">
-            <div class="arrow-left">
-              <i class="fa fa-arrow-circle-left fa-3x" ></i>
-            </div>
             <div id="requestContent" class="col-sm-6 panel">
               <!-- Existing code for the panel -->
-            </div>
-            <div class="arrow-right">
-              <i class="fa fa-arrow-circle-right fa-3x" ></i>
             </div>
           </div>
         </div>
@@ -198,6 +192,19 @@
   // Call the capturePanelImage function to start capturing the panel content
   capturePanelImage();
 }
+
+$(document).ready(function() {
+    // Add an event listener to the search input
+    $('#searchInput').on('keyup', function() {
+      var value = $(this).val().toLowerCase();
+
+      // Filter the table rows based on the search value
+      $('table tbody tr').filter(function() {
+        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+      });
+    });
+  });
 </script>
+
   </body>
 </html>
