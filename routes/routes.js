@@ -855,7 +855,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
       } 
       else{
         const applications = [];
-        res.render('verified_requests',{applications:results});
+        res.render('student_verified_requests',{applications:results});
       }
     });
 
@@ -896,7 +896,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
         var checkVal1='verified';
         var checkVal2='completed';
         var checkVal3='rejected';
-        console.log('cid='+collegeid+',dept='+dept+'status=');
+        console.log('cid='+collegeid+',dept='+dept);
         const query2 = `SELECT
               student.collegeid AS collegeId, student.id AS studentId,requests.formname AS formname,
               requests.appid AS appid, student.batch AS batch, student.department AS dept ,requests.date AS date 
@@ -904,7 +904,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
               student.id=requests.stdid AND student.collegeid =?  AND student.id=requests.stdid  AND student.department=? AND requests.hod IN(?,?,?)`;
         const query2Result = await query(query2, [collegeid,dept,checkVal1,checkVal2,checkVal3]);
         console.log(query2Result);
-        res.render('pending-requests',{id:req.query.id,applications:query2Result});
+        res.render('verified-requests',{id:req.query.id,applications:query2Result});
       });
 
    app.get('/principal-verified-requests',isAuth,async(req,res)=>{ 
@@ -1007,7 +1007,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
           const query2 = `SELECT 
             student.name AS name, student.id AS studentId, requests.formname AS formname,
             requests.appid AS appid, student.batch AS batch, student.department AS dept, requests.date AS date 
-            FROM student JOIN requests ON student.collegeid = requests.collegeid AND  student.id=requests.stdid AND student.collegeid = ? AND student.department=? AND requests.tutor=?`;
+            FROM student JOIN requests ON student.collegeid = requests.collegeid AND  student.id=requests.stdid AND student.collegeid = ? AND student.department=? AND requests.hod=?`;
          const query2Result = await query(query2, [collegeid,dept,pending]);
           console.log(query2Result);
           res.render('pending-requests',{id:req.query.id,applications:query2Result});
