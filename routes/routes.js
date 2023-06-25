@@ -546,7 +546,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
      //tutor
       app.get('/tutoradd',isAuth,(req,res)=>{     
           
-        db.connection.query("select * from tutor ",
+        db.connection.query("select * from tutor where batch=? and deoartment=? AND collegeid=? ",
         [req.body.name],(err,results,fields)=>{
         if(err) {
           throw err;
@@ -669,25 +669,20 @@ app.get('/hod/:name', isAuth, (req, res) => {
 
  
       //student add  
-     app.get('/studentadd',isAuth,(req,res)=>{
-                  
-            db.connection.query("select * from Student",
-                [req.body.name],(err,results,fields)=>{
-                if(err) {
-                  throw err;
-                  
-                }
-                else{
-                   console.log(results);
-                   var id=req.query.id;
-                   if(id === null)
-                            id='12345'
-                   console.log(id);
-                    res.render('addnewstudent',{applications:results,id});
-                } 
-              }); 
+     app.get('/studentadd',isAuth,async(req,res)=>{
+            
+      const query1 = 'SELECT collegeid,batch,department FROM tutor WHERE  id = ?';
+      const query1Result = await query(query1, [req.query.id]);
+      const collegeid=query1[0].collegeid;
+      const batch=query1[0].batch;
+      const department=query1[0].department;
+
+      const query2 = 'SELECT * FROM student WHERE  collegeid=? AND batch=? AND department';
+      const query2Result = await query(query2, [collegeid,batch,department]);
+        
+      res.render('addnewstudent',{applications:query2Result,id:req.query.id});
               
-          });
+      });
    
      app.post('/studentadd',encoder,(req,res)=>{
         var tutorid=req.query.id;
