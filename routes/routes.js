@@ -830,22 +830,34 @@ app.get('/hod/:name', isAuth, (req, res) => {
          /*-------------------- VERIFIED REQUESTS  --------------------*/
 
    // SENDING REQUEST ROUTE FOR STUDENTS 
-   app.get('/verified-requests',isAuth,(req,res)=>{ 
+   app.get('/verified-requests',isAuth,async(req,res)=>{ 
    try{
-    const query1 = 'SELECT dest FROM requests WHERE  id = ?';
-    //const query1Result = await query(query1, [req.params.id]);
-
-    db.connection.query("select * from requests where stdid=? ",
-    [req.params.id],(err,results,fields)=>{
-      if(err) {
-        throw err; 
-      } 
-      else{
-        const applications = [];
-        res.render('verified_requests',{applications:results});
-      }
-    });
-
+    console.log("here - verified")
+    const query1= `
+                  SELECT
+                  student.collegeid AS collegeid, student.id AS studentid, student.batch AS batch,
+                  student.department AS dept, requests.dest AS dest
+                  FROM student
+                  JOIN requests ON student.collegeid = requests.collegeid AND student.id = requests.stdid
+                  WHERE student.id = ?
+                `;
+    const query1Result = await query(query1, [req.query.id]);
+    console.log(query1Result);
+    var collegeid=query1Result[0].collegeid; 
+    var dept=query1Result[0].dept;
+    var batch=query1Result[0].batch;
+    var dest=query1Result[0].dest;
+    var checkVal1='verified'; 
+    var checkVal2='completed';
+    var checkVal3='rejected';
+    const query2 = `SELECT 
+        student.name AS name, student.id AS studentId, requests.formname AS formname,
+        requests.appid AS appid, student.batch AS batch, student.department AS dept, requests.date AS date 
+        FROM student JOIN requests ON student.collegeid = requests.collegeid AND student.collegeid = ?  
+        AND student.id=requests.stdid AND student.department=? AND student.batch=? AND student.id=? AND requests.${dest} IN(?,?,?)`;
+    const query2Result = await query(query2, [collegeid,dept,batch,req.query.id,checkVal1,checkVal2,checkVal3]);   
+    console.log(query2Result)
+    res.render('student_verified_requests',{applications:query2Result});
    }catch(err){
     console.log(err); 
   }  
@@ -883,7 +895,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
         var checkVal1='verified';
         var checkVal2='completed';
         var checkVal3='rejected';
-        console.log('cid='+collegeid+',dept='+dept+'status=')
+        console.log('cid='+collegeid+',dept='+dept)
         const query2 = `SELECT
               student.collegeid AS collegeId, student.id AS studentId,requests.formname AS formname,
               requests.appid AS appid, student.batch AS batch, student.department AS dept ,requests.date AS date 
@@ -891,7 +903,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
               student.id=requests.stdid AND student.collegeid =?  AND student.id=requests.stdid  AND student.department=? AND requests.hod IN(?,?,?)`;
         const query2Result = await query(query2, [collegeid,dept,checkVal1,checkVal2,checkVal3]);
         console.log(query2Result);
-        res.render('teacher_verified_requests',{id:req.query.id,applications:query2Result});
+        res.render('pending-requests',{id:req.query.id,applications:query2Result});
       });
 
    app.get('/principal-verified-requests',isAuth,async(req,res)=>{ 
@@ -1043,23 +1055,38 @@ app.get('/hod/:name', isAuth, (req, res) => {
       app.get('/status/:name',isAuth,async(req,res)=>{
         var active1=" ",active2=" ",active3=" ",active4=" ";
         try{
-          db.connection.query("select * from requests  join student on requests.stdid=student.id and student.id=? ",
-        [req.params.name],(err,results,fields)=>{
-        if(err) { 
-          throw err;  
-        } 
-        else{
-          
-          const applications =results;
+          const query1= `
+          SELECT
+          student.collegeid AS collegeid, student.id AS studentid, student.batch AS batch,
+          student.department AS dept, requests.dest AS dest
+          FROM student
+          JOIN requests ON student.collegeid = requests.collegeid AND student.id = requests.stdid
+          WHERE student.id = ?
+        `;
+          const query1Result = await query(query1, [req.params.name]);
+          var collegeid=query1Result[0].collegeid; 
+          var dept=query1Result[0].department;
+          var batch=query1Result[0].batch;
+          var dest=query1Result[0].dest;
+          console.log(query1Result);
+          var pending1='pending';
+          var pending2='final:pending'; 
+          const query2 = `SELECT 
+          student.name AS name, student.id AS studentId, requests.formname AS formname,
+          requests.appid AS appid, student.batch AS batch, student.department AS dept, requests.date AS date 
+          FROM student JOIN requests ON student.collegeid = requests.collegeid AND student.collegeid = ?  
+          AND student.id=requests.stdid AND student.department=? AND student.batch=? AND student.id=? AND requests.${dest} IN(?,?)`;
+          const query2Result = await query(query2, [collegeid,dept,batch,req.params.name,pending1,pending2]);      
+          const applications =query2Result;
           active1 = "";
-         active2 = "";
+          active2 = "";
           active3 = "";
           active4 = "";
           
           // Empty array, can be populated later if needed
           res.render('status',{ applications,active1,active2,active3,active4 });
-        }
-        }); 
+        
+        
         }catch(err){
           console.log(err); 
         }
