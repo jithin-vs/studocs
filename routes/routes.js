@@ -1056,7 +1056,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
           res.json({ templates: templateNames });
       
         }
-        });
+        });  
         }catch(err){
           console.log(err); 
         } 
