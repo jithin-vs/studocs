@@ -14,6 +14,38 @@
     letter-spacing: 2px;
     font-size: 30px;
   }
+
+  .navbar .btn,
+.navbar .btn:focus {
+  padding: 8px 20px;
+  margin-left: 10px;
+  border-radius: 5px;
+  background-color: #4314B6;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+}
+.navbar .btn1{
+  padding: 8px 20px;
+  margin-left: 10px;
+  border-radius: 5px;
+  color: white;
+  background-color: rgba(29, 29, 32, 1);
+  border:1px solid  rgba(82, 82, 90, 1);;
+  font-size: 14px;
+  font-weight: 600;
+}
+.navbar .btn2,
+.navbar .btn2:focus{
+  padding: 8px 20px;
+  margin-left: 10px;
+  border-radius: 5px;
+  color: white;
+  background-color: rgb(237, 47, 47);
+  font-size: 14px;
+  font-weight: 600;
+}
   .form {
     padding: 20px;;
   }
