@@ -149,7 +149,6 @@
     $(document).ready(function() {
       $('.status-row').click(function() {
         var appId = $(this).find('input#appid').val();
-  
         $.ajax({
           url: '/fetch-request-data',
           method: 'POST',
