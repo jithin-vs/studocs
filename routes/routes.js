@@ -544,24 +544,19 @@ app.get('/hod/:name', isAuth, (req, res) => {
      /*-----add user pages-----*/
 
      //tutor
-      app.get('/tutoradd',isAuth,(req,res)=>{     
-          
-        db.connection.query("select * from tutor where id=? ",
-        [req.query.id],(err,results,fields)=>{
-        if(err) {
-          throw err;
-          
-        }
-        else{
-           console.log(results);
-           var id=req.query.id;
-           if(id === null) 
-                    id='12345'
-           console.log(id);
-            res.render('addnewtutor',{applications:results,id});
-        } 
-      });
-         
+      app.get('/tutoradd',isAuth,async(req,res)=>{     
+        
+        const query1 = 'SELECT collegeid,department FROM hod WHERE  id = ?';
+        const query1Result = await query(query1, [req.query.id]);
+
+        const collegeid=query1Result[0].collegeid;
+        const department=query2Result[0].department;
+
+        const query2 = 'SELECT * FROM tutor WHERE  collegeid = ? AND department=?';
+        const query2Result = await query(query2, [collegeid,department]);
+
+        res.render('addnewtutor',{applications:query2Result,id:req.query.id})
+        
      });
   
      app.post('/tutoradd',encoder,(req,res)=>{
@@ -611,18 +606,18 @@ app.get('/hod/:name', isAuth, (req, res) => {
     
      //add new HOD   
   
-     app.get('/hodadd',isAuth,(req,res)=>{
-            
-      db.connection.query("select * from hod",
-          [req.body.name],(err,results,fields)=>{
-           if(err) {
-             throw err;
-             
-           }
-           else{
-              res.render('addnewhod',{applications:results,id:req.query.id});
-           }
-         }); 
+     app.get('/hodadd',isAuth,async(req,res)=>{
+
+      const query1 = 'SELECT collegeid FROM principal WHERE  id = ?';
+      const query1Result = await query(query1, [req.query.id]);
+
+      const collegeid=query1Result[0].collegeid;
+
+      const query2 = 'SELECT * FROM hod WHERE  collegeid = ?';
+      const query2Result = await query(query2, [collegeid]);
+
+      res.render('addnewhod',{applications:query2Result,id:req.query.id})
+   
          
      });
      
@@ -727,22 +722,15 @@ app.get('/hod/:name', isAuth, (req, res) => {
          });
 
     //principal add
-     app.get('/principaladd',isAuth,(req,res)=>{
+     app.get('/principaladd',isAuth,async(req,res)=>{
            
-             
-          db.connection.query("select * from  principal",
-              [req.body.name],(err,results,fields)=>{
-              if(err) {
-                throw err;
-                
-              }
-              else{
-                var id=req.query.id;
-                console.log(id);
-                  res.render('addnewprincipal',{applications:results,id});
-              }
-            }); 
-             
+
+      const collegeid=query1Result[0].collegeid;
+
+      const query2 = 'SELECT * FROM principal WHERE  collegeid = ?';
+      const query2Result = await query(query2, [req.query.id]);
+
+      res.render('addnewprincipal',{applications:query2Result,id:req.query.id})
         });
         
      app.post('/principaladd',encoder,(req,res)=>{ 
