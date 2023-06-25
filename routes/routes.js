@@ -545,19 +545,24 @@ app.get('/hod/:name', isAuth, (req, res) => {
      /*-----add user pages-----*/
 
      //tutor
-      app.get('/tutoradd',isAuth,async(req,res)=>{     
-        
-        const query1 = 'SELECT collegeid,department FROM hod WHERE  id = ?';
-        const query1Result = await query(query1, [req.query.id]);
-
-        const collegeid=query1Result[0].collegeid;
-        const department=query1Result[0].department;
-
-        const query2 = 'SELECT * FROM tutor WHERE  collegeid = ? AND department=?';
-        const query2Result = await query(query2, [collegeid,department]);
-
-        res.render('addnewtutor',{applications:query2Result,id:req.query.id})
-        
+      app.get('/tutoradd',isAuth,(req,res)=>{     
+          
+        db.connection.query("select * from tutor where batch=? and department=? AND collegeid=? ",
+        [req.body.name],(err,results,fields)=>{
+        if(err) { 
+          throw err;
+          
+        }
+        else{
+           console.log(results);
+           var id=req.query.id;
+           if(id === null) 
+                    id='12345'
+           console.log(id);
+            res.render('addnewtutor',{applications:results,id});
+        } 
+      });
+         
      });
   
      app.post('/tutoradd',encoder,(req,res)=>{
@@ -607,18 +612,18 @@ app.get('/hod/:name', isAuth, (req, res) => {
     
      //add new HOD   
   
-     app.get('/hodadd',isAuth,async(req,res)=>{
-
-      const query1 = 'SELECT collegeid FROM principal WHERE  id = ?';
-      const query1Result = await query(query1, [req.query.id]);
-
-      const collegeid=query1Result[0].collegeid;
-
-      const query2 = 'SELECT * FROM hod WHERE  collegeid = ?';
-      const query2Result = await query(query2, [collegeid]);
-
-      res.render('addnewhod',{applications:query2Result,id:req.query.id})
-   
+     app.get('/hodadd',isAuth,(req,res)=>{
+            
+      db.connection.query("select * from hod",
+          [req.body.name],(err,results,fields)=>{
+           if(err) {
+             throw err;
+             
+           }
+           else{
+              res.render('addnewhod',{applications:results,id:req.query.id});
+           }
+         }); 
          
      });
      
@@ -654,7 +659,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
               });
             });
         
-          } catch (error) {
+          } catch (error) { 
             res.send('server error');
             throw error;
           }
@@ -691,7 +696,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
               db.connection.query("SELECT collegeid,batch,department FROM tutor WHERE id=?", [tutorid], (err, results, fields) => {
                 if (err) {
                   reject(err);
-                } else {
+                } else { 
                   console.log(results);
                   resolve(results);  
                 }
@@ -724,14 +729,22 @@ app.get('/hod/:name', isAuth, (req, res) => {
          });
 
     //principal add
-     app.get('/principaladd',isAuth,async(req,res)=>{
+     app.get('/principaladd',isAuth,(req,res)=>{
            
-
-    
-      const query2 = 'SELECT * FROM principal WHERE  collegeid = ?';
-      const query2Result = await query(query2, [req.query.id]);
-
-      res.render('addnewprincipal',{applications:query2Result,id:req.query.id});
+             
+          db.connection.query("select * from  principal",
+              [req.body.name],(err,results,fields)=>{
+              if(err) {
+                throw err;
+                
+              }
+              else{
+                var id=req.query.id; 
+                console.log(id);
+                  res.render('addnewprincipal',{applications:results,id});
+              }
+            }); 
+             
         });
         
      app.post('/principaladd',encoder,(req,res)=>{ 
@@ -858,29 +871,26 @@ app.get('/hod/:name', isAuth, (req, res) => {
          /*-------------------- VERIFIED REQUESTS  --------------------*/
 
    // SENDING REQUEST ROUTE FOR STUDENTS 
-   app.get('/verified-requests',isAuth,async(req,res)=>{ 
+   app.get('/verified-requests',isAuth,(req,res)=>{ 
+   try{
+    const query1 = 'SELECT dest FROM requests WHERE  id = ?';
+    //const query1Result = await query(query1, [req.params.id]);
+
+    db.connection.query("select * from requests where stdid=? ",
+    [req.params.id],(err,results,fields)=>{
+      if(err) {
+        throw err; 
+      } 
+      else{
+        const applications = [];
+        res.render('verified_requests',{applications:results});
+      }
+    });
+
+   }catch(err){
+    console.log(err); 
+  }  
    
-    const query1 = `SELECT 
-     student.id AS studentid,
-     requests.collegeid AS collegeid, student.department AS dept, student.batch AS batch, requests.dest AS dest
-     FROM student JOIN requests ON student.collegeid = requests.collegeid  AND student.id=requests.stdid AND student.id=?`;
-    const query1Result = await query(query1, [req.query.id]);
-    console.log(query1Result)
-    var collegeid=query1Result[0].collegeid;
-    var dept=query1Result[0].dept;
-    var batch=query1Result[0].batch;
-    var dest =query1Result[0].dest;
-    var checkVal1='verified';
-    var checkVal2='completed';
-    var checkVal3='rejected';
-    //console.log('cid='+collegeid+',dept='+dept+',batch='+batch+',status='+pending)
-    const query2 = `SELECT 
-          student.name AS name, student.id AS studentId, requests.formname AS formname,
-          requests.appid AS appid, student.batch AS batch, student.department AS dept, requests.date AS date 
-          FROM student JOIN requests ON student.collegeid = requests.collegeid AND student.collegeid = ?  AND student.id=requests.stdid AND student.department=? AND student.batch=? AND ${dest} IN (?,?)`;
-    const query2Result = await query(query2, [collegeid,dept,batch,checkVal1,checkVal2]);
-    //console.log(query2Result);
-    res.render('verified-requests',{id:req.query.id,applications:query2Result});
    });
 
    app.get('/tutor-verified-requests',isAuth,async(req,res)=>{ 
@@ -904,7 +914,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
         res.render('verified-requests',{id:req.query.id,applications:query2Result});
     });
 
-   app.get('/hod-verified-requests',isAuth,async(req,res)=>{  
+   app.get('/hod-verified-requests',isAuth,async(req,res)=>{ 
                 
         const query1 = 'SELECT collegeid,department FROM hod WHERE id = ?';
         const query1Result = await query(query1, [req.query.id]);
@@ -914,7 +924,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
         var checkVal1='verified';
         var checkVal2='completed';
         var checkVal3='rejected';
-        console.log('cid='+collegeid+',dept='+dept)
+        console.log('cid='+collegeid+',dept='+dept+'status='+pending)
         const query2 = `SELECT
               student.collegeid AS collegeId, student.id AS studentId,requests.formname AS formname,
               requests.appid AS appid, student.batch AS batch, student.department AS dept ,requests.date AS date 
@@ -1059,7 +1069,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
           res.json({ templates: templateNames });
       
         }
-        });  
+        });
         }catch(err){
           console.log(err); 
         } 
@@ -1070,7 +1080,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
       app.get('/status/:name',isAuth,async(req,res)=>{
         var active1=" ",active2=" ",active3=" ",active4=" ";
         try{
-          db.connection.query("select * from requests  join student on requests.stdid=student.id and student.collegeid=requests.collegeid and student.id=? ",
+          db.connection.query("select * from requests  join student on requests.stdid=student.id and student.id=? ",
         [req.params.name],(err,results,fields)=>{
         if(err) { 
           throw err;  
@@ -1171,51 +1181,27 @@ app.get('/hod/:name', isAuth, (req, res) => {
           }
         });
       });
-      //insert template
-
-      app.post('/insert-card', (req, res) => {
-        const name = req.body.name;
-        const collegeId = req.query.id;
-        console.log('name:', name);
-        console.log('collegeId:', collegeId);
-        // Prepare the SQL query
-        const sql = 'INSERT INTO forms (name, collegeid) VALUES (?, ?)';
-        const values = [name, collegeId];
       
-        // Execute the SQL query
-        db.connection.query(sql, values, (error, results) => {
-          if (error) {
-            console.error('Error inserting the card into the database: ' + error.stack);
-            res.json({ success: false });
-          } else {
-            console.log('Card inserted successfully!');
-            res.json({ success: true });
-          }
-        });
-      });
 
      //SAVING TEMPLATEFORMS
-     app.post('/save-template', (req, res) => {
-      var name = req.query.name;
+     app.post('/save-template',(req,res)=>{   
+      var name=req.query.name; 
       const selectedOption = req.body.selectedOption;
-      const attachment = req.body.attachment;
       console.log(selectedOption);
-      // console.log(name);
-      var collegeid = req.query.id;
+      //console.log(name);
+      var collegeid=req.query.id; 
       console.log(name);
-      var divContent = req.body.content;
-      // console.log(divContent);
-      db.connection.query("UPDATE forms SET formdata = ?, dest = ?, attachment = ? WHERE name = ? AND collegeid = ?",
-         [divContent, selectedOption, attachment, name, collegeid], (err, results, fields) => {
-            if (err) {
-               throw err;
-            } else {
-               res.render('addtemplate');
-               // res.redirect(`/addtemplate?id=${collegeid}`);
-            }
-         });
-   });
-   
+      var divContent = req.body.content; 
+     //  console.log(divContent);
+       db.connection.query("insert into forms(name,collegeid,formdata,dest)values(?,?,?,?)",
+         [name,collegeid,divContent,selectedOption],(err,results,fields)=>{
+          if(err) {
+            throw err; 
+          } else{
+             res.redirect(`/addtemplate?id=${collegeid}`); 
+          }    
+       });
+       });
      
      //ADD OR EDIT FORMS
      app.get('/addnewform',isAuth,(req, res) => {
@@ -1532,13 +1518,14 @@ app.get('/hod/:name', isAuth, (req, res) => {
       app.post('/hod/:name/search', async (req, res) => { // Specify the URL for search with the name parameter
         const searchTerm = req.body.search;
       
-        const query1 = 'SELECT collegeid, department FROM hod WHERE id = ?';
+        const query1 = 'SELECT collegeid, batch, department FROM  WHERE id = ?';
         const query1Result = await query(query1, [req.params.name]);
         const collegeid = query1Result[0].collegeid;
+        const batch = query1Result[0].batch;
         const department = query1Result[0].department;
         // Perform search query
-        const query2 = 'SELECT * FROM tutor WHERE collegeid = ? AND department = ? AND (name LIKE ? OR id LIKE ?)';
-        const params = [collegeid, department, `%${searchTerm}%`, `%${searchTerm}%`];
+        const query2 = 'SELECT * FROM tutor WHERE collegeid = ? AND batch = ? AND department = ? AND (name LIKE ? OR id LIKE ?)';
+        const params = [collegeid, batch, department, `%${searchTerm}%`, `%${searchTerm}%`];
         
       
         db.connection.query(query2, params, (err, results) =>  {
@@ -1553,19 +1540,15 @@ app.get('/hod/:name', isAuth, (req, res) => {
       });
 
 
-      app.post('/principal/:name/search', async (req, res) => { // Specify the URL for search with the name parameter
+      app.post('/principal/:name/search', (req, res) => { // Specify the URL for search with the name parameter
         const searchTerm = req.body.search;
       
-        const query1 = 'SELECT collegeid FROM principal WHERE id = ?';
-        const query1Result = await query(query1, [req.params.name]);
-        const collegeid = query1Result[0].collegeid;
-
         // Perform search query
-        const query2 = 'SELECT * FROM hod WHERE collegeid = ? AND (name LIKE ? OR id LIKE ?)';
-        const params = [collegeid, `%${searchTerm}%`, `%${searchTerm}%`];
-        
+        const query = `SELECT * FROM hod WHERE
+          name LIKE '%${searchTerm}%' OR
+          id LIKE '%${searchTerm}%'`;
       
-        db.connection.query(query2, params, (err, results) =>  {
+        db.connection.query(query, (err, results) => {
           if (err) {
             console.log(err);
             res.send('Server error: ' + err.message);
@@ -1576,16 +1559,15 @@ app.get('/hod/:name', isAuth, (req, res) => {
         });
       });
          
-      app.post('/college/:name/search', async(req, res) => { // Specify the URL for search with the name parameter
+      app.post('/college/:name/search', (req, res) => { // Specify the URL for search with the name parameter
         const searchTerm = req.body.search;
-        
-
-        // Perform search query
-        const query2 = 'SELECT * FROM hod WHERE collegeid = ? AND (name LIKE ? OR id LIKE ?)';
-        const params = [req.params.name,`%${searchTerm}%`, `%${searchTerm}%`];
-        // Perform search query
       
-        db.connection.query(query2, params, (err, results) =>  {
+        // Perform search query
+        const query = `SELECT * FROM principal WHERE
+          name LIKE '%${searchTerm}%' OR
+          id LIKE '%${searchTerm}%'`;
+      
+        db.connection.query(query, (err, results) => {
           if (err) {
             console.log(err);
             res.send('Server error: ' + err.message);
@@ -1683,7 +1665,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
         }
         
   
-       
+      
       });
        
 
