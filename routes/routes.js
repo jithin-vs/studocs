@@ -1200,18 +1200,19 @@ app.get('/hod/:name', isAuth, (req, res) => {
       // console.log(name);
       var collegeid = req.query.id;
       console.log(name);
-      var divContent = req.body.content; 
-     //  console.log(divContent);
-       db.connection.query("insert into forms(name,collegeid,formdata,dest)values(?,?,?,?)",
-         [name,collegeid,divContent,selectedOption],(err,results,fields)=>{
-          if(err) {
-            throw err; 
-          } else{
-              res.render('addtemplate');
-             //res.redirect(`/addtemplate?id=${collegeid}`);
-          }    
-       });
-       });
+      var divContent = req.body.content;
+      // console.log(divContent);
+      db.connection.query("UPDATE forms SET formdata = ?, dest = ?, attachment = ? WHERE name = ? AND collegeid = ?",
+         [divContent, selectedOption, attachment, name, collegeid], (err, results, fields) => {
+            if (err) {
+               throw err;
+            } else {
+               res.render('addtemplate');
+               // res.redirect(`/addtemplate?id=${collegeid}`);
+            }
+         });
+   });
+   
      
      //ADD OR EDIT FORMS
      app.get('/addnewform',isAuth,(req, res) => {
@@ -1679,7 +1680,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
         }
         
   
-      
+       
       });
        
 
