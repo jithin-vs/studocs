@@ -522,24 +522,19 @@ app.get('/hod/:name', isAuth, (req, res) => {
      /*-----add user pages-----*/
 
      //tutor
-      app.get('/tutoradd',isAuth,(req,res)=>{     
-          
-        db.connection.query("select * from tutor where batch=? and department=? AND collegeid=? ",
-        [req.body.name],(err,results,fields)=>{
-        if(err) { 
-          throw err;
-          
-        }
-        else{
-           console.log(results);
-           var id=req.query.id;
-           if(id === null) 
-                    id='12345' 
-           console.log(id); 
-            res.render('addnewtutor',{applications:results,id});
-        } 
-      });
-         
+      app.get('/tutoradd',isAuth,async(req,res)=>{     
+        
+        const query1 = 'SELECT collegeid,department FROM hod WHERE  id = ?';
+        const query1Result = await query(query1, [req.query.id]);
+
+        const collegeid=query1Result[0].collegeid;  
+        const department=query1Result[0].department;
+
+        const query2 = 'SELECT * FROM tutor WHERE  collegeid = ? AND department=?';
+        const query2Result = await query(query2, [collegeid,department]);
+
+        res.render('addnewtutor',{applications:query2Result,id:req.query.id})
+        
      });
   
      app.post('/tutoradd',encoder,(req,res)=>{
