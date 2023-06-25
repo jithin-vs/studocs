@@ -845,7 +845,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
    // SENDING REQUEST ROUTE FOR STUDENTS 
    app.get('/verified-requests',isAuth,async(req,res)=>{ 
    try{
-    console.log("here - verified")
+    
     const query1= `
                   SELECT
                   student.collegeid AS collegeid, student.id AS studentid, student.batch AS batch,
@@ -961,9 +961,10 @@ app.get('/hod/:name', isAuth, (req, res) => {
     var pending1='pending';
     var pending2='final:pending';  
     const query1 = `SELECT 
-    student.name AS name, student.id AS studentId, requests.formname AS formname,
-    requests.appid AS appid, student.batch AS batch, student.department AS dept, requests.date AS date 
-    FROM student JOIN requests ON student.collegeid = requests.collegeid AND student.id=requests.stdid AND student.collegeid = ? AND requests.office IN(?,?)`;
+            student.name AS name, student.id AS studentId, requests.formname AS formname,
+            requests.appid AS appid, student.batch AS batch, student.department AS dept, requests.date AS date 
+            FROM student JOIN requests ON student.collegeid = requests.collegeid AND student.id=requests.stdid AND 
+            student.collegeid = ? AND requests.office IN(?,?)`;
     const query1Result = await query(query1, [req.query.id,pending1,pending2]);
     console.log(query1Result);
     res.render('pending-requests',{id:req.query.id,applications:query1Result}); 
