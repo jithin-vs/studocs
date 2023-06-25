@@ -911,13 +911,14 @@ app.get('/hod/:name', isAuth, (req, res) => {
         var dept=query1Result[0].department;
         var batch=query1Result[0].batch;
         var checkVal1='verified';
-        var checkVal2='complted';
+        var checkVal2='completed';
+        var checkVal3='rejected';
         //console.log('cid='+collegeid+',dept='+dept+',batch='+batch+',status='+pending)
         const query2 = `SELECT 
               student.name AS name, student.id AS studentId, requests.formname AS formname,
               requests.appid AS appid, student.batch AS batch, student.department AS dept, requests.date AS date 
-              FROM student JOIN requests ON student.collegeid = requests.collegeid AND student.collegeid = ?  AND student.id=requests.stdid AND student.department=? AND student.batch=? AND requests.tutor IN(?,?)`;
-        const query2Result = await query(query2, [collegeid,dept,batch,checkVal1,checkVal2]);
+              FROM student JOIN requests ON student.collegeid = requests.collegeid AND student.collegeid = ?  AND student.id=requests.stdid AND student.department=? AND student.batch=? AND requests.tutor IN(?,?,?)`;
+        const query2Result = await query(query2, [collegeid,dept,batch,checkVal1,checkVal2,checkVal3]);
         //console.log(query2Result);
         res.render('verified-requests',{id:req.query.id,applications:query2Result});
     });
@@ -930,14 +931,15 @@ app.get('/hod/:name', isAuth, (req, res) => {
         var collegeid=query1Result[0].collegeid;  
         var dept=query1Result[0].department;   
         var checkVal1='verified';
-        var checkVal2='complted';
+        var checkVal2='completed';
+        var checkVal3='rejected';
         console.log('cid='+collegeid+',dept='+dept+'status='+pending)
         const query2 = `SELECT
               student.collegeid AS collegeId, student.id AS studentId,requests.formname AS formname,
               requests.appid AS appid, student.batch AS batch, student.department AS dept ,requests.date AS date 
               FROM student JOIN requests ON student.collegeid = requests.collegeid  AND 
-              student.id=requests.stdid AND student.collegeid =?  AND student.id=requests.stdid  AND student.department=? AND requests.hod IN(?,?)`;
-        const query2Result = await query(query2, [collegeid,dept,checkVal1,checkVal2]);
+              student.id=requests.stdid AND student.collegeid =?  AND student.id=requests.stdid  AND student.department=? AND requests.hod IN(?,?,?)`;
+        const query2Result = await query(query2, [collegeid,dept,checkVal1,checkVal2,checkVal3]);
         console.log(query2Result);
         res.render('pending-requests',{id:req.query.id,applications:query2Result});
       });
@@ -949,12 +951,13 @@ app.get('/hod/:name', isAuth, (req, res) => {
         var collegeid=query1Result[0].collegeid;
         var checkVal1='verified';
         var checkVal2='completed';
+        var checkVal3='rejected';
         console.log(collegeid)
         const query2 = `SELECT 
         student.name AS name, student.id AS studentId, requests.formname AS formname,
         requests.appid AS appid, student.batch AS batch, student.department AS dept, requests.date AS date 
-        FROM student JOIN requests ON student.collegeid = requests.collegeid AND student.collegeid = ? AND student.id=requests.stdid AND requests.principal IN (?,?)`;
-        const query2Result = await query(query2, [collegeid,checkVal1,checkVal2]);
+        FROM student JOIN requests ON student.collegeid = requests.collegeid AND student.collegeid = ? AND student.id=requests.stdid AND requests.principal IN (?,?,?)`;
+        const query2Result = await query(query2, [collegeid,checkVal1,checkVal2,checkVal3]);
         console.log(query2Result);
         res.render('verified-requests',{applications:query2Result});
         
@@ -963,13 +966,13 @@ app.get('/hod/:name', isAuth, (req, res) => {
    app.get('/office-verified-requests',isAuth,async(req,res)=>{ 
             
             var checkVal1='verified';
-            var checkVal2='complted';
-
+            var checkVal2='completed';
+            var checkVal3='rejected';
             const query1 = `SELECT 
                     student.name AS name, student.id AS studentId, requests.formname AS formname,
                     requests.appid AS appid, student.batch AS batch, student.department AS dept, requests.date AS date 
-                    FROM student JOIN requests ON student.collegeid = requests.collegeid AND student.collegeid = ?  AND student.id=requests.stdid AND  requests.office IN(?,?)`;
-            const query1Result = await query(query1, [req.query.id,checkVal1,checkVal2]);
+                    FROM student JOIN requests ON student.collegeid = requests.collegeid AND student.collegeid = ?  AND student.id=requests.stdid AND  requests.office IN(?,?,?)`;
+            const query1Result = await query(query1, [req.query.id,checkVal1,checkVal2,checkVal3]);
             console.log(query1Result);
             res.render('verified-requests',{id:req.query.id,applications:query1Result}); 
           
