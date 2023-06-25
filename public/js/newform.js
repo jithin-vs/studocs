@@ -14,7 +14,7 @@ var text = 1;
 function replaceWithInputField(content) {
 var replacedContent = content.replace(/#(\w+)/g, function (match, followingWord) {
  var inputId = "text" + (text++);
- return '<input type="text" value="' + followingWord + '" class="' + inputId + '">';
+ return '<input type="text" value="' + followingWord + '" class="' + inputId + '"requred>';
 });
 return replacedContent;
 }
@@ -48,7 +48,6 @@ document.querySelector("#letter-preview .end").innerHTML = replaceWithInput(endC
 
 // Get all the input fields and paragraphs with class names starting with "text"
 $(document).ready(function() {
-// Bind event handler to all input fields with class names starting with "textn"
 $('body').on('input', 'input[class^="text"]', function() {
  var newValue = $(this).val();
  var className = $(this).attr('class');

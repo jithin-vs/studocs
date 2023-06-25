@@ -16,7 +16,7 @@ console.log(ending);
   var content = "<strong>From,</strong> <div class='from'>&nbsp&nbsp" + from + "</div><div class='date'>" +
     date + "</div>" + "<strong>To,</strong><br> <div class='to'>&nbsp&nbsp" + to + "</div><br>" +
     "<div class='sub'><strong>Sub:</strong>" + subject + "</div><br>sir/madam,<br><div class='para1'>&nbsp&nbsp&nbsp&nbsp " +
-    paragraph1 + "</div><div class='para2'>&nbsp&nbsp&nbsp&nbsp" + paragraph2 + "</div><br><div class='end'>" + ending +"</div>";
+    paragraph1 + "</div><div class='para2'>&nbsp&nbsp&nbsp&nbsp" + paragraph2 + "</div><br><div class='end'>" + ending +"</div><br><div class=remarks><\div>";
 
   var regex = /#\w+/g;
   var highlightedContent = content.replace(regex, '<span style="color: red;">$&</span>');
@@ -65,29 +65,49 @@ function getCurrentDate() {
 }
 
 function generatePDF() {
-  const doc = new jsPDF('p', 'pt', 'a4');
+  var panelElement = document.getElementById('letter-preview');
+  
+  // Calculate the total height of the scrollable panel
+  var totalHeight = panelElement.scrollHeight;
+  
+  // Set the height of the panel to its full content height
+  panelElement.style.height = totalHeight + 'px';
 
-  // Define the dimensions of the A4 page
-  const pageWidth = doc.internal.pageSize.getWidth();
-  const pageHeight = doc.internal.pageSize.getHeight();
-
-  // Define the position and size of the content div
-  const contentX = 20;
-  const contentY = 20;
-  const contentWidth = pageWidth - 2 * contentX;
-  const contentHeight = pageHeight - 2 * contentY;
-
-  // Get the content div element
-  const contentDiv = document.getElementById('letter-preview');
-
-  // Convert the content div to a canvas
-  html2canvas(contentDiv).then((canvas) => {
-    const contentDataURL = canvas.toDataURL('image/png');
-
-    // Add the content image to the PDF
-    doc.addImage(contentDataURL, 'PNG', contentX, contentY, contentWidth, contentHeight);
-
-    // Save the PDF
-    doc.save('download.pdf');
+  // Create a new jsPDF instance
+  var pdf = new jsPDF({
+    orientation: 'portrait',
+    unit: 'pt',
+    format: 'a4'
   });
+
+  // Function to capture the scrollable panel as an image
+  function capturePanelImage() {
+    panelElement.style.border = 'none';
+    html2canvas(panelElement).then(canvas => {
+      var imageData = canvas.toDataURL('image/png',1.0);
+      var imgWidth = pdf.internal.pageSize.getWidth();
+    var imgHeight = pdf.internal.pageSize.getHeight();
+      
+      // Add the captured image to the PDF
+      pdf.addImage(imageData, 'PNG', 0, 0, imgWidth, imgHeight, '', 'FAST');
+
+      // Check if there's more content to capture
+      if (panelElement.scrollTop + panelElement.offsetHeight < totalHeight) {
+        // Scroll down to the next position
+        panelElement.scrollTop += panelElement.offsetHeight;
+
+        // Call the capturePanelImage function recursively after a delay
+        setTimeout(capturePanelImage, 500); // Adjust the delay if needed
+      } else {
+        // Save the PDF file
+        pdf.save('download.pdf');
+
+        // Reset the panel height to its original value
+        panelElement.style.height = '';
+      }
+    });
+  }
+
+  // Call the capturePanelImage function to start capturing the panel content
+  capturePanelImage();
 }

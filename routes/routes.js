@@ -1228,7 +1228,9 @@ app.get('/hod/:name', isAuth, (req, res) => {
           case 'tutor'    : nextUser = 'hod' ;       break;
           case 'hod'      : nextUser = 'principal' ; break;
           case 'principal': nextUser = 'office' ;    break;
-        }    
+        }   
+        if(user ==='office')
+           nextUser=user; 
         console.log(nextUser+','+appid);
        // Check the flag column value before executing the update query
           const checkQuery = `SELECT ${user},${nextUser} FROM requests WHERE appid =?`;  
@@ -1732,23 +1734,9 @@ app.get('/hod/:name', isAuth, (req, res) => {
                       console.error('Error saving attachment to the database');
                       res.status(500).send('Internal Server Error'+error);
                     } else {
-                      var name = results1[0].name;
-                      var admno = results1[0].admno;
-                      var regno = results1[0].id;
-                      var dept = results1[0].department;
-                      var phno = results1[0].phno;
-                      var addr = results1[0].address;
-                      var email = results1[0].email;
-                      var photo = results1[0].photo;
               
-                      db.connection.query('SELECT * FROM attachment where stdid=?',[req.params], function (error, results2) {
-                        if (error) {
-                          console.error('Error retrieving attachments from the database');
-                          res.status(500).send('Internal Server Error');
-                        } else {
-                          res.render('student', { name, admno, regno, dept, phno, addr, email, photo, attachments: results2 });
-                        }
-                      });
+                          res.redirect(`/student/${regno}`);
+
                     }
                   });
                 })

@@ -42,7 +42,8 @@
 			  <a class="nav-link active btn2" href="#" data-target="#pub" data-toggle="modal">Publish</a>
 			</li>
 			<li class="nav-item">
-			  <a class="nav-link active btn" onclick="generatePDF()">Download <i class="fa fa-download"></i></a>
+        <a class="nav-link active btn" onclick="generatePDF()">Download <i class="fa fa-download"></i></a>
+			  <!-- <a class="nav-link active btn" onclick="generatePDF()">Download <i class="fa fa-download"></i></a> -->
 			</li>
 		  </ul>
 		</div>
@@ -142,6 +143,8 @@
   })
 </script>
 <script>
+
+
 function sendDivContent() {
   function getURLParameters() {
     const queryString = window.location.search.slice(1);
