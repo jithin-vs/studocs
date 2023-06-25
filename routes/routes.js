@@ -796,7 +796,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
                 student.batch AS batch,
                 student.department AS dept,
                 forms.name AS formname,
-                forms.dest AS dest
+                forms.dest AS dest 
               FROM
                 student
               JOIN
@@ -827,8 +827,8 @@ app.get('/hod/:name', isAuth, (req, res) => {
         var pending='pending';
         // Insert the values into the "requests" table
         const insertQuery = `INSERT INTO requests 
-                             (collegeId, stdid, formid, appid,date,dept,request_data,formname,${dest},tutor,dest)
-                             VALUES (?,?,?,?,NOW(),?,?,?,?,?,?)`;
+                             (collegeId, stdid, formid, appid,date,dept,request_data,formname,${dest},tutor,dest,insert_time)
+                             VALUES (?,?,?,?,NOW(),?,?,?,?,?,?,NOW())`;
         const insertValues = query2Result.map(row => [row.collegeId, row.studentId, row.formId, uniqueId, row.dept, content, row.formname,final,pending,row.dest]);
         const flattenedValues = insertValues.flat(); // Flatten the nested arrays
         await query(insertQuery, flattenedValues);
@@ -869,9 +869,8 @@ app.get('/hod/:name', isAuth, (req, res) => {
         student.name AS name, student.id AS studentId, requests.formname AS formname,
         requests.appid AS appid, student.batch AS batch, student.department AS dept, requests.date AS date 
         FROM student JOIN requests ON student.collegeid = requests.collegeid AND student.collegeid = ?  
-        AND student.id=requests.stdid AND student.department=? AND student.batch=? AND student.id=? AND requests.${dest} IN(?,?,?)`;
-    const query2Result = await query(query2, [collegeid,dept,batch,req.query.id,checkVal1,checkVal2,checkVal3]);   
-    console.log(query2Result)
+        AND student.id=requests.stdid AND student.department=? AND student.batch=? AND student.id=? AND (requests.${dest} IN(?,?,?) OR requests.tutor=? OR requests.hod=? OR requests.principal=? OR requests.office=?)`;
+    const query2Result = await query(query2, [collegeid,dept,batch,req.query.id,checkVal1,checkVal2,checkVal3,checkVal3,checkVal3,checkVal3,checkVal3]);   
     res.render('student_verified_requests',{applications:query2Result});
    }catch(err){
     console.log(err); 
@@ -1072,27 +1071,29 @@ app.get('/hod/:name', isAuth, (req, res) => {
         var active1=" ",active2=" ",active3=" ",active4=" ";
         try{
           const query1= `
-          SELECT
+          SELECT distinct
           student.collegeid AS collegeid, student.id AS studentid, student.batch AS batch,
-          student.department AS dept, requests.dest AS dest
+          student.department AS dept, requests.dest AS dest 
           FROM student
           JOIN requests ON student.collegeid = requests.collegeid AND student.id = requests.stdid
           WHERE student.id = ?
         `;
           const query1Result = await query(query1, [req.params.name]);
+          console.log(req.params.name)
           var collegeid=query1Result[0].collegeid; 
-          var dept=query1Result[0].department;
+          var dept=query1Result[0].dept;
           var batch=query1Result[0].batch;
           var dest=query1Result[0].dest;
-          console.log(query1Result);
+          console.dir(query1Result);
           var pending1='pending';
           var pending2='final:pending'; 
           const query2 = `SELECT 
-          student.name AS name, student.id AS studentId, requests.formname AS formname,
+          student.name AS name, student.id AS studentId, requests.formname AS formname,requests.formid AS formid,
           requests.appid AS appid, student.batch AS batch, student.department AS dept, requests.date AS date 
           FROM student JOIN requests ON student.collegeid = requests.collegeid AND student.collegeid = ?  
-          AND student.id=requests.stdid AND student.department=? AND student.batch=? AND student.id=? AND requests.${dest} IN(?,?)`;
-          const query2Result = await query(query2, [collegeid,dept,batch,req.params.name,pending1,pending2]);      
+          AND student.id=requests.stdid AND student.department=? AND student.batch=? AND student.id=? AND (requests.${dest} IN(?,?) OR requests.tutor=? OR requests.hod=? OR requests.principal=? OR requests.office=?)`;
+          const query2Result = await query(query2, [collegeid,dept,batch,req.params.name,pending1,pending2,pending1,pending1,pending1,pending1]);   
+          console.log(query2Result) 
           const applications =query2Result;
           active1 = "";
           active2 = "";
@@ -1106,7 +1107,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
         }catch(err){
           console.log(err); 
         }
-
+   
     });
     //ststus
     app.post('/fetch-request-data', (req, res) => {
@@ -1141,8 +1142,6 @@ app.get('/hod/:name', isAuth, (req, res) => {
       active3: active3,
       active4: active4
     };
-  
-          console.log(responseData);
         
           res.send({ requestData: requestData, responseData: responseData });
         } 
