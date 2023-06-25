@@ -734,10 +734,10 @@ app.get('/hod/:name', isAuth, (req, res) => {
           }
          getData(); 
       });   
-   
+    
       /*-----------REQUEST HANDLING ROUTES ------*/
       
-  // SENDING REQUEST ROUTE FOR STUDENTS    
+  // SENDING REQUEST ROUTE FOR STUDENTS        
   app.get('/requests', isAuth,async(req, res) => {
     let id=req.query.id;
     const query1 = 'SELECT collegeid FROM student WHERE  id = ?';

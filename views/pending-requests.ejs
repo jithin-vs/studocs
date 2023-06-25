@@ -122,8 +122,8 @@
         <div id="textAreaContainer" style="display: none;">
             <div id="textAreaWindow">
                 <span id="closeButton">&#10006;</span>
-                <textarea id="myTextArea"  rows="3" style="resize: none; border-radius: 5px;" placeholder="Remarks"></textarea>
-                <button id="button1" data-target="#myModa" data-toggle="modal" onclick="redirectToVerifyForm()">Verify</button>
+                <textarea id="myTextArea" rows="3" style="resize: none; border-radius: 5px;" placeholder="Remarks"></textarea>
+                <button id="button1" onclick="redirectToVerifyForm()">Verify</button>
             </div>
         </div>
         <button class="btn btn-secondary scc" style="background-color: blue;" id="button2" disabled>Forward</button>
@@ -308,14 +308,23 @@
             }
 
         function redirectToVerifyForm() {
+           const textareaValue = document.getElementById('myTextArea').value;
+            // Append the desired string
+            const modifiedText = 'Verified by tutor: ' + textareaValue;
+            console.log(modifiedText);
+
             var userurl= getURLParameters();
             console.log("user="+userurl.user)
-            const url = `/verify-form?appid=${selectedFormId}&id=${userurl.id}&user=${userurl.user}`;
+           // const url = `/verify-form?appid=${selectedFormId}&id=${userurl.id}&user=${userurl.user}`;
             window.location.href = url;
           }
        function redirectToRejectForm() {
-            var userurl= getURLParameters();
-            console.log("user="+userurl.user)
+              var userurl= getURLParameters();
+              const textareaValue = document.getElementById('myTextArea').value;
+              // Append the desired string
+              const modifiedText = 'Rejected by tutor: ' + textareaValue;
+              console.log(modifiedText);  
+              console.log("user="+userurl.user)
             const url = `/reject-form?appid=${selectedFormId}&id=${userurl.id}&user=${userurl.user}`;
             window.location.href = url;
           }
