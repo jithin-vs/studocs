@@ -14,8 +14,6 @@
   <link rel="stylesheet" href="./css/addtemp.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
   <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'>
-  <link rel="stylesheet" href="/css/sweetalert2.min.css">
-  <script src="/js/sweetalert2.min.js"></script>
 
   <style>
     .card {
@@ -122,12 +120,8 @@
       if (name !== null && name !== '') {
         const result = checkNameExists(applications, name);
         if (result === 'Name already exists!') {
-          // Display a popup notification using SweetAlert
-          Swal.fire({
-            title: 'Name Exists',
-            text: 'Name already exists!',
-            icon: 'error'
-          });
+            // Display a popup notification using the alert() function
+                alert('Name already exists!');
         } else {
           // Proceed with creating the card
           createCard(name);
