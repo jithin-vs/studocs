@@ -1212,7 +1212,7 @@ app.get('/hod/:name', isAuth, (req, res) => {
           if(err) {
             throw err; 
           } else{
-             res.redirect(`/addtemplate?id=${collegeid}`);
+             res.redirect(`/addtemplate?id=${collegeid}`); 
           }    
        });
        });

@@ -28,7 +28,10 @@
     font-family: "Jost", sans-serif;
     padding-top: 50px;
 }
-
+.form-row,
+.k{
+    font-family: "Jost", sans-serif ;
+}
 .panel {
     border: 2px solid #000000;
     padding: 20px;
