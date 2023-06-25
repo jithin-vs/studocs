@@ -147,6 +147,7 @@
   $(".f2").click(function(){
   $("#text2").toggle();
   })
+  window.addEventListener("load", loadValuesFromPreview);
 </script>
 <script>
 
@@ -198,6 +199,31 @@ function sendDivContent() {
 }
 
   
+</script>
+<script>
+function loadValuesFromPreview() {
+  var from = document.querySelector('.from');
+  var date = document.querySelector('.date');
+  var to = document.querySelector('.to');
+  var subject = document.querySelector('.subject');
+  var para1 = document.querySelector('.para1');
+  var para2 = document.querySelector('.para2');
+  var ending = document.querySelector('.end');
+
+  document.getElementById('text1').value = from ? from.innerText.trim().replace(/<br>/g, '\n') : '';
+  document.getElementById('text2').value = date ? date.innerText.trim().replace(/<br>/g, '\n') : '';
+  document.getElementById('text3').value = to ? to.innerText.trim().replace(/<br>/g, '\n') : '';
+  document.getElementById('text4').value = subject ? subject.innerText.trim().replace(/<br>/g, '\n') : '';
+  document.getElementById('text6').value = para1 ? para1.innerText.trim().replace(/<br>/g, '\n') : '';
+  document.getElementById('text7').value = para2 ? para2.innerText.trim().replace(/<br>/g, '\n') : '';
+  document.getElementById('text8').value = ending ? ending.innerText.trim().replace(/<br>/g, '\n') : '';
+}
+
+window.onload = function() {
+  loadValuesFromPreview();
+};
+
+
 </script>
 </body>
 </html>
