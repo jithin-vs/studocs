@@ -295,7 +295,7 @@ var routes =function(app,isAuth,encoder){
  });  
     }); 
 
-
+ 
     /*------dashboards-------*/   
 
     //staffadvisor
@@ -307,8 +307,8 @@ var routes =function(app,isAuth,encoder){
         const query1Result = await query(query1, [username]);
         console.log(query1Result)
         var collegeid=query1Result[0].collegeid;
-        var dept=query1Result[0].department;
-        var batch=query1Result[0].batch;  
+        var dept=query1Result[0].department; 
+        var batch=query1Result[0].batch;   
         const pending='pending';
         //console.log('cid='+collegeid+',dept='+dept+',batch='+batch+',status='+pending)
         const query2 = `SELECT 
@@ -1271,12 +1271,21 @@ var routes =function(app,isAuth,encoder){
      })
 
       //REJECT FORM BY ADMINISTRATORS
-     app.get('/reject-form',async(req,res)=>{ 
+      app.get('/reject-form',async(req,res)=>{ 
         var appid=req.query.appid;
         var user=req.query.user;
- 
+        const query1 = `SELECT 
+        student.name AS name, student.id AS studentId,
+        requests.appid AS appid,student.email AS email
+        FROM student JOIN requests ON student.collegeid = requests.collegeid AND student.id=requests.stdid AND 
+        requests.appid=?`;
+       const query1Result = await query(query1, [req.query.appid]);
+       console.log(query1Result);
+       const name=query1Result[0].name;
+       const email=query1Result[0].email;
+       mail.sendrejectEmail(name,appid,email);
         console.log('appid='+appid);
-          try {
+          try { 
             const updateQuery = `UPDATE requests SET ${user} = 'rejected' WHERE appid = ?`;
                 try {
                   const updateResult = await query(updateQuery, [appid]);  
@@ -1439,9 +1448,10 @@ var routes =function(app,isAuth,encoder){
         //REGISTER COLLEGE
         app.post('/register-college',(req,res)=>{
              
-           var{name,email}=req.body;
-           mail.sendregisterEmail(name,email);
-        })  
+          var{name,email,subject,message}=req.body;
+          mail.sendregisterEmail(name,email);
+          res.redirect('/home');
+       })  
          
 
       app.post('/deleteuser', encoder, (req, res) => { 
@@ -1578,7 +1588,7 @@ var routes =function(app,isAuth,encoder){
       //OTP VERIFICATION
       app.get('/otpverify',isAuth,(req, res) => {
         const jsonData = req.query.data;
-        const data = JSON.parse(jsonData); 
+        const data = JSON.parse(jsonData);  
         const formid = data[0].formid; // Accessing the 'formid' property
         const stdid = data[0].id; 
        
@@ -1589,13 +1599,13 @@ var routes =function(app,isAuth,encoder){
             const email = results.length > 0 ? results[0].email : '';
             const name=results.length>0?results[0].name:''; // Get the template content or set it as an empty string if not found
             var genOtp=verify.generateOTP();        
-             // mail.sendOTPEmail(name,email,genOtp);
+              mail.sendOTPEmail(name,email,genOtp);
               req.session.otp = genOtp; 
               console.log(genOtp)
               //const jsonData = JSON.stringify(data);
               res.render('otpverify', {otp:genOtp,jsonData});
           }
-        });;
+        });;    
        });
 
       //OTP VERIFICATION

@@ -84,16 +84,11 @@
       </div>
     <div class="col-sm-6 side2">
       <div class="d-flex justify-content-center align-items-center">
-        <div class="arrow-left">
-          <i class="fa fa-arrow-circle-left fa-3x" ></i>
-        </div>
-        <div class="col-sm-6 panel"id="displayContainer">
+        <div class="col-sm-6 panel"id="displayContainer" style="margin-left: 20%;">
           <!-- Existing code for the panel -->
         </div>
-        <div class="arrow-right">
-          <i class="fa fa-arrow-circle-right fa-3x" ></i>
+        <div class="container-fluid col-lg-3" id="attach" ></div>
         </div>
-      </div>
       <br>
       <div class="subm">
         <button class="btn btn-secondary scc" style="background-color:rgb(2, 169, 2);" id="button3">Verify</button>
@@ -114,6 +109,7 @@
             </div>
           </div>
       </div>
+     
     </div>
   </div>
               
@@ -187,6 +183,7 @@
               document.addEventListener('DOMContentLoaded', function() {
   const viewButtons = document.querySelectorAll('.view-button');
   const displayContainer = document.getElementById('displayContainer');
+  const attachContainer = document.getElementById('attach'); // Get the attach container element
 
   viewButtons.forEach(function(button) {
     button.addEventListener('click', function(event) {
@@ -201,24 +198,33 @@
           displayContainer.innerHTML = html;
         })
         .catch(error => console.error(error));
-        fetch(`/add_attach?id=101`)
-    .then(response => response.json())
-    .then(data => {
-      attachment.innerHTML = generateAttachmentLinks(data);
-    })
-    .catch(error => console.error(error));
 
-  function generateAttachmentLinks(data) {
-    let links = '';
-    data.forEach(attachment => {
-      const link = `<a href="${attachment.file}">${attachment.attaname}</a><br>`;
-      links += link;
+      // Make a request to fetch the attachments
+      fetch(`/add_attach?id=${selectedFormId}`)
+        .then(response => response.json())
+        .then(data => {
+          console.log(data);
+          let links = '';
+          data.forEach(attachment => {
+            const encodedFile = encodeURIComponent(attachment.file);
+            const url = `/download?file=${encodedFile}`;
+            const link = `<a href="${url}" target="_blank">${attachment.attaname}</a><br>`;
+            links += link;
+          });
+          console.log(links);
+          // Update the HTML content of the attach container with the links and styling
+          attachContainer.innerHTML = `
+            <h4>Attachments</h4>
+            <div style="border: 1px solid black; border-radius:5px; box-shadow: 0px 2px 15px rgba(42, 0, 250, 0.2); padding:5px; min-height:25px">
+              ${links}
+            </div>
+          `;
+        })
+        .catch(error => console.error(error));
     });
-    return links;
-  }
+  });
 });
-});
-});
+
                    
         const button1 = document.getElementById('button1');
         const button2 = document.getElementById('button2');
