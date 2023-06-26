@@ -71,26 +71,22 @@
         <table class="table">
           <thead>
             <tr>
-              <th>ID</th>
+              <th style="padding-left: 30px;">ID</th>
               <th>Form Name</th>
               <th>Applicant Name</th>
               <th>Submit Date</th>
-              <th>Action</th>
             </tr>
           </thead>
         <tbody>
         <% applications.forEach(function(application) { %>
-            <tr>
-              <td ><%= application.studentId%></td>
+            <tr >
+              <td style="padding-left: 30px;" ><%= application.studentId%></td>
               <td ><%= application.appid %></td>
               <td ><%= application.name %></td>
               <% const dateFromDatabase = application.date %>
               <% const options = { day: '2-digit', month: '2-digit', year: 'numeric' }; %>
               <% const formattedDate = dateFromDatabase ? dateFromDatabase.toLocaleDateString(undefined, options) : null; %>
               <td data-toggle="mo" data-target="#myMo"><%= formattedDate %></td>
-              <td>
-                <button type="button" class="btn btn-success" data-toggle="dwd" data-target="#dwd">view</button>
-              </td>
             </tr>
         <% }); %>
         </tbody>

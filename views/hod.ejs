@@ -72,28 +72,29 @@
           <thead>
             <tr>
               <tr>
-                <th>ID</th>
+                <th style="padding-left: 20px;">ID</th>
                 <th>Application Name</th>
                 <th>Name</th>
                 <th>Batch</th>
                 <th>Dept</th>
                 <th>Submit date</th>
-                <th>Action</th>
+                
               </tr>
             </tr>
           </thead>
         <tbody>
         <% applications.forEach(function(application) { %>
             <tr>
-              <td data-toggle="mod" data-target="#myMod"><%= application.form_id %></td>
+              <td style="padding-left: 20px;"data-toggle="mod" data-target="#myMod"><%= application.formid %></td>
               <td data-toggle="moda" data-target="#myModa"><%= application.name %></td>
-              <td data-toggle="moda" data-target="#myM"><%= applicant.name %></td>
-              <td data-toggle="moda" data-target="#myModa"><%= applicant.batch %></td>
-              <td data-toggle="moda" data-target="#myModa"><%= applicant.dept %></td>
-              <td data-toggle="mo" data-target="#myMo"><%= application.date %></td>
-              <td>
-                <button type="button" class="btn btn-success" data-toggle="dwd" data-target="#dwd">view</button>
-              </td>
+              <td data-toggle="moda" data-target="#myM"><%= application.name %></td>
+              <td data-toggle="moda" data-target="#myModa"><%= application.batch %></td>
+              <td data-toggle="moda" data-target="#myModa"><%= application.dept %></td>
+              <% const dateFromDatabase = application.date %>
+                    <% const options = { day: '2-digit', month: '2-digit', year: 'numeric' }; %>
+                    <% const formattedDate = dateFromDatabase ? dateFromDatabase.toLocaleDateString(undefined, options) : null; %>
+                    <td ><%= formattedDate %></td>
+              
             </tr>
         <% }); %>
         </tbody>

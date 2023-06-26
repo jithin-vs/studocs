@@ -46,16 +46,16 @@
             <div class="imag" style="width: 225px; height: 225px; object-fit: cover; overflow: hidden;">
               <img src="/<%= Photo%>" style="width: 100%; height: 100%;object-fit: cover; border-radius: 50%; box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);"><br><br>
             </div>
-             <b> &nbsp;NAME&nbsp;&nbsp;&nbsp;:<%= Name%></b>
+             <b> &nbsp;NAME&nbsp;&nbsp;&nbsp;:<%= tutorData.name%></b>
           </div>
           <div class="col-lg-6 address" ><b>
-              ID&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:<%= Id%><br>
-              ADDRESS&nbsp;&nbsp;&nbsp;&nbsp;  :<%= Address%><br>
-              PHONE NO &nbsp;&nbsp;:<%= Mobile%> <br>
-              EMAIL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:<%= Email%><br>
+              ID&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:<%= tutorData.id%><br>
+              ADDRESS&nbsp;&nbsp;&nbsp;&nbsp;  :<%= tutorData.address%><br>
+              PHONE NO &nbsp;&nbsp;:<%= tutorData.phno%> <br>
+              EMAIL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:<%= tutorData.email%><br>
             </b>
             <div class="edit">
-              <a href="/pform/<%= Id%>">Edit</a> 
+              <a href="/pform/<%= tutorData.id%>">Edit</a> 
             </div> </div><br>
             
         </div>
@@ -79,11 +79,14 @@
         <tbody>
         <% applications.forEach(function(application) { %>
             <tr>
-              <td data-toggle="mod" data-target="#myMod"><%= application.form_id %></td>
+              <td data-toggle="mod" data-target="#myMod"><%= application.formid %></td>
+              <td data-toggle="moda" data-target="#myModa"><%= application.appid%></td>
               <td data-toggle="moda" data-target="#myModa"><%= application.name %></td>
-              <td data-toggle="moda" data-target="#myModa"><%= applicant.name %></td>
-              <td data-toggle="mo" data-target="#myMo"><%= application.date %></td>
-              <td data-toggle="mo" data-target="#myMo"><%= applicant.department %></td>
+              <% const dateFromDatabase = application.date %>
+              <% const options = { day: '2-digit', month: '2-digit', year: 'numeric' }; %>
+              <% const formattedDate = dateFromDatabase ? dateFromDatabase.toLocaleDateString(undefined, options) : null; %>
+              <td data-toggle="mo" data-target="#myMo"><%= formattedDate %></td>
+              <td data-toggle="mo" data-target="#myMo"><%= application.department %></td>
               <td>
                 <button type="button" class="btn btn-success" data-toggle="dwd" data-target="#dwd">view</button>
               </td>

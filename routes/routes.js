@@ -343,12 +343,12 @@ var routes =function(app,isAuth,encoder){
       var pending2='final:pending';  
       //console.log('cid='+collegeid+',dept='+dept+',batch='+batch+',status='+pending)
       const query2 = `SELECT 
-            student.name AS name, student.id AS studentId, requests.formname AS formname,
+            student.name AS name, student.id AS studentId, requests.formname AS formname,requests.formid AS formid,
             requests.appid AS appid, student.batch AS batch, student.department AS dept, requests.date AS date 
             FROM student JOIN requests ON student.collegeid = requests.collegeid AND  student.id=requests.stdid AND student.collegeid = ? AND student.department=?  AND requests.hod IN(?,?)`;
       const query2Result = await query(query2, [collegeid,dept,pending1,pending2]);
       console.log(query2Result);
-      const query3=`SELECT name, id, phno, department, address, email, photo FROM hod WHERE id = `
+      const query3=`SELECT name, id, phno, department, address, email, photo FROM hod WHERE id =? `
       const query3Result = await query(query3, [username]);
       const tutorData=query3Result[0];
       const imagePath = tutorData.photo ? path.relative('public', tutorData.photo) : 'default/path/to/image.jpg';
@@ -359,7 +359,7 @@ var routes =function(app,isAuth,encoder){
       console.log(err);
       res.send('Server error: ' + err.message);
     }
-  } else {
+  } else { 
     res.send('Unauthorized user');
   }
     });
@@ -385,13 +385,13 @@ var routes =function(app,isAuth,encoder){
                 FROM student JOIN requests ON student.collegeid = requests.collegeid AND  student.id=requests.stdid AND student.collegeid = ?  AND requests.principal IN(?,?)`;
           const query2Result = await query(query2, [collegeid,pending1,pending2]);
           console.log(query2Result);
-          const query3=`SELECT name, id, phno, department, address, email, photo FROM hod WHERE id = `
+          const query3=`SELECT name, id, phno, address, email, photo FROM principal WHERE id =? `
           const query3Result = await query(query3, [username]);
           const tutorData=query3Result[0];
           const imagePath = tutorData.photo ? path.relative('public', tutorData.photo) : 'default/path/to/image.jpg';
           const Photo = imagePath.replace(/\\/g, '/'); // Convert backslashes to forward slashes for URL compatibility
           const user='principal';
-          res.render('principal', { Photo, tutorData, applications:query2Result,user });
+          res.render('principal', { Photo, tutorData, applications:query2Result,user,Id:tutorData.id });
         }catch(err)
         {
             console.log(err);
