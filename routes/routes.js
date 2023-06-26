@@ -432,7 +432,7 @@ var routes =function(app,isAuth,encoder){
          }); 
         }catch(err)
         {
-            console.log(err);
+            console.log(err); 
             res.send('server error');  
         }
     
@@ -513,7 +513,7 @@ var routes =function(app,isAuth,encoder){
         
         const query1 = 'SELECT collegeid,department FROM hod WHERE  id = ?';
         const query1Result = await query(query1, [req.query.id]);
-
+        console.log(req.query.id)
         const collegeid=query1Result[0].collegeid;  
         const department=query1Result[0].department;
 
@@ -571,18 +571,19 @@ var routes =function(app,isAuth,encoder){
     
      //add new HOD   
      app.get('/hodadd',isAuth,async(req,res)=>{  
-            
+      console.log("at route="+req.query.id)    
       const query1 = 'SELECT collegeid FROM principal WHERE  id = ?';
       const query1Result = await query(query1, [req.query.id]);
-      const collegeid = query1Result[0].collegeid;
+      console.log(query1Result)
+       collegeid = query1Result[0].collegeid;
 
       const query2 = 'SELECT * from hod WHERE  collegeid = ?';
       const query2Result = await query(query2, [collegeid]); 
 
       res.render('addnewhod',{applications:query2Result,id:req.query.id});
     });
-
-     app.post('/hodadd',encoder,(req,res)=>{ 
+  
+     app.post('/hodadd',encoder,(req,res)=>{      
         
         var principalid=req.query.id;
         var {name,id,dept,email}=req.body;   
@@ -955,11 +956,11 @@ var routes =function(app,isAuth,encoder){
     });
 
     //PENDING REQUESTS FOR TUTOR
-   app.get('/tutor-pending-requests',isAuth,async(req,res)=>{         
+   app.get('/tutor-pending-requests',isAuth,async(req,res)=>{          
         
       const query1 = 'SELECT collegeid,batch,department FROM tutor WHERE  id = ?';
       const query1Result = await query(query1, [req.query.id]);
-      console.log(query1Result)
+      console.log(query1Result) 
       var collegeid=query1Result[0].collegeid;
       var dept=query1Result[0].department;
       var batch=query1Result[0].batch;  
@@ -1441,34 +1442,35 @@ var routes =function(app,isAuth,encoder){
            var{name,email}=req.body;
            mail.sendregisterEmail(name,email);
         })  
-       
+         
 
       app.post('/deleteuser', encoder, (req, res) => { 
         var id = req.query.id; 
         var user = req.query.user;
         var returnid=req.query.returnid;
-        console.log('user'+user);
+        console.log('user='+returnid);
         console.log('hererdfxf'); 
         db.connection.query("DELETE FROM ?? WHERE id = ?", [req.query.user, req.query.id], (err, results, fields) => {
           if (err) {
             res.send('server error');    
             throw err;
-          } else {
-            if (user === 'student')
-              return res.redirect(`/studentadd?id=${id}`);
+          } else { 
+            if (user === 'student')  
+              return res.redirect(`/studentadd?id=${returnid}&user=${user}`);
             if (user === 'tutor')
-              return res.redirect(`/tutoradd?id=${returnid}`);
+              return res.redirect(`/tutoradd?id=${returnid}&user=${user}`);
             if (user === 'hod')
-              return res.redirect(`/hodadd?id=${id}`);
+              return res.redirect(`/hodadd?id=${returnid}&user=${user}`);
+              console.log(returnid)
             if (user === 'principal')
               return res.redirect(`/principaladd?id=${id}`);
           }
-        }); 
+        });   
       });
       
      //logout
       app.get('/logout',(req,res)=>{
-        req.session.destroy(function(err){  
+        req.session.destroy(function(err){    
           if(err){
             console.log(err);
             res.send('error');
@@ -1507,14 +1509,14 @@ var routes =function(app,isAuth,encoder){
       app.post('/hod/:name/search', async (req, res) => { // Specify the URL for search with the name parameter
         const searchTerm = req.body.search;
       
-        const query1 = 'SELECT collegeid, batch, department FROM  WHERE id = ?';
+        const query1 = 'SELECT collegeid, department FROM hod WHERE id = ?';
         const query1Result = await query(query1, [req.params.name]);
         const collegeid = query1Result[0].collegeid;
         const batch = query1Result[0].batch;
         const department = query1Result[0].department;
         // Perform search query
-        const query2 = 'SELECT * FROM tutor WHERE collegeid = ? AND batch = ? AND department = ? AND (name LIKE ? OR id LIKE ?)';
-        const params = [collegeid, batch, department, `%${searchTerm}%`, `%${searchTerm}%`];
+        const query2 = 'SELECT * FROM tutor WHERE collegeid = ? AND department = ? AND (name LIKE ? OR id LIKE ?)';
+        const params = [collegeid, department, `%${searchTerm}%`, `%${searchTerm}%`];
         
       
         db.connection.query(query2, params, (err, results) =>  {
@@ -1529,15 +1531,21 @@ var routes =function(app,isAuth,encoder){
       });
 
 
-      app.post('/principal/:name/search', (req, res) => { // Specify the URL for search with the name parameter
+      app.post('/principal/:name/search', async(req, res) => { // Specify the URL for search with the name parameter
         const searchTerm = req.body.search;
       
+        const query1 = 'SELECT collegeid FROM principal WHERE id = ?';
+        const query1Result = await query(query1, [req.params.name]);
+        const collegeid = query1Result[0].collegeid;
+        const batch = query1Result[0].batch;
+        const department = query1Result[0].department;
         // Perform search query
-        const query = `SELECT * FROM hod WHERE
-          name LIKE '%${searchTerm}%' OR
-          id LIKE '%${searchTerm}%'`;
+        const query2 = 'SELECT * FROM hod WHERE collegeid = ?  AND (name LIKE ? OR id LIKE ?)';
+        const params = [collegeid,`%${searchTerm}%`, `%${searchTerm}%`];
+
+        // Perform search query
       
-        db.connection.query(query, (err, results) => {
+        db.connection.query(query2, params, (err, results) =>  {
           if (err) {
             console.log(err);
             res.send('Server error: ' + err.message);
@@ -1546,7 +1554,7 @@ var routes =function(app,isAuth,encoder){
             res.render('addnewhod', { applications, id: req.params.name, searchTerm });
           }
         });
-      });
+      });  
          
       app.post('/college/:name/search', (req, res) => { // Specify the URL for search with the name parameter
         const searchTerm = req.body.search;

@@ -104,14 +104,13 @@
                 <button id="button1" onclick="redirectToVerifyForm()">Verify</button>
             </div>
         </div>
-        <button class="btn btn-secondary scc" style="background-color: blue;" id="button2" disabled>Forward</button>
 
-        <button class="btn btn-secondary scc" style="background-color: rgb(208, 66, 23);"  onclick="redirectToRejectForm()" id="button4">Reject</button>
+        <button class="btn btn-secondary scc" style="background-color: rgb(208, 66, 23);"  id="button4">Reject</button>
           <div id="textAreaContainer1" style="display: none;">
             <div id="textAreaWindow">
               <span id="closeButton1">&#10006;</span>
               <textarea id="myTextArea1"  rows="3" style="resize: none; border-radius: 5px;" placeholder="Reason for rejection"></textarea>
-              <button id="button5" data-target="#my" data-toggle="modal">Reject</button>
+              <button id="button5" data-target="#my" data-toggle="modal" onclick="redirectToRejectForm()" >Reject</button>
             </div>
           </div>
       </div>
@@ -240,35 +239,15 @@
         
         });
 
-        // Add click event listener to button2
-        button2.addEventListener('click', () => {
-        // Handle button2 click event
-        console.log('Button 2 clicked!');
-
-        });
-
-
         button3.addEventListener('click', () => {
         // Toggle the visibility of the text area container
         textAreaContainer.style.display = textAreaContainer.style.display === 'none' ? 'block' : 'none';
-        });
- 
-        view.addEventListener('click', function(event) {
-          // Call the fetchid() function to save the form ID
-
-          // Make a request to fetch the HTML content from the server
-          fetch(`/form`)
-            .then(response => response.text())
-            .then(html => {
-              // Update the HTML content of the display container
-              displayContainer.innerHTML = html;
-            })
-            .catch(error => console.error(error));
         });
         button4.addEventListener('click', () => {
         // Toggle the visibility of the text area container
         textAreaContainer1.style.display = textAreaContainer1.style.display === 'none' ? 'block' : 'none';
         });
+
 
         closeButton.addEventListener('click', () => {
         // Hide the text area container
@@ -370,7 +349,7 @@
           }
        function redirectToRejectForm() {
               var userurl= getURLParameters();
-              const textareaValue = document.getElementById('myTextArea').value;
+              const textareaValue = document.getElementById('myTextArea1').value;
               // Append the desired string
               const modifiedText = 'Rejected by '+userurl.user+': ' + textareaValue;
               console.log(modifiedText);  

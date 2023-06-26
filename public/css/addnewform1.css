@@ -115,11 +115,14 @@
   
    }
   .subm{
-    margin-left: 23%;
+    margin-left: 25%;
     margin-top: 10px;
   }
 
   .panel2 input{
     border-radius: 5px;
     margin-top: 2px;
+  }
+  .scc{
+    margin-top: 10px;
   }

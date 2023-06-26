@@ -178,14 +178,14 @@
 	</div>
     <br><br>
     <script>
-        function confirmDelete(id) {
+        function confirmDelete(id,returnid) {
     if (confirm("Are you sure you want to delete this entry?")) {
-      deleteEntry(id);
+      deleteEntry(id,returnid);
     }
   }
   
-  function deleteEntry(id) {
-    fetch(`/deleteuser?id=${id}&user=student`, {
+  function deleteEntry(id,returnid) {
+    fetch(`/deleteuser?id=${id}&user=student&returnid=${returnid}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

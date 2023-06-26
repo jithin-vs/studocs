@@ -82,18 +82,17 @@
         <table class="table">
           <thead>
             <tr>
-              <th>ID</th>
+              <th style="padding-left: 30px;">ID</th>
               <th>Form Name</th>
               <th>Applicant Name</th>
               <th>Submit Date</th>
               <th>Department</th>
-              <th>Action</th>
             </tr>
           </thead>
         <tbody>
         <% applications.forEach(function(application) { %>
             <tr>
-              <td data-toggle="mod" data-target="#myMod"><%= application.appid %></td>
+              <td style="padding-left: 30px;"data-toggle="mod" data-target="#myMod"><%= application.appid %></td>
               <td data-toggle="moda" data-target="#myModa"><%= application.formname %></td>
               <td data-toggle="moda" data-target="#myModa"><%= application.name %></td>
               <% const dateFromDatabase = application.date %>
@@ -102,9 +101,7 @@
               <td data-toggle="mo" data-target="#myMo"><%= formattedDate ? formattedDate : (formattedDate === null ? 'null' : '&nbsp;') %>
               </td>
               <td data-toggle="mo" data-target="#myMo"><%= application.dept %></td>
-              <td>
-                <button type="button" class="btn btn-success" data-toggle="dwd" data-target="#dwd">view</button>
-              </td>
+              
             </tr>
         <% }); %>
         </tbody>
